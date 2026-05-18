@@ -307,6 +307,72 @@ body.light-route-active {
   overflow: hidden;
   scroll-snap-type: none;
   overscroll-behavior: none;
+}
+
+@media print {
+  /* Hide the entire body content using visibility */
+  body {
+    visibility: hidden !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Force the report to be visible and positioned at the top */
+  #printable-report {
+    visibility: visible !important;
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 1.5cm !important;
+    background: white !important;
+    z-index: 99999 !important;
+  }
+
+  /* Ensure all children of the report are visible */
+  #printable-report * {
+    visibility: visible !important;
+  }
+
+  /* Completely remove UI elements from the print layout */
+  .print\:hidden, 
+  button, 
+  nav, 
+  header,
+  .fixed.inset-0.z-\[100\],
+  .fixed.inset-0.z-\[200\],
+  .bg-black\/70,
+  .bg-black\/60 {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Reset all scrolling and height constraints */
+  html, body, #root, main, .admin-portal-view, .member-portal-view {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    position: static !important;
+  }
+
+  /* Optimize for color printing if needed */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+.snap-container-locked {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  scroll-snap-type: none;
+  overscroll-behavior: none;
   touch-action: none;
   -ms-overflow-style: none;
   scrollbar-width: none;

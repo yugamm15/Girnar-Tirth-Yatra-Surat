@@ -96,9 +96,9 @@ export const membersDB = {
     const { data, error } = await supabase
       .from('members')
       .select('*')
-      .eq('email', email)
-      .single();
-    if (error && error.code !== 'PGRST116') throw error;
+      .ilike('email', email)
+      .maybeSingle();
+    if (error) throw error;
     return data;
   },
 
