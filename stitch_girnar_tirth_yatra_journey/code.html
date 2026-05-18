@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shri Girnar Tirth Yatra Group | Sacred Ascent</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&amp;family=Manrope:wght@200;300;400;500;600&amp;family=Cinzel:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#e6c364",
+                        "outline-variant": "#4d4637",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary-fixed-dim": "#cdc6b1",
+                        "on-primary-fixed": "#241a00",
+                        "surface-variant": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-container": "#ffc9ac",
+                        "surface-dim": "#131313",
+                        "surface": "#131313",
+                        "tertiary-container": "#b2ab97",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-container": "#444030",
+                        "inverse-primary": "#755b00",
+                        "secondary": "#ffb68c",
+                        "error": "#ffb4ab",
+                        "inverse-on-surface": "#313030",
+                        "on-primary-fixed-variant": "#584400",
+                        "surface-container-high": "#2a2a2a",
+                        "error-container": "#93000a",
+                        "secondary-fixed": "#ffdbc9",
+                        "on-background": "#e5e2e1",
+                        "on-surface-variant": "#d0c5b2",
+                        "on-primary-container": "#503d00",
+                        "on-secondary-fixed": "#321200",
+                        "surface-bright": "#3a3939",
+                        "background": "#131313",
+                        "on-secondary": "#532200",
+                        "surface-container": "#201f1f",
+                        "on-secondary-fixed-variant": "#763400",
+                        "primary": "#e6c364",
+                        "tertiary-fixed": "#eae2cc",
+                        "surface-container-low": "#1c1b1b",
+                        "on-error": "#690005",
+                        "secondary-fixed-dim": "#ffb68c",
+                        "primary-container": "#c9a84c",
+                        "outline": "#99907e",
+                        "on-tertiary-fixed-variant": "#4b4737",
+                        "secondary-container": "#974400",
+                        "primary-fixed": "#ffe08f",
+                        "on-tertiary": "#343022",
+                        "tertiary": "#cdc6b1",
+                        "on-tertiary-fixed": "#1f1c0e",
+                        "on-primary": "#3d2e00",
+                        "inverse-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#e6c364",
+                        "surface-container-highest": "#353534"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Newsreader", "serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { 
+            background-color: #000; 
+            overflow-x: hidden; 
+            cursor: none; 
+            scroll-behavior: auto;
+        }
+        
+        /* Snap Container */
+        #smooth-content {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .scene { 
+            position: relative; 
+            height: 100vh; 
+            width: 100%; 
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+        }
+        
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        
+        /* Custom Lusion Cursor with Lerp */
+        #custom-cursor {
+            width: 34px;
+            height: 34px;
+            border: 1px solid rgba(230, 195, 100, 0.6);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            mix-blend-mode: difference;
+        }
+        #custom-cursor::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: #e6c364;
+            border-radius: 50%;
+        }
+        .cursor-hover #custom-cursor {
+            transform: scale(2);
+            background: rgba(230, 195, 100, 0.15);
+            border-color: rgba(230, 195, 100, 1);
+        }
+
+        .parallax-wrap {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .parallax-bg {
+            width: 100%;
+            height: 115%;
+            object-fit: cover;
+            filter: brightness(0.4) contrast(1.1) saturate(0.8) sepia(0.05);
+            transform: scale(1.1); /* Start zoomed for zoom-in/out effect */
+            will-change: transform;
+        }
+
+        .vignette-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, transparent 10%, rgba(0,0,0,0.85) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Dark Flash Overlay */
+        .scene-overlay {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 30;
+        }
+
+        .frosted-premium {
+            background: rgba(10, 10, 10, 0.45);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(230, 195, 100, 0.1);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+        }
+
+        .gold-glow { text-shadow: 0 0 40px rgba(230, 195, 100, 0.3); }
+
+        #particles-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .mote {
+            position: absolute;
+            background: rgba(230, 195, 100, 0.4);
+            border-radius: 50%;
+            filter: blur(1px);
+            will-change: transform;
+        }
+
+        /* Animation Classes */
+        .fade-slide-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .is-visible .fade-slide-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Delay helper classes */
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+        .delay-400 { transition-delay: 400ms; }
+
+        /* Hide scrollbar */
+        #smooth-content::-webkit-scrollbar { display: none; }
+        #smooth-content { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-on-surface font-body overflow-hidden">
+<div id="custom-cursor"></div>
+<div id="particles-container"></div>
+<!-- Persistent UI -->
+<nav class="fixed top-0 w-full z-[70] flex justify-between items-center px-8 md:px-12 py-8 transition-all duration-700">
+<div class="text-xl font-bold text-primary uppercase tracking-[0.2em] font-headline gold-glow interactive cursor-pointer">
+        Shri Girnar
+    </div>
+<div class="hidden md:flex gap-12 font-['Newsreader'] tracking-[0.3em] uppercase text-[10px] font-bold">
+<a class="text-primary border-b border-primary/40 pb-1 interactive" href="#">Home</a>
+<a class="text-neutral-400 hover:text-white transition-colors interactive" href="#">About</a>
+<a class="text-neutral-400 hover:text-white transition-colors interactive" href="#">Join Us</a>
+<a class="text-neutral-400 hover:text-white transition-colors interactive" href="#">Help</a>
+</div>
+</nav>
+<aside class="fixed right-8 md:right-12 top-1/2 -translate-y-1/2 z-[70] flex flex-col gap-8 items-center">
+<div class="flex flex-col gap-10 items-center nav-dots">
+<div class="group relative flex items-center justify-end interactive cursor-pointer" onclick="scrollToScene(0)">
+<span class="absolute right-8 text-[10px] uppercase tracking-[0.4em] text-primary opacity-0 group-hover:opacity-100 transition-all duration-500 whitespace-nowrap">Bhavnath</span>
+<div class="w-2 h-2 rounded-full bg-primary ring-4 ring-primary/20 dot"></div>
+</div>
+<div class="group relative flex items-center justify-end interactive cursor-pointer" onclick="scrollToScene(1)">
+<span class="absolute right-8 text-[10px] uppercase tracking-[0.4em] text-neutral-500 opacity-0 group-hover:opacity-100 transition-all duration-500 whitespace-nowrap">Uparkot</span>
+<div class="w-1.5 h-1.5 rounded-full bg-neutral-700 hover:bg-white transition-all dot"></div>
+</div>
+<div class="group relative flex items-center justify-end interactive cursor-pointer" onclick="scrollToScene(2)">
+<span class="absolute right-8 text-[10px] uppercase tracking-[0.4em] text-neutral-500 opacity-0 group-hover:opacity-100 transition-all duration-500 whitespace-nowrap">Monthly</span>
+<div class="w-1.5 h-1.5 rounded-full bg-neutral-700 hover:bg-white transition-all dot"></div>
+</div>
+<div class="group relative flex items-center justify-end interactive cursor-pointer" onclick="scrollToScene(3)">
+<span class="absolute right-8 text-[10px] uppercase tracking-[0.4em] text-neutral-500 opacity-0 group-hover:opacity-100 transition-all duration-500 whitespace-nowrap">The Summit</span>
+<div class="w-1.5 h-1.5 rounded-full bg-neutral-700 hover:bg-white transition-all dot"></div>
+</div>
+</div>
+</aside>
+<main id="smooth-content">
+<!-- Scene 1: Entry -->
+<section class="scene" id="scene-1">
+<div class="scene-overlay"></div>
+<div class="parallax-wrap">
+<img alt="The base of a sacred mountain" class="parallax-bg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlGXlMRQojLnv_d2ZTUf-ELH0NG1H9svyOiU7fsVFwF1xgYznryY2XvoDgcwWgF0dnF1nzULSCgVkEKHFdcDTdkRStzjxsOA5vqeO2ffsloSXk6qm20JBInOtbnQqkisdnEXuaOgu3ec4WFU6LO0OXQLNbQY8AqmXeprDRIi2BPSoATNTvt14M5rMdjxbvEGF4BK3PpRwteeSqf3SrkKw9JiUfshM9FrESdWyfaoKCkr9gn_rXbJQj4JAy3IO2rIDqt4Xt0Kvb8uen"/>
+<div class="vignette-overlay"></div>
+</div>
+<div class="text-center px-6 max-w-6xl z-10">
+<div class="fade-slide-up">
+<span class="inline-block text-primary font-headline text-xs tracking-[0.6em] uppercase opacity-70 mb-6">The Pilgrimage Begins</span>
+</div>
+<h1 class="font-headline text-7xl md:text-9xl text-primary font-bold gold-glow tracking-tighter leading-[0.9] fade-slide-up delay-100">
+                Shri Girnar <br/>Tirth Yatra
+            </h1>
+<p class="mt-12 font-body text-lg md:text-xl text-on-surface-variant font-light tracking-[0.2em] max-w-xl mx-auto italic fade-slide-up delay-200">
+                A cinematic journey from Surat to the peaks of divinity.
+            </p>
+</div>
+<div class="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-6 fade-slide-up delay-300">
+<span class="text-[9px] uppercase tracking-[0.5em] text-outline-variant font-bold">Scroll to Ascend</span>
+<div class="w-[1px] h-[80px] bg-outline-variant/30 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-full bg-primary scroll-line"></div>
+</div>
+</div>
+</section>
+<!-- Scene 2: The Leaders -->
+<section class="scene" id="scene-2">
+<div class="scene-overlay"></div>
+<div class="parallax-wrap">
+<img alt="Path of carved stone steps" class="parallax-bg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAa06HcUl_vWaCw4XwzHC4AM1b1iBrqMdfdPX2NjKh0bCAqRWwZWvLNJf0Ie6CSVp_xCWlCZTcZd4fmKllhZHAvgw6x34-GW3QXI_bgqiWIzS2dRS164RPMr1yIjmYLah8Wcb0pQX3BO-vcdNFY_7eD5wwONZ_oGXGOf5G55hIh7FtybHoo_C2NNc6aGBvF2wHU44QP4-HMYc1yQxG5VIzU0tB3t3igC1sDLEUx9L8R9tomwBSc4QY9Kip3OYxnzHPkmBQIsavv37Kz"/>
+<div class="vignette-overlay"></div>
+</div>
+<div class="z-10 w-full px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-7xl items-center">
+<div class="frosted-premium p-10 md:p-16 rounded-sm fade-slide-up">
+<div class="mb-10">
+<span class="text-primary font-headline text-[10px] tracking-[0.5em] uppercase opacity-60">The Spiritual Guide</span>
+<h2 class="text-4xl md:text-5xl font-headline mt-4 text-white leading-tight">P.P. Acharya <br/>Hemvallabh M.S.</h2>
+</div>
+<p class="text-on-surface-variant leading-relaxed font-light text-lg">
+                    Dedicated 13 years to Girnar's divine presence. His Holiness leads with a foundation of strict saiyam life, guiding thousands toward spiritual awakening through unwavering faith.
+                </p>
+</div>
+<div class="frosted-premium p-10 md:p-16 rounded-sm md:mt-40 fade-slide-up delay-200">
+<div class="mb-10">
+<span class="text-primary font-headline text-[10px] tracking-[0.5em] uppercase opacity-60">The Visionary</span>
+<h2 class="text-4xl md:text-5xl font-headline mt-4 text-white leading-tight">Milan <br/>Bhai</h2>
+</div>
+<p class="text-on-surface-variant leading-relaxed font-light text-lg">
+                    Founder since 2018. Milan Bhai’s selfless vision created a monthly sanctuary for seekers, ensuring the sacred climb remains accessible to every devotee in Surat.
+                </p>
+</div>
+</div>
+</section>
+<!-- Scene 3: The Work -->
+<section class="scene" id="scene-3">
+<div class="scene-overlay"></div>
+<div class="parallax-wrap">
+<img alt="Temple architecture" class="parallax-bg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVAkBB22S-u219Q1lKHwOWSv4RyoKVIrSMDg2CgZmNE8cwdx9OD47OJykpMX1mc_hCxLD1gmwubHYMDC_WDGWcH2umf1EKd7wVAZ4z6KItsBd6qkeKNGJe4PEmJwAPourilRvSaPc-CCdl0PY4F_BwkvqUwwDOYYl8esqv22ySLsq8wXRWveKEnjZw__RDk0mhoFYKSYXXJrqFmOWZcwIXtuM2O97YCa5Wf9k3osv54vDboyq294g5xzCTgPx-aDRegKbd0M9QhsdX"/>
+<div class="vignette-overlay"></div>
+</div>
+<div class="z-10 w-full px-6 md:px-24 flex justify-start">
+<div class="frosted-premium p-10 md:p-20 max-w-2xl border-l-[6px] border-primary fade-slide-up">
+<span class="text-secondary font-bold tracking-[0.5em] uppercase text-[10px] opacity-70">Sacred Transit</span>
+<h2 class="text-5xl md:text-7xl font-headline mt-6 mb-8 leading-none text-white">Monthly Bus Yatra</h2>
+<p class="text-xl text-on-surface-variant font-light mb-12 leading-relaxed">
+                    A collective journey of faith. Our specialized bus yatras from Surat are designed for maximum devotion, ensuring seekers can reach the peaks of Girnar and Ambika Mata Mandir with ease and companionship.
+                </p>
+<div class="flex items-center gap-6 text-primary group cursor-pointer interactive">
+<span class="uppercase tracking-[0.4em] text-xs font-bold">View Yatra Calendar</span>
+<div class="w-12 h-[1px] bg-primary transition-all group-hover:w-20"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Scene 4: The Summit -->
+<section class="scene" id="scene-4">
+<div class="scene-overlay"></div>
+<div class="parallax-wrap">
+<img alt="Mountain peak at sunrise" class="parallax-bg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQzovSXW9RmbiKWtIQqPdcU8bNJhFeYIkNIDNuhmAWhjbgL_rR9dWvo23nVji9UT1fDiCUAeO5lcXE1OTi8UU61k8p04NPl8saB2H9h_gk0T2AVz47QjI-rt594Gosrm9ZMOLJbfCMA8-DOoLo84InY-9Wp9MpBD-6A5S-U8R_pQOeqcLRmRC0Z5xsbTnS0w6UGpOS5jJA_5cDoK7GdDYEmBntXjgVzdiWlwgccQBTfXNoxJEAvztJMo4IftmyOedpxWkyjzAqxzJo"/>
+<div class="vignette-overlay" style="background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.95) 100%);"></div>
+</div>
+<div class="z-10 px-6 text-center">
+<h2 class="text-5xl md:text-8xl font-headline text-white font-bold tracking-tight mb-16 fade-slide-up">
+                Join Our Sacred <br/>Journey
+            </h2>
+<div class="flex flex-col md:flex-row gap-6 justify-center items-center fade-slide-up delay-200">
+<button class="px-14 py-6 bg-primary text-on-primary font-bold tracking-[0.3em] uppercase text-xs rounded-sm hover:scale-105 transition-all duration-500 shadow-2xl shadow-primary/20 interactive">
+                    Join the Yatra
+                </button>
+<button class="px-14 py-6 border border-primary/40 text-primary font-bold tracking-[0.3em] uppercase text-xs rounded-sm hover:bg-primary hover:text-black transition-all duration-500 interactive">
+                    Support Seva
+                </button>
+</div>
+</div>
+<footer class="absolute bottom-0 w-full bg-black/40 backdrop-blur-md border-t border-primary/10 flex flex-col md:flex-row justify-between items-center px-12 py-10">
+<div class="text-primary/60 font-bold font-body text-[10px] tracking-[0.4em] mb-4 md:mb-0">
+                © 2024 SHRI GIRNAR TIRTH YATRA GROUP
+            </div>
+<div class="flex gap-12 font-body text-[10px] font-bold tracking-[0.4em]">
+<a class="text-neutral-500 hover:text-primary transition-all interactive" href="#">Privacy</a>
+<a class="text-neutral-500 hover:text-primary transition-all interactive" href="#">Rituals</a>
+<a class="text-neutral-500 hover:text-primary transition-all interactive" href="#">Contact</a>
+</div>
+</footer>
+</section>
+</main>
+<script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    const scrollContainer = document.getElementById('smooth-content');
+    const scenes = gsap.utils.toArray('.scene');
+    const dots = document.querySelectorAll('.dot');
+    
+    // --- 1. LUSION CURSOR WITH LERP ---
+    const cursor = document.getElementById('custom-cursor');
+    let mouseX = 0, mouseY = 0;
+    let cursorX = 0, cursorY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    function lerpCursor() {
+        // Organic lag effect (0.15 factor)
+        cursorX += (mouseX - cursorX) * 0.15;
+        cursorY += (mouseY - cursorY) * 0.15;
+        
+        cursor.style.transform = `translate3d(${cursorX - 17}px, ${cursorY - 17}px, 0)`;
+        requestAnimationFrame(lerpCursor);
+    }
+    lerpCursor();
+
+    document.querySelectorAll('.interactive').forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    });
+
+    // --- 2. PARTICLES RESPONSIVE TO SCROLL ---
+    const particlesContainer = document.getElementById('particles-container');
+    const particles = [];
+    for (let i = 0; i < 70; i++) {
+        const mote = document.createElement('div');
+        mote.className = 'mote';
+        const size = Math.random() * 3 + 1;
+        mote.style.width = `${size}px`;
+        mote.style.height = `${size}px`;
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        mote.style.left = `${x}%`;
+        mote.style.top = `${y}%`;
+        mote.style.opacity = Math.random() * 0.5 + 0.1;
+        particlesContainer.appendChild(mote);
+        particles.push({ el: mote, x, y, speed: Math.random() * 2 + 1 });
+    }
+
+    // --- 3. SCROLL LOGIC & ANIMATIONS ---
+    function scrollToScene(index) {
+        scenes[index].scrollIntoView({ behavior: 'smooth' });
+    }
+
+    scrollContainer.addEventListener('scroll', () => {
+        const scrollTop = scrollContainer.scrollTop;
+        const containerHeight = scrollContainer.clientHeight;
+        const scrollPercent = scrollTop / (scrollContainer.scrollHeight - containerHeight);
+
+        // Update Nav Dots
+        const activeIndex = Math.round(scrollTop / containerHeight);
+        dots.forEach((dot, i) => {
+            if(i === activeIndex) {
+                dot.className = 'w-2 h-2 rounded-full bg-primary ring-4 ring-primary/20 dot';
+            } else {
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-neutral-700 hover:bg-white transition-all dot';
+            }
+        });
+
+        // Dynamic Particles based on scroll
+        particles.forEach(p => {
+            const yOffset = (scrollTop * 0.1) * p.speed;
+            p.el.style.transform = `translateY(-${yOffset % 100}vh)`;
+        });
+    });
+
+    // Intersection Observer for Text Reveals & Parallax
+    const observerOptions = {
+        threshold: 0.5
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                
+                // Dark Flash effect on section change
+                const overlay = entry.target.querySelector('.scene-overlay');
+                if(overlay) {
+                    gsap.fromTo(overlay, 
+                        { opacity: 1 }, 
+                        { opacity: 0, duration: 1.2, ease: "power2.out" }
+                    );
+                }
+            } else {
+                entry.target.classList.remove('is-visible');
+            }
+        });
+    }, observerOptions);
+
+    scenes.forEach((scene, i) => {
+        observer.observe(scene);
+        
+        const bg = scene.querySelector('.parallax-bg');
+        
+        // --- 4. ZOOM-IN & PARALLAX ---
+        // Tie scale and position directly to scroll of that specific scene
+        ScrollTrigger.create({
+            trigger: scene,
+            scroller: "#smooth-content",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+            onUpdate: (self) => {
+                // Background zoom 1.1 -> 1.3 (approaching effect)
+                const scale = 1.1 + (self.progress * 0.2);
+                // Subtle Y-parallax
+                const yPos = (self.progress * 40) - 20; 
+                bg.style.transform = `scale(${scale}) translateY(${yPos}px)`;
+            }
+        });
+    });
+
+    // Initial load animations
+    window.addEventListener('load', () => {
+        scenes[0].classList.add('is-visible');
+        gsap.to('.scroll-line', {
+            y: '100%',
+            repeat: -1,
+            duration: 2.5,
+            ease: "expo.inOut"
+        });
+    });
+</script>
+</body></html>

@@ -1,0 +1,43 @@
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4",
+    "clsx": "^2.1.1",
+    "gsap": "^3.14.2",
+    "lucide-react": "^1.8.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.14.1",
+    "react-zoom-pan-pinch": "^4.0.3",
+    "tailwind-merge": "^3.5.0",
+    "three": "^0.183.2"
+  },
+  "name": "girnar-tirth-yatra",
+  "version": "1.0.0",
+  "description": "Girnar Tirth Yatra surat. this is the group they work for girnar tirth and work under the p.pu. Acharya HemVallabh m.s.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yugamm15/Girnar-Tirth-Yatra-Surat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/yugamm15/Girnar-Tirth-Yatra-Surat/issues"
+  },
+  "homepage": "https://github.com/yugamm15/Girnar-Tirth-Yatra-Surat#readme",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.9",
+    "tailwindcss": "^4.2.2",
+    "vite": "^8.0.8"
+  }
+}
