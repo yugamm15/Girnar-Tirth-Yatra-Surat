@@ -7,32 +7,11 @@ const ADMIN_CREDENTIALS = {
   password: 'Girnar@22'
 };
 
-const MEMBER_CREDENTIALS = {
-  email: 'Yugamkothari886@gmail.com',
-  password: 'Yugam@1505'
-};
-
 const generateMemberCode = (name) => {
   if (!name) return '';
   const prefix = name.substring(0, 2).toUpperCase();
   return `${prefix}GYG022`;
 };
-
-const INITIAL_MEMBERS = [
-  { id: 1, name: 'Yugam Kothari', email: 'Yugamkothari886@gmail.com', phone: '+91 98765 43210', hasAccess: false, code: 'YUGYG022' },
-  { id: 2, name: 'Milan Bhai', email: 'milan.bhai@example.com', phone: '+91 98250 12345', hasAccess: false, code: 'MIGYG022' },
-  { id: 3, name: 'Suresh Shah', email: 'suresh.shah@example.com', phone: '+91 94260 67890', hasAccess: false, code: 'SUGYG022' },
-];
-
-const INITIAL_UPASHRAYS = [
-  { id: 1, name: 'VAGAD', village: 'Vagad', route: 'Surat to Girnar', trusty: 'Milan Bhai', mobile: '+91 98765 43210', location: 'https://goo.gl/maps/example1', description: 'Main road Upashray at Vagad.', beforeImg: '/images/Upasray.png', processImg: '/images/Upasray.png', afterImg: '/images/Upasray.png', status: 'Done', reports: [] },
-  { id: 2, name: 'RANPUR', village: 'Ranpur', route: 'Surat to Palitana', trusty: '', mobile: '', location: 'https://goo.gl/maps/example2', description: 'Recently renovated Upashray at Ranpur.', beforeImg: '/images/Upasray.png', processImg: '/images/Upasray.png', afterImg: '/images/Upasray.png', status: 'Process', reports: [] },
-  { id: 3, name: 'UMRALA', village: 'Umrala', route: 'Surat to Girnar', trusty: '', mobile: '', location: 'https://goo.gl/maps/example3', description: 'Spacious Upashray at Umrala.', beforeImg: '/images/Upasray.png', processImg: '/images/Upasray.png', afterImg: '/images/Upasray.png', status: 'Plan', reports: [] },
-];
-
-const INITIAL_JINALAYAS = [
-  { id: 1, name: 'Shri Neminath Bhagwan Jinalay', village: 'Girnar Taleti', route: 'Main Taleti', mulnayak: 'Shri Neminath Bhagwan', status: 'Done', description: 'Historical Jinalay at the base of Girnar.', location: 'https://goo.gl/maps/example4', beforeImg: '/images/mobile/portrait.webp', processImg: '/images/mobile/portrait.webp', afterImg: '/images/mobile/portrait.webp' },
-];
 
 export const AuthView = ({ onBack, initialView = 'login' }) => {
   const [view, setView] = useState('login'); // 'login', 'admin', 'member'
@@ -40,9 +19,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [upashrays, setUpashrays] = useState(INITIAL_UPASHRAYS);
-  const [jinalayas, setJinalayas] = useState(INITIAL_JINALAYAS);
-  const [members, setMembers] = useState(INITIAL_MEMBERS);
+  const [upashrays, setUpashrays] = useState([]);
+  const [jinalayas, setJinalayas] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [currentMemberId, setCurrentMemberId] = useState(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [activeTab, setActiveTab] = useState('upashrays'); // 'upashrays', 'members', 'jinalayas', 'reports'
   const [upashraySearch, setUpashraySearch] = useState('');
@@ -98,6 +78,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     name: '',
     email: '',
     phone: '',
+    password: '',
     hasAccess: false
   });
 
@@ -133,19 +114,19 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         jinalayasDB.getAll().catch(err => { console.error('Jinalayas load error:', err); return []; }),
         checkingReportsDB.getAll().catch(err => { console.error('Reports load error:', err); return []; })
       ]);
-      
-      if (Array.isArray(upashraysData) && upashraysData.length > 0) {
+
+      if (Array.isArray(upashraysData)) {
         setUpashrays(upashraysData.map(u => {
           if (!u) return null;
           // Find reports for this upashray
           const uReports = Array.isArray(reportsData)
             ? reportsData
-                .filter(r => r && r.upashray_id === u.id)
-                .map(r => ({
-                  id: r.id,
-                  title: 'Checking Report',
-                  date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
-                }))
+              .filter(r => r && r.upashray_id === u.id)
+              .map(r => ({
+                id: r.id,
+                title: 'Checking Report',
+                date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
+              }))
             : [];
 
           return {
@@ -161,19 +142,21 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         }).filter(Boolean));
       }
 
-      if (Array.isArray(membersData) && membersData.length > 0) {
+      if (Array.isArray(membersData)) {
         setMembers(membersData.map(m => {
           if (!m) return null;
           return {
             ...m,
             name: m.name || '',
             email: m.email || '',
+            phone: m.phone || '',
+            password: m.password || '',
             hasAccess: !!m.has_access
           };
         }).filter(Boolean));
       }
 
-      if (Array.isArray(jinalayasData) && jinalayasData.length > 0) {
+      if (Array.isArray(jinalayasData)) {
         setJinalayas(jinalayasData.map(j => {
           if (!j) return null;
           return {
@@ -197,6 +180,21 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     const checkSession = async () => {
       setIsInitializing(true);
       try {
+        const override = localStorage.getItem('auth_override');
+        if (override === 'admin' && initialView === 'admin') {
+          setView('admin');
+          await loadAllData();
+          setIsInitializing(false);
+          return;
+        } else if (override === 'member' && initialView === 'member') {
+          const storedMemberId = localStorage.getItem('auth_member_id');
+          if (storedMemberId) setCurrentMemberId(storedMemberId);
+          setView('member');
+          await loadAllData();
+          setIsInitializing(false);
+          return;
+        }
+
         if (!supabase || !supabase.auth) {
           console.warn('Supabase auth not available');
           setView('login');
@@ -204,23 +202,22 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         }
 
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (session?.user) {
           const email = session.user.email || '';
           const normalizedEmail = email.toLowerCase();
-          
+
           const [adminProfile, memberRecord] = await Promise.all([
             adminProfilesDB.getByUserId(session.user.id).catch(() => null),
             membersDB.getByEmail(normalizedEmail).catch(() => null)
           ]);
 
           const isDefaultAdminEmail = normalizedEmail === ADMIN_CREDENTIALS.email.toLowerCase();
-          const isDefaultMemberEmail = normalizedEmail === MEMBER_CREDENTIALS.email.toLowerCase();
 
           if (initialView === 'admin' && (adminProfile || isDefaultAdminEmail)) {
             setView('admin');
             await loadAllData();
-          } else if (initialView === 'member' && (memberRecord?.has_access || isDefaultMemberEmail)) {
+          } else if (initialView === 'member' && memberRecord?.has_access) {
             setView('member');
             await loadAllData();
           } else {
@@ -259,7 +256,6 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       ]);
 
       const isDefaultAdminEmail = normalizedEmail === ADMIN_CREDENTIALS.email.toLowerCase();
-      const isDefaultMemberEmail = normalizedEmail === MEMBER_CREDENTIALS.email.toLowerCase();
 
       if (initialView === 'admin' || isDefaultAdminEmail) {
         const canAccessAdmin = adminProfile && adminProfile.is_active !== false && ['admin', 'editor'].includes(adminProfile.role);
@@ -271,22 +267,23 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           return true;
         }
 
-        await supabase.auth.signOut().catch(() => {});
+        await supabase.auth.signOut().catch(() => { });
         setError('You do not have admin access for this account');
         return true;
       }
 
-      if (initialView === 'member' || isDefaultMemberEmail) {
+      if (initialView === 'member') {
         const canAccessMember = memberRecord && memberRecord.has_access;
 
-        if (canAccessMember || isDefaultMemberEmail) {
+        if (canAccessMember) {
+          setCurrentMemberId(memberRecord?.id || data.user.id);
           setView('member');
           setError('');
           await loadAllData();
           return true;
         }
 
-        await supabase.auth.signOut().catch(() => {});
+        await supabase.auth.signOut().catch(() => { });
         setError('Your account does not have access. Please contact Admin.');
         return true;
       }
@@ -309,10 +306,11 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     } catch (authError) {
       console.log('Supabase auth login failed, using fallback credentials:', authError.message);
     }
-    
+
     // Admin login attempt
     if (initialView === 'admin') {
       if (normalizedEmail === ADMIN_CREDENTIALS.email.toLowerCase() && password === ADMIN_CREDENTIALS.password) {
+        localStorage.setItem('auth_override', 'admin');
         setView('admin');
         setError('');
         await loadAllData();
@@ -325,11 +323,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     // Member login attempt
     if (initialView === 'member') {
       const member = members.find(m => m.email && m.email.toLowerCase() === normalizedEmail);
-      if (normalizedEmail === MEMBER_CREDENTIALS.email.toLowerCase() && password === MEMBER_CREDENTIALS.password) {
-        setView('member');
-        setError('');
-        await loadAllData();
-      } else if (member && member.hasAccess && password === 'Member@123') {
+      if (member && member.hasAccess && password === member.password) {
+        setCurrentMemberId(member.id);
+        localStorage.setItem('auth_override', 'member');
+        localStorage.setItem('auth_member_id', member.id);
         setView('member');
         setError('');
         await loadAllData();
@@ -343,11 +340,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
     // Generic login (fallback)
     if (normalizedEmail === ADMIN_CREDENTIALS.email.toLowerCase() && password === ADMIN_CREDENTIALS.password) {
+      localStorage.setItem('auth_override', 'admin');
       setView('admin');
-      setError('');
-      await loadAllData();
-    } else if (normalizedEmail === MEMBER_CREDENTIALS.email.toLowerCase() && password === MEMBER_CREDENTIALS.password) {
-      setView('member');
       setError('');
       await loadAllData();
     } else {
@@ -355,10 +349,21 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     }
   };
 
+  const handleLogout = async () => {
+    localStorage.removeItem('auth_override');
+    localStorage.removeItem('auth_member_id');
+    try {
+      if (supabase && supabase.auth) {
+        await supabase.auth.signOut();
+      }
+    } catch (e) {}
+    setView('login');
+  };
+
   if (isInitializing) {
     return (
-      <div className="fixed top-0 left-0 w-full h-screen z-[200] bg-[#f8f9fa] flex items-center justify-center p-6">
-        <div className="bg-white border border-gray-200 rounded-sm shadow-lg p-8 mx-auto my-auto">
+      <div className="fixed inset-0 z-[200] bg-[#f8f9fa] flex items-center justify-center p-6">
+        <div className="bg-white border border-gray-200 rounded-sm shadow-lg p-8">
           <div className="w-8 h-8 border-2 border-[#c5a059] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="mt-4 text-[#8f6d2f] text-xs uppercase tracking-[0.2em] font-bold">Checking Session...</p>
         </div>
@@ -481,6 +486,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             name: memberFormData.name,
             email: memberFormData.email,
             phone: memberFormData.phone,
+            password: memberFormData.password,
             code: code,
             has_access: memberFormData.hasAccess
           });
@@ -495,6 +501,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             name: memberFormData.name,
             email: memberFormData.email,
             phone: memberFormData.phone,
+            password: memberFormData.password,
             code: code,
             has_access: memberFormData.hasAccess
           });
@@ -574,10 +581,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         if (u.id === checkingUpashrayId) {
           return {
             ...u,
-            reports: [...(u.reports || []), { 
-              title: 'Checking Report', 
-              id: Date.now(), 
-              date: new Date().toLocaleDateString() 
+            reports: [...(u.reports || []), {
+              title: 'Checking Report',
+              id: Date.now(),
+              date: new Date().toLocaleDateString()
             }]
           };
         }
@@ -592,7 +599,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       })));
     } catch (error) {
       console.error('Error saving checking report:', error);
-    }   
+    }
   };
 
   const startEdit = (upashray) => {
@@ -701,9 +708,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
   if (view === 'login') {
     return (
-      <div className="fixed top-0 left-0 w-full h-screen z-[200] bg-[#f8f9fa]/95 backdrop-blur-2xl flex items-center justify-center p-6">
-        <div className="w-full max-w-md bg-white p-8 md:p-12 border-l-4 border-[#c5a059] relative shadow-2xl rounded-r-sm mx-auto my-auto">
-          <button 
+      <div className="fixed inset-0 z-[200] bg-[#f8f9fa]/95 backdrop-blur-2xl flex items-center justify-center p-6">
+        <div className="w-full max-w-md bg-white p-8 md:p-12 border-l-4 border-[#c5a059] relative shadow-2xl rounded-r-sm">
+          <button
             onClick={onBack}
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors"
           >
@@ -713,15 +720,19 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           </button>
 
           <div className="text-center mb-10">
-            <span className="text-[#c5a059] font-headline text-[10px] tracking-[0.5em] uppercase opacity-80 font-bold">Authentication</span>
-            <h2 className="text-3xl md:text-4xl font-headline mt-4 text-gray-900">Login</h2>
+            <span className="text-[#c5a059] font-headline text-[10px] tracking-[0.5em] uppercase opacity-80 font-bold">
+              {initialView === 'admin' ? 'Admin Portal' : initialView === 'member' ? 'Member Portal' : 'Authentication'}
+            </span>
+            <h2 className="text-3xl md:text-4xl font-headline mt-4 text-gray-900">
+              {initialView === 'admin' ? 'Admin Login' : initialView === 'member' ? 'Member Login' : 'Secure Login'}
+            </h2>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Email Address</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-sm px-4 py-3 text-gray-900 focus:border-[#c5a059] outline-none transition-all font-body"
@@ -731,8 +742,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             </div>
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Password</label>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-sm px-4 py-3 text-gray-900 focus:border-[#c5a059] outline-none transition-all font-body"
@@ -741,7 +752,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
               />
             </div>
             {error && <p className="text-red-500 text-xs font-body tracking-wider font-bold">{error}</p>}
-            <button 
+            <button
               type="submit"
               className="w-full py-4 bg-[#c5a059] text-white font-bold uppercase tracking-[0.2em] text-xs hover:bg-[#b08d4a] transition-all duration-300 shadow-xl shadow-[#c5a059]/20"
             >
@@ -769,44 +780,40 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 md:px-16 shrink-0 shadow-sm overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-8 md:gap-12">
             <span className="text-[#c5a059] font-headline text-lg tracking-widest uppercase font-bold whitespace-nowrap">Admin Portal</span>
-            
+
             <nav className="flex items-center">
-              <button 
+              <button
                 onClick={() => setActiveTab('upashrays')}
-                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${
-                  activeTab === 'upashrays' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
-                }`}
+                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'upashrays' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                  }`}
               >
                 Manage Upashrays
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('members')}
-                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${
-                  activeTab === 'members' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
-                }`}
+                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'members' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                  }`}
               >
                 Manage Members
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('jinalayas')}
-                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${
-                  activeTab === 'jinalayas' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
-                }`}
+                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'jinalayas' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                  }`}
               >
                 Manage Jinalayas
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('reports')}
-                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${
-                  activeTab === 'reports' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
-                }`}
+                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'reports' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                  }`}
               >
                 Reports
               </button>
             </nav>
           </div>
-          <button 
-            onClick={() => setView('login')}
+          <button
+            onClick={handleLogout}
             className="px-6 py-2 border border-[#c5a059] text-[#c5a059] text-[10px] uppercase tracking-widest hover:bg-[#c5a059] hover:text-white transition-all font-bold whitespace-nowrap ml-4"
           >
             Logout
@@ -825,8 +832,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   </div>
                   <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-4">
                     <div className="relative w-full md:w-64">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={upashraySearch}
                         onChange={(e) => setUpashraySearch(e.target.value)}
                         placeholder="Search by name..."
@@ -836,7 +843,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setIsModalOpen(true)}
                       className="w-full md:w-auto px-8 py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all flex items-center justify-center gap-3 h-[52px]"
                     >
@@ -864,35 +871,34 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                  {upashrays
-                    .filter(u => (u.name || '').toLowerCase().includes((upashraySearch || '').toLowerCase()))
-                    .map((u) => (
-                    <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{u.name || '-'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{u.village || '-'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{u.route || '-'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {u.trusty || '-'}<br/>
-                            <span className="text-[10px] text-gray-400">{u.mobile || '-'}</span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${
-                                u.status === 'Done' ? 'bg-green-50 text-green-600' : 
-                                u.status === 'Process' ? 'bg-blue-50 text-blue-600' : 
-                                'bg-amber-50 text-amber-600'
-                              }`}>
+                      {upashrays
+                        .filter(u => (u.name || '').toLowerCase().includes((upashraySearch || '').toLowerCase()))
+                        .map((u) => (
+                          <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{u.name || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{u.village || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{u.route || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                              {u.trusty || '-'}<br />
+                              <span className="text-[10px] text-gray-400">{u.mobile || '-'}</span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${u.status === 'Done' ? 'bg-green-50 text-green-600' :
+                                u.status === 'Process' ? 'bg-blue-50 text-blue-600' :
+                                  'bg-amber-50 text-amber-600'
+                                }`}>
                                 {u.status}
                               </span>
                             </td>
                             <td className="p-6 text-right">
                               <div className="flex justify-end gap-3">
-                                <button 
+                                <button
                                   onClick={() => startEdit(u)}
                                   className="p-2 text-[#c5a059] hover:bg-[#c5a059]/10 rounded-full transition-all title-case text-[10px] font-bold tracking-widest uppercase"
                                 >
                                   Edit
                                 </button>
-                                <button 
+                                <button
                                   onClick={() => deleteUpashray(u.id)}
                                   className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
                                 >
@@ -902,10 +908,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                             </td>
                           </tr>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
             </>
           )}
 
@@ -919,8 +925,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   </div>
                   <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-4">
                     <div className="relative w-full md:w-64">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={memberSearch}
                         onChange={(e) => setMemberSearch(e.target.value)}
                         placeholder="Search by name..."
@@ -930,7 +936,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setIsMemberModalOpen(true)}
                       className="w-full md:w-auto px-8 py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all flex items-center justify-center gap-3 h-[52px]"
                     >
@@ -957,54 +963,52 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                         <th className="px-6 py-4 text-right text-[10px] uppercase tracking-widest text-gray-400 font-bold">Actions</th>
                       </tr>
                     </thead>
-                        <tbody className="divide-y divide-gray-100">
-                          {members
-                            .filter(m => (m.name || '').toLowerCase().includes((memberSearch || '').toLowerCase()))
-                            .map((m) => (
-                            <tr key={m.id} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="inline-block px-3 py-1 bg-gray-100 text-[#c5a059] text-[11px] font-mono font-bold rounded-sm border border-gray-200 min-w-[85px] text-center">
-                                  {m.code || generateMemberCode(m.name || 'Member')}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{m.name || '-'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{m.email || '-'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{m.phone || '-'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <button 
-                              onClick={() => toggleMemberAccess(m.id)}
-                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                                m.hasAccess ? 'bg-[#c5a059]' : 'bg-gray-200'
-                              }`}
-                            >
-                              <span
-                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                  m.hasAccess ? 'translate-x-6' : 'translate-x-1'
-                                }`}
-                              />
-                            </button>
-                            <span className={`block text-[8px] uppercase tracking-widest font-bold mt-1 ${m.hasAccess ? 'text-[#c5a059]' : 'text-gray-400'}`}>
-                              {m.hasAccess ? 'Access Granted' : 'No Access'}
-                            </span>
-                          </td>
-                          <td className="p-6 text-right">
-                            <div className="flex justify-end gap-3">
-                              <button 
-                                onClick={() => startEditMember(m)}
-                                className="p-2 text-[#c5a059] hover:bg-[#c5a059]/10 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
+                    <tbody className="divide-y divide-gray-100">
+                      {members
+                        .filter(m => (m.name || '').toLowerCase().includes((memberSearch || '').toLowerCase()))
+                        .map((m) => (
+                          <tr key={m.id} className="hover:bg-gray-50/50 transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="inline-block px-3 py-1 bg-gray-100 text-[#c5a059] text-[11px] font-mono font-bold rounded-sm border border-gray-200 min-w-[85px] text-center">
+                                {m.code || generateMemberCode(m.name || 'Member')}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{m.name || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{m.email || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{m.phone || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                              <button
+                                onClick={() => toggleMemberAccess(m.id)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${m.hasAccess ? 'bg-[#c5a059]' : 'bg-gray-200'
+                                  }`}
                               >
-                                Edit
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${m.hasAccess ? 'translate-x-6' : 'translate-x-1'
+                                    }`}
+                                />
                               </button>
-                              <button 
-                                onClick={() => deleteMember(m.id)}
-                                className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                              <span className={`block text-[8px] uppercase tracking-widest font-bold mt-1 ${m.hasAccess ? 'text-[#c5a059]' : 'text-gray-400'}`}>
+                                {m.hasAccess ? 'Access Granted' : 'No Access'}
+                              </span>
+                            </td>
+                            <td className="p-6 text-right">
+                              <div className="flex justify-end gap-3">
+                                <button
+                                  onClick={() => startEditMember(m)}
+                                  className="p-2 text-[#c5a059] hover:bg-[#c5a059]/10 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => deleteMember(m.id)}
+                                  className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -1022,8 +1026,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   </div>
                   <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-4">
                     <div className="relative w-full md:w-64">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={jinalayaSearch}
                         onChange={(e) => setJinalayaSearch(e.target.value)}
                         placeholder="Search by name..."
@@ -1033,7 +1037,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setIsJinalayaModalOpen(true)}
                       className="w-full md:w-auto px-8 py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all flex items-center justify-center gap-3 h-[52px]"
                     >
@@ -1064,53 +1068,52 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       {jinalayas
                         .filter(j => (j.name || '').toLowerCase().includes((jinalayaSearch || '').toLowerCase()))
                         .map((j) => (
-                        <tr key={j.id} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="w-12 h-12 rounded-sm overflow-hidden border border-gray-200 bg-gray-50">
-                              {j.afterImg ? (
-                                <img src={j.afterImg} alt={j.name || 'Jinalaya'} className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                  </svg>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{j.name || '-'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {j.village || '-'}<br/>
-                            <span className="text-[10px] text-gray-400 uppercase tracking-wider">{j.route || '-'}</span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{j.mulnayak || '-'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${
-                              j.status === 'Done' ? 'bg-green-50 text-green-600' : 
-                              j.status === 'Process' ? 'bg-blue-50 text-blue-600' : 
-                              'bg-amber-50 text-amber-600'
-                            }`}>
-                              {j.status}
-                            </span>
-                          </td>
-                          <td className="p-6 text-right">
-                            <div className="flex justify-end gap-3">
-                              <button 
-                                onClick={() => startEditJinalaya(j)}
-                                className="p-2 text-[#c5a059] hover:bg-[#c5a059]/10 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
-                              >
-                                Edit
-                              </button>
-                              <button 
-                                onClick={() => deleteJinalaya(j.id)}
-                                className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                          <tr key={j.id} className="hover:bg-gray-50/50 transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="w-12 h-12 rounded-sm overflow-hidden border border-gray-200 bg-gray-50">
+                                {j.afterImg ? (
+                                  <img src={j.afterImg} alt={j.name || 'Jinalaya'} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{j.name || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                              {j.village || '-'}<br />
+                              <span className="text-[10px] text-gray-400 uppercase tracking-wider">{j.route || '-'}</span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{j.mulnayak || '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${j.status === 'Done' ? 'bg-green-50 text-green-600' :
+                                j.status === 'Process' ? 'bg-blue-50 text-blue-600' :
+                                  'bg-amber-50 text-amber-600'
+                                }`}>
+                                {j.status}
+                              </span>
+                            </td>
+                            <td className="p-6 text-right">
+                              <div className="flex justify-end gap-3">
+                                <button
+                                  onClick={() => startEditJinalaya(j)}
+                                  className="p-2 text-[#c5a059] hover:bg-[#c5a059]/10 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => deleteJinalaya(j.id)}
+                                  className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -1143,30 +1146,30 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   <div className="space-y-6">
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Upashray Name</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         required
                       />
                     </div>
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Village Name</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={formData.village}
-                        onChange={(e) => setFormData({...formData, village: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, village: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         required
                       />
                     </div>
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Route</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={formData.route}
-                        onChange={(e) => setFormData({...formData, route: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, route: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         placeholder="e.g., Surat to Girnar"
                         required
@@ -1175,19 +1178,19 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Trusty Name (Optional)</label>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           value={formData.trusty}
-                          onChange={(e) => setFormData({...formData, trusty: e.target.value})}
+                          onChange={(e) => setFormData({ ...formData, trusty: e.target.value })}
                           className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         />
                       </div>
                       <div>
                         <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Mobile Number (Optional)</label>
-                        <input 
-                          type="tel" 
+                        <input
+                          type="tel"
                           value={formData.mobile}
-                          onChange={(e) => setFormData({...formData, mobile: e.target.value})}
+                          onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                           className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         />
                       </div>
@@ -1197,19 +1200,19 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   <div className="space-y-6">
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Google Map Link</label>
-                      <input 
-                        type="url" 
+                      <input
+                        type="url"
                         value={formData.location}
-                        onChange={(e) => setFormData({...formData, location: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         required
                       />
                     </div>
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Status</label>
-                      <select 
+                      <select
                         value={formData.status}
-                        onChange={(e) => setFormData({...formData, status: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors appearance-none"
                       >
                         <option value="Plan">Plan</option>
@@ -1219,9 +1222,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                     </div>
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Description</label>
-                      <textarea 
+                      <textarea
                         value={formData.description}
-                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm h-[135px] focus:border-[#c5a059] outline-none transition-colors resize-none"
                         required
                       ></textarea>
@@ -1233,24 +1236,24 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="flex flex-col gap-2">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Before</span>
-                        <input 
-                          type="file" 
+                        <input
+                          type="file"
                           onChange={(e) => handleFileChange(e, 'beforeImg')}
                           className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-[#c5a059]/10 file:text-[#c5a059] hover:file:bg-[#c5a059]/20"
                         />
                       </div>
                       <div className="flex flex-col gap-2">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">In-Process</span>
-                        <input 
-                          type="file" 
+                        <input
+                          type="file"
                           onChange={(e) => handleFileChange(e, 'processImg')}
                           className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-[#c5a059]/10 file:text-[#c5a059] hover:file:bg-[#c5a059]/20"
                         />
                       </div>
                       <div className="flex flex-col gap-2">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">After</span>
-                        <input 
-                          type="file" 
+                        <input
+                          type="file"
                           onChange={(e) => handleFileChange(e, 'afterImg')}
                           className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-[#c5a059]/10 file:text-[#c5a059] hover:file:bg-[#c5a059]/20"
                         />
@@ -1259,13 +1262,13 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   </div>
 
                   <div className="md:col-span-2 pt-6 flex gap-4">
-                    <button 
+                    <button
                       type="submit"
                       className="flex-grow py-5 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
                     >
                       {editingId ? 'Save Changes' : 'Confirm & Save Upashray'}
                     </button>
-                    <button 
+                    <button
                       type="button"
                       onClick={resetForm}
                       className="px-10 py-5 border border-gray-300 text-gray-500 font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition-colors"
@@ -1293,78 +1296,89 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                 </div>
 
                 <form onSubmit={handleSaveMember} className="space-y-6">
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <div>
-                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Full Name</label>
-                       <input 
-                         type="text" 
-                         value={memberFormData.name}
-                         onChange={(e) => setMemberFormData({...memberFormData, name: e.target.value})}
-                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
-                         placeholder="Enter member's full name"
-                         required
-                       />
-                     </div>
-                     <div>
-                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Auto-Generated Code</label>
-                       <div className="w-full bg-gray-100 border border-gray-200 p-4 text-gray-500 text-sm font-mono font-bold select-none cursor-not-allowed">
-                         {generateMemberCode(memberFormData.name) || '---'}
-                       </div>
-                       <p className="text-[9px] text-gray-400 mt-1 uppercase tracking-wider">Format: Name(First 2) + GYG022</p>
-                     </div>
-                   </div>
-                   <div>
-                     <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Email Address</label>
-                     <input 
-                       type="email" 
-                       value={memberFormData.email}
-                       onChange={(e) => setMemberFormData({...memberFormData, email: e.target.value})}
-                       className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
-                       required
-                     />
-                   </div>
-                   <div className="grid grid-cols-2 gap-4">
-                     <div>
-                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Phone Number</label>
-                       <input 
-                         type="tel" 
-                         value={memberFormData.phone}
-                         onChange={(e) => setMemberFormData({...memberFormData, phone: e.target.value})}
-                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
-                         placeholder="e.g., +91 98765 43210"
-                       />
-                     </div>
-                     <div className="flex flex-col justify-center items-start">
-                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-3 font-bold">Member System Access</label>
-                       <div className="flex items-center gap-3">
-                        <button 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Full Name</label>
+                      <input
+                        type="text"
+                        value={memberFormData.name}
+                        onChange={(e) => setMemberFormData({ ...memberFormData, name: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
+                        placeholder="Enter member's full name"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Auto-Generated Code</label>
+                      <div className="w-full bg-gray-100 border border-gray-200 p-4 text-gray-500 text-sm font-mono font-bold select-none cursor-not-allowed">
+                        {generateMemberCode(memberFormData.name) || '---'}
+                      </div>
+                      <p className="text-[9px] text-gray-400 mt-1 uppercase tracking-wider">Format: Name(First 2) + GYG022</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Email Address</label>
+                      <input
+                        type="email"
+                        value={memberFormData.email}
+                        onChange={(e) => setMemberFormData({ ...memberFormData, email: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Password</label>
+                      <input
+                        type="text"
+                        value={memberFormData.password}
+                        onChange={(e) => setMemberFormData({ ...memberFormData, password: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
+                        placeholder="Enter custom password"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Phone Number</label>
+                      <input
+                        type="tel"
+                        value={memberFormData.phone}
+                        onChange={(e) => setMemberFormData({ ...memberFormData, phone: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
+                        placeholder="e.g., +91 98765 43210"
+                      />
+                    </div>
+                    <div className="flex flex-col justify-center items-start">
+                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-3 font-bold">Member System Access</label>
+                      <div className="flex items-center gap-3">
+                        <button
                           type="button"
-                          onClick={() => setMemberFormData({...memberFormData, hasAccess: !memberFormData.hasAccess})}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                            memberFormData.hasAccess ? 'bg-[#c5a059]' : 'bg-gray-200'
-                          }`}
+                          onClick={() => setMemberFormData({ ...memberFormData, hasAccess: !memberFormData.hasAccess })}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${memberFormData.hasAccess ? 'bg-[#c5a059]' : 'bg-gray-200'
+                            }`}
                         >
                           <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              memberFormData.hasAccess ? 'translate-x-6' : 'translate-x-1'
-                            }`}
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${memberFormData.hasAccess ? 'translate-x-6' : 'translate-x-1'
+                              }`}
                           />
                         </button>
                         <span className={`text-[10px] uppercase tracking-widest font-bold ${memberFormData.hasAccess ? 'text-[#c5a059]' : 'text-gray-400'}`}>
                           {memberFormData.hasAccess ? 'Access Enabled' : 'Access Disabled'}
                         </span>
-                       </div>
-                     </div>
-                   </div>
+                      </div>
+                    </div>
+                  </div>
 
-                   <div className="pt-6 flex gap-4">
-                    <button 
+                  <div className="pt-6 flex gap-4">
+                    <button
                       type="submit"
                       className="flex-grow py-5 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
                     >
                       {editingMemberId ? 'Save Changes' : 'Confirm & Save Member'}
                     </button>
-                    <button 
+                    <button
                       type="button"
                       onClick={resetMemberForm}
                       className="px-10 py-5 border border-gray-300 text-gray-500 font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition-colors"
@@ -1395,30 +1409,30 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   <div className="space-y-6">
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Jinalaya Name</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={jinalayaFormData.name}
-                        onChange={(e) => setJinalayaFormData({...jinalayaFormData, name: e.target.value})}
+                        onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, name: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         required
                       />
                     </div>
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Village Name</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={jinalayaFormData.village}
-                        onChange={(e) => setJinalayaFormData({...jinalayaFormData, village: e.target.value})}
+                        onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, village: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         required
                       />
                     </div>
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Route</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={jinalayaFormData.route}
-                        onChange={(e) => setJinalayaFormData({...jinalayaFormData, route: e.target.value})}
+                        onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, route: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         placeholder="e.g., Main Taleti or Vihar Route"
                         required
@@ -1426,10 +1440,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                     </div>
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Google Map Link</label>
-                      <input 
-                        type="url" 
+                      <input
+                        type="url"
                         value={jinalayaFormData.location}
-                        onChange={(e) => setJinalayaFormData({...jinalayaFormData, location: e.target.value})}
+                        onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, location: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         required
                       />
@@ -1439,19 +1453,19 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   <div className="space-y-6">
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Mulnayak</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={jinalayaFormData.mulnayak}
-                        onChange={(e) => setJinalayaFormData({...jinalayaFormData, mulnayak: e.target.value})}
+                        onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, mulnayak: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
                         placeholder="e.g., Shri Neminath Bhagwan"
                       />
                     </div>
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Status</label>
-                      <select 
+                      <select
                         value={jinalayaFormData.status}
-                        onChange={(e) => setJinalayaFormData({...jinalayaFormData, status: e.target.value})}
+                        onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, status: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors appearance-none"
                       >
                         <option value="Plan">Plan</option>
@@ -1461,9 +1475,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                     </div>
                     <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Description</label>
-                      <textarea 
+                      <textarea
                         value={jinalayaFormData.description}
-                        onChange={(e) => setJinalayaFormData({...jinalayaFormData, description: e.target.value})}
+                        onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, description: e.target.value })}
                         className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm h-[135px] focus:border-[#c5a059] outline-none transition-colors resize-none"
                         required
                       ></textarea>
@@ -1475,8 +1489,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="flex flex-col gap-2">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Before</span>
-                        <input 
-                          type="file" 
+                        <input
+                          type="file"
                           onChange={(e) => {
                             const file = e.target.files[0];
                             if (file) {
@@ -1489,8 +1503,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       </div>
                       <div className="flex flex-col gap-2">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">In-Process</span>
-                        <input 
-                          type="file" 
+                        <input
+                          type="file"
                           onChange={(e) => {
                             const file = e.target.files[0];
                             if (file) {
@@ -1503,8 +1517,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       </div>
                       <div className="flex flex-col gap-2">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">After</span>
-                        <input 
-                          type="file" 
+                        <input
+                          type="file"
                           onChange={(e) => {
                             const file = e.target.files[0];
                             if (file) {
@@ -1519,13 +1533,13 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   </div>
 
                   <div className="md:col-span-2 pt-6 flex gap-4">
-                    <button 
+                    <button
                       type="submit"
                       className="flex-grow py-5 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
                     >
                       {editingJinalayaId ? 'Save Changes' : 'Confirm & Save Jinalaya'}
                     </button>
-                    <button 
+                    <button
                       type="button"
                       onClick={resetJinalayaForm}
                       className="px-10 py-5 border border-gray-300 text-gray-500 font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition-colors"
@@ -1537,10 +1551,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
               </div>
             </div>
           )}
-          </main>
-        </div>
-      );
-    }
+        </main>
+      </div>
+    );
+  }
 
   if (view === 'member') {
     return (
@@ -1554,7 +1568,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             display: none !important;
           }
         `}</style>
-        
+
         {/* Member Header - Light Mode */}
         <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 md:px-16 shrink-0 shadow-sm">
           <div className="flex items-center gap-4">
@@ -1562,8 +1576,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             <span className="h-4 w-[1px] bg-gray-300"></span>
             <span className="text-gray-500 text-xs uppercase tracking-widest font-body">Upashray Reports</span>
           </div>
-          <button 
-            onClick={() => setView('login')}
+          <button
+            onClick={handleLogout}
             className="px-6 py-2 border border-[#c5a059] text-[#c5a059] text-[10px] uppercase tracking-widest hover:bg-[#c5a059] hover:text-white transition-all font-bold"
           >
             Logout
@@ -1587,7 +1601,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                         <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Trusty</strong> {upashrays.find(u => u.id === checkingUpashrayId)?.trusty || '-'}</span>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setCheckingUpashrayId(null)}
                       className="text-gray-400 hover:text-gray-600 transition-colors"
                     >
@@ -1618,7 +1632,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                                 </div>
                               </td>
                               <td className="p-4 border-r border-gray-100 align-middle">
-                                <input 
+                                <input
                                   type="text"
                                   value={item.description}
                                   onChange={(e) => {
@@ -1631,7 +1645,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                                 />
                               </td>
                               <td className="p-4 text-center align-middle">
-                                <input 
+                                <input
                                   type="checkbox"
                                   checked={item.isChecked}
                                   onChange={(e) => {
@@ -1661,7 +1675,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                               {/* Description Input */}
                               <div>
                                 <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2">Description / વિગત</label>
-                                <input 
+                                <input
                                   type="text"
                                   value={item.description}
                                   onChange={(e) => {
@@ -1677,7 +1691,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                               {/* Checkbox */}
                               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-sm">
                                 <label className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">Verified / ચેક</label>
-                                <input 
+                                <input
                                   type="checkbox"
                                   checked={item.isChecked}
                                   onChange={(e) => {
@@ -1695,14 +1709,14 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row justify-center md:justify-end gap-4 sm:gap-6 mt-8">
-                      <button 
+                      <button
                         type="button"
                         onClick={() => setCheckingUpashrayId(null)}
                         className="w-full sm:w-auto px-10 py-4 border border-gray-300 text-gray-500 font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition-all"
                       >
                         Cancel
                       </button>
-                      <button 
+                      <button
                         type="submit"
                         className="w-full sm:w-auto px-12 py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
                       >
@@ -1734,10 +1748,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       </td>
                       <td className="p-6">
                         <div className="text-gray-900 text-sm font-bold tracking-wider mb-1 uppercase">{u.name}</div>
-                        <div className={`text-[9px] inline-block px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${
-                          u.status === 'Done' ? 'bg-green-100 text-green-600' : 
+                        <div className={`text-[9px] inline-block px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${u.status === 'Done' ? 'bg-green-100 text-green-600' :
                           u.status === 'Process' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'
-                        }`}>
+                          }`}>
                           {u.status || 'Plan'}
                         </div>
                       </td>
@@ -1756,13 +1769,13 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                         )}
                       </td>
                       <td className="p-6 text-right">
-                          <button 
-                            onClick={() => setCheckingUpashrayId(u.id)}
-                            className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-all rounded-sm shadow-md"
-                          >
-                            Add Report
-                          </button>
-                        </td>
+                        <button
+                          onClick={() => setCheckingUpashrayId(u.id)}
+                          className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-all rounded-sm shadow-md"
+                        >
+                          Add Report
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
