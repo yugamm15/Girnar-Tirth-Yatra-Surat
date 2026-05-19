@@ -651,6 +651,21 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setFormData({ ...formData, [field]: updated });
   };
 
+  const deleteExistingMedia = async (mediaId, field) => {
+    try {
+      await upashrayMediaDB.delete(mediaId);
+      // Remove from form state
+      const existingField = `existing${field}Media`;
+      setFormData(prev => ({
+        ...prev,
+        [existingField]: (prev[existingField] || []).filter(m => m.id !== mediaId)
+      }));
+      console.log('Media deleted successfully');
+    } catch (err) {
+      console.error('Error deleting media:', err);
+    }
+  };
+
   const resetForm = () => {
     setEditingId(null);
     setFormData({
@@ -766,13 +781,28 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                 .from('upashray-media')
                 .getPublicUrl(fileName);
 
+              console.log('Public URL for upload:', publicData.publicUrl);
+
               // Save to upashray_media table
-              await upashrayMediaDB.create({
-                upashray_id: upashrayId,
-                media_type: mediaTypeMap[fileField],
-                file_url: publicData.publicUrl,
-                sort_order: i
-              });
+              try {
+                const createdMedia = await upashrayMediaDB.create({
+                  upashray_id: upashrayId,
+                  media_type: mediaTypeMap[fileField],
+                  file_url: publicData.publicUrl,
+                  sort_order: i
+                });
+                console.log('Saved media record:', createdMedia);
+              } catch (dbErr) {
+                console.error('Error saving media record:', dbErr);
+              }
+
+              // Verify by fetching all media rows for this upashray
+              try {
+                const verifyRows = await upashrayMediaDB.getByUpashrayId(upashrayId);
+                console.log('Verify upashray_media rows for', upashrayId, verifyRows);
+              } catch (verifyErr) {
+                console.error('Error fetching media rows for verification:', verifyErr);
+              }
 
               console.log('File uploaded successfully:', fileObj.name);
             }
@@ -992,7 +1022,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     }
   };
 
-  const startEdit = (upashray) => {
+  const startEdit = async (upashray) => {
     setEditingId(upashray.id);
     setFormData({
       name: upashray.name,
@@ -1002,11 +1032,33 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       mobile: upashray.mobile || '',
       location: upashray.location,
       description: upashray.description,
-      beforeImg: upashray.beforeImg,
-      processImg: upashray.processImg,
-      afterImg: upashray.afterImg,
-      status: upashray.status || 'Plan'
+      slug: upashray.slug || '',
+      beforeFiles: [], // Will be populated with existing media
+      processFiles: [],
+      afterFiles: [],
+      status: upashray.status || 'plan',
+      existingBeforeMedia: [],
+      existingProcessMedia: [],
+      existingAfterMedia: []
     });
+
+    // Fetch existing media for this upashray
+    try {
+      const allMedia = await upashrayMediaDB.getByUpashrayId(upashray.id);
+      const beforeMedia = allMedia.filter(m => m.media_type === 'before');
+      const processMedia = allMedia.filter(m => m.media_type === 'process');
+      const afterMedia = allMedia.filter(m => m.media_type === 'after');
+
+      setFormData(prev => ({
+        ...prev,
+        existingBeforeMedia: beforeMedia,
+        existingProcessMedia: processMedia,
+        existingAfterMedia: afterMedia
+      }));
+    } catch (err) {
+      console.error('Error fetching existing media:', err);
+    }
+
     setIsModalOpen(true);
   };
 
@@ -2210,6 +2262,28 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       {/* Before Images */}
                       <div className="flex flex-col gap-3">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Before</span>
+                        
+                        {/* Existing Media */}
+                        {formData.existingBeforeMedia && formData.existingBeforeMedia.length > 0 && (
+                          <div className="bg-blue-50 border border-blue-100 p-3 rounded space-y-2">
+                            <p className="text-[9px] font-bold text-blue-700">Existing Images:</p>
+                            {formData.existingBeforeMedia.map((media) => (
+                              <div key={media.id} className="flex justify-between items-center bg-white p-2 rounded text-[9px]">
+                                <a href={media.file_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate">
+                                  View Image
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteExistingMedia(media.id, 'Before')}
+                                  className="text-red-500 hover:text-red-700 font-bold ml-2"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
                         <input
                           type="file"
                           multiple
@@ -2237,6 +2311,28 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       {/* Process Images */}
                       <div className="flex flex-col gap-3">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">In-Process</span>
+                        
+                        {/* Existing Media */}
+                        {formData.existingProcessMedia && formData.existingProcessMedia.length > 0 && (
+                          <div className="bg-blue-50 border border-blue-100 p-3 rounded space-y-2">
+                            <p className="text-[9px] font-bold text-blue-700">Existing Images:</p>
+                            {formData.existingProcessMedia.map((media) => (
+                              <div key={media.id} className="flex justify-between items-center bg-white p-2 rounded text-[9px]">
+                                <a href={media.file_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate">
+                                  View Image
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteExistingMedia(media.id, 'Process')}
+                                  className="text-red-500 hover:text-red-700 font-bold ml-2"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
                         <input
                           type="file"
                           multiple
@@ -2264,6 +2360,28 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       {/* After Images */}
                       <div className="flex flex-col gap-3">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">After</span>
+                        
+                        {/* Existing Media */}
+                        {formData.existingAfterMedia && formData.existingAfterMedia.length > 0 && (
+                          <div className="bg-blue-50 border border-blue-100 p-3 rounded space-y-2">
+                            <p className="text-[9px] font-bold text-blue-700">Existing Images:</p>
+                            {formData.existingAfterMedia.map((media) => (
+                              <div key={media.id} className="flex justify-between items-center bg-white p-2 rounded text-[9px]">
+                                <a href={media.file_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate">
+                                  View Image
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteExistingMedia(media.id, 'After')}
+                                  className="text-red-500 hover:text-red-700 font-bold ml-2"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
                         <input
                           type="file"
                           multiple

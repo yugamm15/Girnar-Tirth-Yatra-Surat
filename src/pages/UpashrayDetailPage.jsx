@@ -207,28 +207,23 @@ const UpashrayDetailPage = () => {
           <article className="light-panel-soft p-5">
             <h2 className="text-xl font-headline text-gray-900">{t(pageCopy.sections?.before || 'Before')}</h2>
             {beforeImages.length > 0 ? (
-              <div className="mt-4 grid grid-cols-1 gap-3">
-                {beforeImages.map((img, index) => (
-                  <div
-                    key={img.id || index}
-                    className="cursor-pointer group relative"
-                    onClick={() => openGallery(beforeImages, `${upashray.name} - Before`)}
-                  >
-                    <SecureImage
-                      src={img.file_url}
-                      alt={`${upashray.name} - Before`}
-                      containerClassName="w-full h-44 rounded-sm border border-gray-100"
-                      className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"
-                    />
-                    {beforeImages.length > 1 && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors rounded-sm">
-                        <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                ))}
+              <div className="mt-4">
+                <div
+                  className="cursor-pointer group relative"
+                  onClick={() => openGallery(beforeImages, `${upashray.name} - Before`)}
+                >
+                  <SecureImage
+                    src={beforeImages[0].file_url}
+                    alt={`${upashray.name} - Before`}
+                    containerClassName="w-full h-44 rounded-sm border border-gray-100"
+                    className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"
+                  />
+                  {beforeImages.length > 1 && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors rounded-sm">
+                      <div className="text-white text-sm font-bold bg-black/40 px-3 py-1 rounded">{beforeImages.length} photos</div>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="mt-4 w-full h-44 rounded-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
@@ -241,28 +236,23 @@ const UpashrayDetailPage = () => {
           <article className="light-panel-soft p-5">
             <h2 className="text-xl font-headline text-gray-900">{t(pageCopy.sections?.process || 'In Process')}</h2>
             {processImages.length > 0 ? (
-              <div className="mt-4 grid grid-cols-1 gap-3">
-                {processImages.map((img, index) => (
-                  <div
-                    key={img.id || index}
-                    className="cursor-pointer group relative"
-                    onClick={() => openGallery(processImages, `${upashray.name} - In Process`)}
-                  >
-                    <SecureImage
-                      src={img.file_url}
-                      alt={`${upashray.name} - In Process`}
-                      containerClassName="w-full h-44 rounded-sm border border-gray-100"
-                      className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"
-                    />
-                    {processImages.length > 1 && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors rounded-sm">
-                        <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                ))}
+              <div className="mt-4">
+                <div
+                  className="cursor-pointer group relative"
+                  onClick={() => openGallery(processImages, `${upashray.name} - In Process`)}
+                >
+                  <SecureImage
+                    src={processImages[0].file_url}
+                    alt={`${upashray.name} - In Process`}
+                    containerClassName="w-full h-44 rounded-sm border border-gray-100"
+                    className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"
+                  />
+                  {processImages.length > 1 && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors rounded-sm">
+                      <div className="text-white text-sm font-bold bg-black/40 px-3 py-1 rounded">{processImages.length} photos</div>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="mt-4 w-full h-44 rounded-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
@@ -275,28 +265,23 @@ const UpashrayDetailPage = () => {
           <article className="light-panel-soft p-5">
             <h2 className="text-xl font-headline text-gray-900">{t(pageCopy.sections?.after || 'After')}</h2>
             {afterImages.length > 0 ? (
-              <div className="mt-4 grid grid-cols-1 gap-3">
-                {afterImages.map((img, index) => (
-                  <div
-                    key={img.id || index}
-                    className="cursor-pointer group relative"
-                    onClick={() => openGallery(afterImages, `${upashray.name} - After`)}
-                  >
-                    <SecureImage
-                      src={img.file_url}
-                      alt={`${upashray.name} - After`}
-                      containerClassName="w-full h-44 rounded-sm border border-gray-100"
-                      className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"
-                    />
-                    {afterImages.length > 1 && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors rounded-sm">
-                        <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                ))}
+              <div className="mt-4">
+                <div
+                  className="cursor-pointer group relative"
+                  onClick={() => openGallery(afterImages, `${upashray.name} - After`)}
+                >
+                  <SecureImage
+                    src={afterImages[0].file_url}
+                    alt={`${upashray.name} - After`}
+                    containerClassName="w-full h-44 rounded-sm border border-gray-100"
+                    className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"
+                  />
+                  {afterImages.length > 1 && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors rounded-sm">
+                      <div className="text-white text-sm font-bold bg-black/40 px-3 py-1 rounded">{afterImages.length} photos</div>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="mt-4 w-full h-44 rounded-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
