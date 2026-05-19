@@ -215,16 +215,27 @@ export const yatraDatesDB = {
   async create(yatraDate) {
     const { data, error } = await supabase
       .from('yatra_dates')
-      .insert([{ ...yatraDate, created_at: new Date().toISOString() }])
+      .insert([{ 
+        date_text: yatraDate.date_text,
+        description: yatraDate.description,
+        image: yatraDate.image,
+        registration_open: yatraDate.registration_open,
+        created_at: new Date().toISOString() 
+      }])
       .select();
     if (error) throw error;
     return data?.[0];
   },
 
-  async update(id, yatraDate) {
+  async update(id, updates) {
     const { data, error } = await supabase
       .from('yatra_dates')
-      .update({ ...yatraDate })
+      .update({
+        date_text: updates.date_text,
+        description: updates.description,
+        image: updates.image,
+        registration_open: updates.registration_open
+      })
       .eq('id', id)
       .select();
     if (error) throw error;

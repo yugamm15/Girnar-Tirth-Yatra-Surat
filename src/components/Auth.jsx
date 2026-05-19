@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient.js';
-import { upashraysDB, membersDB, jinalayasDB, checkingReportsDB, adminProfilesDB } from '../lib/database.js';
+import { upashraysDB, membersDB, jinalayasDB, checkingReportsDB, adminProfilesDB, yatrikRegistrationsDB, yatraDatesDB } from '../lib/database.js';
 
 const ADMIN_CREDENTIALS = {
   email: 'GirnarTirthYatraGroup@gmail.com',
@@ -24,8 +24,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const [members, setMembers] = useState([]);
   const [currentMemberId, setCurrentMemberId] = useState(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
-  const [activeTab, setActiveTab] = useState('upashrays'); // 'upashrays', 'members', 'jinalayas', 'reports'
+  const [activeTab, setActiveTab] = useState('upashrays'); // 'upashrays', 'members', 'jinalayas', 'reports', 'bus-yatra'
   const [allReports, setAllReports] = useState([]);
+  const [busRegistrations, setBusRegistrations] = useState([]);
+  const [yatraDates, setYatraDates] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   
@@ -105,6 +107,16 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     status: 'Plan'
   });
 
+  // Form State for Yatra Dates
+  const [yatraDateFormData, setYatraDateFormData] = useState({
+    date_text: '',
+    description: '',
+    image: '',
+    registration_open: true
+  });
+  const [isYatraDateModalOpen, setIsYatraDateModalOpen] = useState(false);
+  const [editingYatraDateId, setEditingYatraDateId] = useState(null);
+
   // State for Checking Report
   const [checkingReport, setCheckingReport] = useState(CHECKING_POINTS.map((point, index) => ({
     id: index,
@@ -117,12 +129,20 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const loadAllData = async () => {
     setIsLoadingData(true);
     try {
-      const [upashraysData, membersData, jinalayasData, reportsData] = await Promise.all([
+      const [upashraysData, membersData, jinalayasData, reportsData, busData, datesData] = await Promise.all([
         upashraysDB.getAll().catch(err => { console.error('Upashrays load error:', err); return []; }),
         membersDB.getAll().catch(err => { console.error('Members load error:', err); return []; }),
         jinalayasDB.getAll().catch(err => { console.error('Jinalayas load error:', err); return []; }),
-        checkingReportsDB.getAll().catch(err => { console.error('Reports load error:', err); return []; })
+        checkingReportsDB.getAll().catch(err => { console.error('Reports load error:', err); return []; }),
+        yatrikRegistrationsDB.getAll().catch(err => { console.error('Bus Yatra load error:', err); return []; }),
+        yatraDatesDB.getAll().catch(err => { console.error('Yatra Dates load error:', err); return []; })
       ]);
+
+      setBusRegistrations(busData || []);
+      setYatraDates((datesData || []).map(d => ({
+        ...d,
+        registration_open: d.registration_open !== false // Default to true unless explicitly false
+      })));
 
       if (Array.isArray(upashraysData)) {
         setUpashrays(upashraysData.map(u => {
@@ -754,6 +774,80 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     }
   };
 
+  const deleteBusRegistration = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this registration?')) return;
+    try {
+      await yatrikRegistrationsDB.delete(id);
+      setBusRegistrations(busRegistrations.filter(r => r.id !== id));
+    } catch (error) {
+      console.error('Error deleting registration:', error);
+      alert('Failed to delete registration');
+    }
+  };
+
+  const handleYatraFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setYatraDateFormData({ ...yatraDateFormData, image: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleYatraDateSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingYatraDateId) {
+        const updated = await yatraDatesDB.update(editingYatraDateId, yatraDateFormData);
+        const mappedUpdated = {
+          ...updated,
+          registration_open: updated.registration_open !== false
+        };
+        setYatraDates(yatraDates.map(d => d.id === editingYatraDateId ? mappedUpdated : d));
+      } else {
+        const created = await yatraDatesDB.create(yatraDateFormData);
+        const mappedCreated = {
+          ...created,
+          registration_open: created.registration_open !== false
+        };
+        setYatraDates([mappedCreated, ...yatraDates]);
+      }
+      setIsYatraDateModalOpen(false);
+      setEditingYatraDateId(null);
+      setYatraDateFormData({ date_text: '', description: '', image: '', registration_open: true });
+    } catch (error) {
+      console.error('Error saving yatra date:', error);
+      alert('Failed to save yatra date');
+    }
+  };
+
+  const deleteYatraDate = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this yatra date? All associated registrations will be lost.')) return;
+    try {
+      await yatraDatesDB.delete(id);
+      setYatraDates(yatraDates.filter(d => d.id !== id));
+    } catch (error) {
+      console.error('Error deleting yatra date:', error);
+      alert('Failed to delete yatra date');
+    }
+  };
+
+  const toggleRegistrationStatus = async (id, currentStatus) => {
+    try {
+      const updated = await yatraDatesDB.update(id, { registration_open: !currentStatus });
+      const mappedUpdated = {
+        ...updated,
+        registration_open: updated.registration_open !== false
+      };
+      setYatraDates(yatraDates.map(d => d.id === id ? mappedUpdated : d));
+    } catch (error) {
+      console.error('Error toggling status:', error);
+      alert('Failed to toggle registration status');
+    }
+  };
+
   if (view === 'login') {
     return (
       <div className="fixed inset-0 z-[200] bg-[#f8f9fa] flex items-center justify-center p-6">
@@ -858,6 +952,13 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
               >
                 Reports
               </button>
+              <button
+                onClick={() => setActiveTab('bus-yatra')}
+                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'bus-yatra' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                  }`}
+              >
+                Bus Yatra
+              </button>
             </nav>
           </div>
           <button
@@ -956,6 +1057,180 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                             </td>
                           </tr>
                         ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            </>
+          )}
+
+          {activeTab === 'bus-yatra' && (
+            <>
+              <div className="max-w-5xl mx-auto mb-12">
+                <div className="flex justify-between items-center mb-6">
+                  <div className="text-center md:text-left">
+                    <h2 className="text-4xl font-headline text-gray-900 mb-2">Bus Yatra Management</h2>
+                    <p className="text-gray-500 text-sm font-light">Manage yatra dates and view registrations.</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setEditingYatraDateId(null);
+                      setYatraDateFormData({ date_text: '', description: '', image: '', registration_open: true });
+                      setIsYatraDateModalOpen(true);
+                    }}
+                    className="px-6 py-3 bg-[#c5a059] text-white text-[11px] font-bold uppercase tracking-widest rounded-sm shadow-lg shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
+                  >
+                    Add Yatra Date
+                  </button>
+                </div>
+
+                {/* Yatra Dates Table */}
+                <div className="mb-12">
+                  <h3 className="text-sm font-bold uppercase tracking-widest mb-4 text-[#c5a059]">Yatra Dates</h3>
+                  <div className="bg-white overflow-x-auto shadow-md rounded-sm border border-gray-100">
+                    <table className="w-full min-w-[800px] text-left border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50 border-b border-gray-200">
+                          <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Yatra Date</th>
+                          <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Image</th>
+                          <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Description</th>
+                          <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Yatriks</th>
+                          <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Registration</th>
+                          <th className="px-6 py-4 text-right text-[10px] uppercase tracking-widest text-gray-400 font-bold">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {yatraDates.length > 0 ? (
+                          yatraDates.map((date) => {
+                            const registrationCount = busRegistrations.filter(r => String(r.yatra_id) === String(date.id)).length;
+                            return (
+                              <tr key={date.id} className="hover:bg-gray-50/50 transition-colors">
+                                <td className="px-6 py-4 text-sm font-bold text-gray-900">{date.date_text}</td>
+                                <td className="px-6 py-4">
+                                  <div className="w-12 h-12 rounded-sm overflow-hidden bg-gray-100 border border-gray-200">
+                                    {date.image ? (
+                                      <img src={date.image} alt="Yatra" className="w-full h-full object-cover" />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-600 max-w-[200px] truncate">{date.description || '-'}</td>
+                                <td className="px-6 py-4">
+                                  <span className="px-3 py-1 bg-gray-100 text-[#c5a059] text-[10px] font-bold rounded-full">
+                                    {registrationCount} Registered
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <button
+                                    onClick={() => toggleRegistrationStatus(date.id, date.registration_open)}
+                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${date.registration_open ? 'bg-green-500' : 'bg-gray-300'}`}
+                                  >
+                                    <span
+                                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${date.registration_open ? 'translate-x-6' : 'translate-x-1'}`}
+                                    />
+                                    <span className="sr-only">{date.registration_open ? 'ON' : 'OFF'}</span>
+                                  </button>
+                                  <span className={`ml-3 text-[10px] font-bold uppercase tracking-wider ${date.registration_open ? 'text-green-600' : 'text-gray-400'}`}>
+                                    {date.registration_open ? 'Open' : 'Closed'}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 text-right space-x-2">
+                                  <button
+                                    onClick={() => {
+                                      setEditingYatraDateId(date.id);
+                                      setYatraDateFormData({
+                                        date_text: date.date_text,
+                                        description: date.description || '',
+                                        image: date.image || '',
+                                        registration_open: date.registration_open
+                                      });
+                                      setIsYatraDateModalOpen(true);
+                                    }}
+                                    className="p-2 text-gray-400 hover:text-[#c5a059] transition-colors"
+                                  >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    onClick={() => deleteYatraDate(date.id)}
+                                    className="p-2 text-red-400 hover:text-red-600 transition-colors"
+                                  >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        ) : (
+                          <tr>
+                            <td colSpan="5" className="px-6 py-20 text-center text-gray-400 italic">No yatra dates added yet.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-[#c5a059]">All Registrations</h3>
+                </div>
+              </div>
+
+              <section className="max-w-5xl mx-auto">
+                <div className="bg-white overflow-x-auto shadow-md rounded-sm border border-gray-100">
+                  <table className="w-full min-w-[900px] text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Yatrik Name</th>
+                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Contact</th>
+                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Gender</th>
+                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Remarks</th>
+                        <th className="px-6 py-4 text-right text-[10px] uppercase tracking-widest text-gray-400 font-bold">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {busRegistrations.length > 0 ? (
+                        busRegistrations.map((reg) => (
+                          <tr key={reg.id} className="hover:bg-gray-50/50 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="text-sm font-bold text-gray-900">{reg.first_name} {reg.last_name}</div>
+                              <div className="text-[10px] text-gray-400">DOB: {reg.birthdate}</div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="text-sm text-gray-600">{reg.phone}</div>
+                              {reg.alt_phone && <div className="text-[10px] text-gray-400">Alt: {reg.alt_phone}</div>}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase rounded-sm border border-gray-200">
+                                {reg.gender}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-500 max-w-[200px] truncate">{reg.remarks || '-'}</td>
+                            <td className="px-6 py-4 text-right">
+                              <button
+                                onClick={() => deleteBusRegistration(reg.id)}
+                                className="p-2 text-red-400 hover:text-red-600 transition-colors"
+                              >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="5" className="px-6 py-20 text-center text-gray-400 italic">No bus yatra registrations found.</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -1823,6 +2098,100 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             </div>
           )}
         </main>
+
+        {/* Yatra Date Modal */}
+        {isYatraDateModalOpen && (
+          <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/80" onClick={() => setIsYatraDateModalOpen(false)}></div>
+            <div className="relative bg-white w-full max-w-lg shadow-2xl rounded-sm overflow-hidden animate-fade-in">
+              <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900">
+                  {editingYatraDateId ? 'Edit Yatra Date' : 'Add New Yatra Date'}
+                </h3>
+                <button onClick={() => setIsYatraDateModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <form onSubmit={handleYatraDateSubmit} className="p-8 space-y-6">
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Date Text (e.g. 15th May 2024)</label>
+                  <input
+                    type="text"
+                    required
+                    value={yatraDateFormData.date_text}
+                    onChange={(e) => setYatraDateFormData({ ...yatraDateFormData, date_text: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 text-sm py-3 px-4 outline-none focus:border-[#c5a059] transition-colors"
+                    placeholder="Enter yatra date description"
+                  />
+                </div>
+                <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Yatra Image</label>
+                    <div className="flex items-center gap-4">
+                      <div className="w-20 h-20 bg-gray-50 border border-dashed border-gray-300 rounded-sm overflow-hidden flex items-center justify-center relative">
+                        {yatraDateFormData.image ? (
+                          <img src={yatraDateFormData.image} alt="Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleYatraFileChange}
+                          className="absolute inset-0 opacity-0 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-grow">
+                        <p className="text-[10px] text-gray-400 mb-2 uppercase font-bold">Click to upload photo</p>
+                        {yatraDateFormData.image && (
+                          <button 
+                            type="button"
+                            onClick={() => setYatraDateFormData({ ...yatraDateFormData, image: '' })}
+                            className="text-[10px] text-red-500 font-bold uppercase hover:underline"
+                          >
+                            Remove Photo
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Short Description</label>
+                  <textarea
+                    value={yatraDateFormData.description}
+                    onChange={(e) => setYatraDateFormData({ ...yatraDateFormData, description: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 text-sm py-3 px-4 outline-none focus:border-[#c5a059] transition-colors h-24 resize-none"
+                    placeholder="Optional details about this yatra"
+                  />
+                </div>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-sm">
+                  <div>
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-700">Open for Registration</h4>
+                    <p className="text-[10px] text-gray-400">Toggle whether users can sign up for this date.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setYatraDateFormData({ ...yatraDateFormData, registration_open: !yatraDateFormData.registration_open })}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${yatraDateFormData.registration_open ? 'bg-green-500' : 'bg-gray-300'}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${yatraDateFormData.registration_open ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </button>
+                </div>
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    className="w-full py-4 bg-[#c5a059] text-white text-[11px] font-bold uppercase tracking-[0.3em] rounded-sm shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
+                  >
+                    {editingYatraDateId ? 'Update Yatra Date' : 'Save Yatra Date'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
