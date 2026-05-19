@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient.js';
-import { upashraysDB, membersDB, jinalayasDB, checkingReportsDB, adminProfilesDB, yatrikRegistrationsDB, yatraDatesDB } from '../lib/database.js';
+import { upashraysDB, membersDB, jinalayasDB, checkingReportsDB, adminProfilesDB, yatrikRegistrationsDB, yatraDatesDB, upashrayMediaDB } from '../lib/database.js';
 
 const ADMIN_CREDENTIALS = {
   email: 'GirnarTirthYatraGroup@gmail.com',
@@ -78,10 +78,11 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     mobile: '',
     location: '',
     description: '',
-    beforeImg: null,
-    processImg: null,
-    afterImg: null,
-    status: 'Plan'
+    slug: '',
+    beforeFiles: [], // Array of file objects
+    processFiles: [], // Array of file objects
+    afterFiles: [], // Array of file objects
+    status: 'plan'
   });
 
   // Form State for Adding/Editing Member
@@ -101,10 +102,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     mulnayak: '',
     location: '',
     description: '',
-    beforeImg: null,
-    processImg: null,
-    afterImg: null,
-    status: 'Plan'
+    beforeFiles: [],
+    processFiles: [],
+    afterFiles: [],
+    status: 'plan'
   });
 
   // Form State for Yatra Dates
@@ -439,11 +440,39 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   }
 
   const handleFileChange = (e, field) => {
-    const file = e.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setFormData({ ...formData, [field]: url });
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      setFormData({ 
+        ...formData, 
+        [field]: files.map(f => ({ name: f.name, size: f.size }))
+      });
     }
+  };
+
+  const handleMultipleFilesChange = (e, field) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      // Create temporary data URLs for preview
+      const fileObjects = files.map(f => ({
+        name: f.name,
+        size: f.size,
+        file: f,
+        preview: URL.createObjectURL(f)
+      }));
+      setFormData({ 
+        ...formData, 
+        [field]: [...(formData[field] || []), ...fileObjects]
+      });
+    }
+  };
+
+  const removeMediaFile = (field, index) => {
+    const updated = [...formData[field]];
+    if (updated[index] && updated[index].preview) {
+      URL.revokeObjectURL(updated[index].preview);
+    }
+    updated.splice(index, 1);
+    setFormData({ ...formData, [field]: updated });
   };
 
   const resetForm = () => {
@@ -456,10 +485,11 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       mobile: '',
       location: '',
       description: '',
-      beforeImg: null,
-      processImg: null,
-      afterImg: null,
-      status: 'Plan'
+      slug: '',
+      beforeFiles: [],
+      processFiles: [],
+      afterFiles: [],
+      status: 'plan'
     });
     setIsModalOpen(false);
   };
@@ -484,10 +514,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       mulnayak: '',
       location: '',
       description: '',
-      beforeImg: null,
-      processImg: null,
-      afterImg: null,
-      status: 'Plan'
+      beforeFiles: [],
+      processFiles: [],
+      afterFiles: [],
+      status: 'plan'
     });
     setIsJinalayaModalOpen(false);
   };
@@ -495,47 +525,85 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const handleSaveUpashray = async (e) => {
     e.preventDefault();
     try {
+      let upashrayId = editingId;
+      const upashrayData = {
+        name: formData.name,
+        village: formData.village,
+        route: formData.route,
+        trusty: formData.trusty,
+        mobile: formData.mobile,
+        location: formData.location,
+        description: formData.description,
+        slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
+        status: formData.status.toLowerCase()
+      };
+
       if (editingId) {
-        // Update existing
+        // Update existing upashray
         try {
-          await upashraysDB.update(editingId, {
-            name: formData.name,
-            village: formData.village,
-            route: formData.route,
-            trusty: formData.trusty,
-            mobile: formData.mobile,
-            location: formData.location,
-            description: formData.description,
-            before_img: formData.beforeImg,
-            process_img: formData.processImg,
-            after_img: formData.afterImg,
-            status: formData.status.toLowerCase()
-          });
+          await upashraysDB.update(editingId, upashrayData);
         } catch (dbError) {
           console.log('Database update failed, using local state');
         }
-        setUpashrays(upashrays.map(u => u.id === editingId ? { ...formData, id: u.id, reports: u.reports } : u));
+        setUpashrays(upashrays.map(u => u.id === editingId ? { ...u, ...upashrayData } : u));
       } else {
-        // Create new
+        // Create new upashray
         try {
-          await upashraysDB.create({
-            name: formData.name,
-            village: formData.village,
-            route: formData.route,
-            trusty: formData.trusty,
-            mobile: formData.mobile,
-            location: formData.location,
-            description: formData.description,
-            before_img: formData.beforeImg,
-            process_img: formData.processImg,
-            after_img: formData.afterImg,
-            status: formData.status.toLowerCase()
-          });
+          const created = await upashraysDB.create(upashrayData);
+          upashrayId = created.id;
         } catch (dbError) {
           console.log('Database create failed, using local state');
+          upashrayId = Date.now();
         }
-        setUpashrays([...upashrays, { ...formData, id: Date.now(), reports: [] }]);
+        setUpashrays([...upashrays, { ...upashrayData, id: upashrayId, reports: [] }]);
       }
+
+      // Handle media uploads for before, process, after
+      const mediaTypes = ['beforeFiles', 'processFiles', 'afterFiles'];
+      const mediaTypeMap = {
+        beforeFiles: 'before',
+        processFiles: 'process',
+        afterFiles: 'after'
+      };
+
+      for (const fileField of mediaTypes) {
+        const files = formData[fileField] || [];
+        for (let i = 0; i < files.length; i++) {
+          const fileObj = files[i];
+          try {
+            if (fileObj.file) {
+              // This is a new file - upload to Supabase storage
+              const fileName = `upashray-${upashrayId}-${mediaTypeMap[fileField]}-${Date.now()}-${fileObj.name}`;
+              const { data, error } = await supabase.storage
+                .from('upashray-media')
+                .upload(fileName, fileObj.file);
+
+              if (error) {
+                console.error('Upload error:', error);
+                continue;
+              }
+
+              // Get public URL for the uploaded file
+              const { data: publicData } = supabase.storage
+                .from('upashray-media')
+                .getPublicUrl(fileName);
+
+              // Save to upashray_media table
+              await upashrayMediaDB.create({
+                upashray_id: upashrayId,
+                media_type: mediaTypeMap[fileField],
+                file_url: publicData.publicUrl,
+                sort_order: i
+              });
+
+              console.log('File uploaded successfully:', fileObj.name);
+            }
+          } catch (err) {
+            console.error('Error uploading/saving media:', err);
+          }
+        }
+      }
+
       resetForm();
     } catch (error) {
       console.error('Error saving upashray:', error);
@@ -586,45 +654,75 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const handleSaveJinalaya = async (e) => {
     e.preventDefault();
     try {
+      let jinalayaId = editingJinalayaId;
+      const jinalayaData = {
+        name: jinalayaFormData.name,
+        village: jinalayaFormData.village,
+        route: jinalayaFormData.route,
+        mulnayak: jinalayaFormData.mulnayak,
+        location: jinalayaFormData.location,
+        description: jinalayaFormData.description,
+        status: jinalayaFormData.status.toLowerCase()
+      };
+
       if (editingJinalayaId) {
         // Update existing
         try {
-          await jinalayasDB.update(editingJinalayaId, {
-            name: jinalayaFormData.name,
-            village: jinalayaFormData.village,
-            route: jinalayaFormData.route,
-            mulnayak: jinalayaFormData.mulnayak,
-            location: jinalayaFormData.location,
-            description: jinalayaFormData.description,
-            before_img: jinalayaFormData.beforeImg,
-            process_img: jinalayaFormData.processImg,
-            after_img: jinalayaFormData.afterImg,
-            status: jinalayaFormData.status.toLowerCase()
-          });
+          await jinalayasDB.update(editingJinalayaId, jinalayaData);
         } catch (dbError) {
           console.log('Database update failed, using local state');
         }
-        setJinalayas(jinalayas.map(j => j.id === editingJinalayaId ? { ...jinalayaFormData, id: j.id } : j));
+        setJinalayas(jinalayas.map(j => j.id === editingJinalayaId ? { ...j, ...jinalayaData } : j));
       } else {
         // Create new
         try {
-          await jinalayasDB.create({
-            name: jinalayaFormData.name,
-            village: jinalayaFormData.village,
-            route: jinalayaFormData.route,
-            mulnayak: jinalayaFormData.mulnayak,
-            location: jinalayaFormData.location,
-            description: jinalayaFormData.description,
-            before_img: jinalayaFormData.beforeImg,
-            process_img: jinalayaFormData.processImg,
-            after_img: jinalayaFormData.afterImg,
-            status: jinalayaFormData.status.toLowerCase()
-          });
+          const created = await jinalayasDB.create(jinalayaData);
+          jinalayaId = created.id;
         } catch (dbError) {
           console.log('Database create failed, using local state');
+          jinalayaId = Date.now();
         }
-        setJinalayas([...jinalayas, { ...jinalayaFormData, id: Date.now() }]);
+        setJinalayas([...jinalayas, { ...jinalayaData, id: jinalayaId }]);
       }
+
+      // Handle media uploads for before, process, after
+      const mediaTypes = ['beforeFiles', 'processFiles', 'afterFiles'];
+      const mediaTypeMap = {
+        beforeFiles: 'before',
+        processFiles: 'process',
+        afterFiles: 'after'
+      };
+
+      for (const fileField of mediaTypes) {
+        const files = jinalayaFormData[fileField] || [];
+        for (let i = 0; i < files.length; i++) {
+          const fileObj = files[i];
+          try {
+            if (fileObj.file) {
+              // This is a new file - upload to Supabase storage
+              const fileName = `jinalaya-${jinalayaId}-${mediaTypeMap[fileField]}-${Date.now()}-${fileObj.name}`;
+              const { data, error } = await supabase.storage
+                .from('jinalaya-media')
+                .upload(fileName, fileObj.file);
+
+              if (error) {
+                console.error('Upload error:', error);
+                continue;
+              }
+
+              // Get public URL for the uploaded file
+              const { data: publicData } = supabase.storage
+                .from('jinalaya-media')
+                .getPublicUrl(fileName);
+
+              console.log('File uploaded successfully:', fileObj.name);
+            }
+          } catch (err) {
+            console.error('Error uploading media:', err);
+          }
+        }
+      }
+
       resetJinalayaForm();
     } catch (error) {
       console.error('Error saving jinalaya:', error);
@@ -1592,6 +1690,16 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       />
                     </div>
                     <div>
+                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">URL Slug (auto-generated from name)</label>
+                      <input
+                        type="text"
+                        value={formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-')}
+                        onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
+                        placeholder="e.g., vagad, ranpur"
+                      />
+                    </div>
+                    <div>
                       <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Village Name</label>
                       <input
                         type="text"
@@ -1669,31 +1777,87 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   </div>
 
                   <div className="md:col-span-2 border-t border-gray-100 pt-8">
-                    <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-4 font-bold">Update Pictures (Before / In-Process / After)</label>
+                    <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-4 font-bold">Upload Pictures (Before / In-Process / After) - Multiple Files Supported</label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="flex flex-col gap-2">
+                      {/* Before Images */}
+                      <div className="flex flex-col gap-3">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Before</span>
                         <input
                           type="file"
-                          onChange={(e) => handleFileChange(e, 'beforeImg')}
+                          multiple
+                          onChange={(e) => handleMultipleFilesChange(e, 'beforeFiles')}
                           className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-[#c5a059]/10 file:text-[#c5a059] hover:file:bg-[#c5a059]/20"
                         />
+                        {formData.beforeFiles && formData.beforeFiles.length > 0 && (
+                          <div className="text-[9px] text-gray-600 space-y-1">
+                            {formData.beforeFiles.map((f, idx) => (
+                              <div key={idx} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                                <span className="truncate">{f.name || 'Image'}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeMediaFile('beforeFiles', idx)}
+                                  className="text-red-500 hover:text-red-700 font-bold"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <div className="flex flex-col gap-2">
+
+                      {/* Process Images */}
+                      <div className="flex flex-col gap-3">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">In-Process</span>
                         <input
                           type="file"
-                          onChange={(e) => handleFileChange(e, 'processImg')}
+                          multiple
+                          onChange={(e) => handleMultipleFilesChange(e, 'processFiles')}
                           className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-[#c5a059]/10 file:text-[#c5a059] hover:file:bg-[#c5a059]/20"
                         />
+                        {formData.processFiles && formData.processFiles.length > 0 && (
+                          <div className="text-[9px] text-gray-600 space-y-1">
+                            {formData.processFiles.map((f, idx) => (
+                              <div key={idx} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                                <span className="truncate">{f.name || 'Image'}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeMediaFile('processFiles', idx)}
+                                  className="text-red-500 hover:text-red-700 font-bold"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <div className="flex flex-col gap-2">
+
+                      {/* After Images */}
+                      <div className="flex flex-col gap-3">
                         <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">After</span>
                         <input
                           type="file"
-                          onChange={(e) => handleFileChange(e, 'afterImg')}
+                          multiple
+                          onChange={(e) => handleMultipleFilesChange(e, 'afterFiles')}
                           className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-[#c5a059]/10 file:text-[#c5a059] hover:file:bg-[#c5a059]/20"
                         />
+                        {formData.afterFiles && formData.afterFiles.length > 0 && (
+                          <div className="text-[9px] text-gray-600 space-y-1">
+                            {formData.afterFiles.map((f, idx) => (
+                              <div key={idx} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                                <span className="truncate">{f.name || 'Image'}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeMediaFile('afterFiles', idx)}
+                                  className="text-red-500 hover:text-red-700 font-bold"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

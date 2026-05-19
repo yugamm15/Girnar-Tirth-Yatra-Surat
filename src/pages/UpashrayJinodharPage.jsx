@@ -1,19 +1,77 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { LightPageShell } from '../components/LightPageShell.jsx';
 import SecureImage from '../components/SecureImage.jsx';
-import { siteCopy, supabaseRoadmap } from '../content/siteCopy.js';
-import { upashrays } from '../content/upashrays.js';
+import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { upashraysDB, upashrayMediaDB } from '../lib/database.js';
 
 const statusClassNames = {
   completed: 'bg-green-100 text-green-700 border-green-200',
   inProgress: 'bg-amber-100 text-amber-700 border-amber-200',
   planned: 'bg-slate-100 text-slate-700 border-slate-200',
+  done: 'bg-green-100 text-green-700 border-green-200',
+  process: 'bg-amber-100 text-amber-700 border-amber-200',
+  plan: 'bg-slate-100 text-slate-700 border-slate-200',
 };
 
 const UpashrayJinodharPage = () => {
   const { t } = useLanguage();
   const pageCopy = siteCopy.upashrayPage;
+  const [upashrays, setUpashrays] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadUpashrays = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const data = await upashraysDB.getAll();
+        if (!data || data.length === 0) {
+          setUpashrays([]);
+          return;
+        }
+
+        // For each upashray, fetch its media for cover image
+        const upashrayWithImages = await Promise.all(
+          data.map(async (upashray) => {
+            try {
+              const media = await upashrayMediaDB.getByUpashrayId(upashray.id);
+              // Use first 'before' image as cover, or any image if no 'before'
+              const coverImage = 
+                media.find((m) => m.media_type === 'before')?.file_url ||
+                media[0]?.file_url ||
+                '/images/Upasray.png';
+
+              return {
+                ...upashray,
+                coverImage,
+                slug: upashray.slug || upashray.id.toString(),
+              };
+            } catch (err) {
+              console.error(`Error loading media for upashray ${upashray.id}:`, err);
+              return {
+                ...upashray,
+                coverImage: '/images/Upasray.png',
+                slug: upashray.slug || upashray.id.toString(),
+              };
+            }
+          })
+        );
+
+        setUpashrays(upashrayWithImages);
+      } catch (err) {
+        console.error('Error loading upashrays:', err);
+        setError('Failed to load upashrays');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUpashrays();
+  }, []);
 
   return (
     <LightPageShell>
@@ -65,56 +123,66 @@ const UpashrayJinodharPage = () => {
           </div>
         </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {upashrays.map((upashray) => (
-            <article key={upashray.slug} className="light-panel-soft light-card-image overflow-hidden">
-              <SecureImage
-                src={upashray.coverImage}
-                alt={t(upashray.name)}
-                containerClassName="w-full h-52"
-                className="w-full h-52 object-cover"
-              />
-
-              <div className="p-5 md:p-6">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-xl md:text-2xl font-headline text-gray-900">{t(upashray.name)}</h2>
-                  <span
-                    className={`px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] font-bold rounded-full border ${
-                      statusClassNames[upashray.status] ?? statusClassNames.planned
-                    }`}
-                  >
-                    {t(siteCopy.statuses[upashray.status])}
-                  </span>
+        {loading ? (
+          <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            {[...Array(6)].map((_, i) => (
+              <article key={i} className="light-panel-soft light-card-image overflow-hidden animate-pulse">
+                <div className="w-full h-52 bg-gray-200"></div>
+                <div className="p-5 md:p-6 space-y-3">
+                  <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
                 </div>
-
-                <p className="mt-2 text-sm text-gray-600">{t(upashray.place)}</p>
-                <p className="mt-3 text-sm text-gray-600 leading-relaxed">{t(upashray.description)}</p>
-
-                <div className="mt-5">
-                  <Link
-                    to={`/upashray-jinodhar/${upashray.slug}`}
-                    className="inline-block px-5 py-2.5 bg-[#c5a059] text-white uppercase tracking-[0.16em] text-[10px] font-bold hover:bg-[#b08d4a] transition-colors"
-                  >
-                    {t(siteCopy.common.viewDetails)}
-                  </Link>
-                </div>
-              </div>
-            </article>
-          ))}
-        </section>
-
-        <section className="light-panel light-panel-right p-6 md:p-10">
-          <h3 className="text-2xl md:text-3xl font-headline text-gray-900">{t(pageCopy.supabasePhaseTitle)}</h3>
-          <p className="mt-4 text-sm md:text-base text-gray-600 max-w-4xl leading-relaxed">{t(supabaseRoadmap.body)}</p>
-          <ul className="mt-5 space-y-3 text-sm md:text-base text-gray-700">
-            {pageCopy.supabasePhaseBullets.map((item, index) => (
-              <li key={index} className="flex gap-3">
-                <span className="w-1.5 h-1.5 mt-2 rounded-full bg-[#c5a059] shrink-0" />
-                <span>{t(item)}</span>
-              </li>
+              </article>
             ))}
-          </ul>
-        </section>
+          </section>
+        ) : error ? (
+          <section className="light-panel light-panel-left p-6 md:p-10">
+            <p className="text-red-600">{error}</p>
+          </section>
+        ) : upashrays.length === 0 ? (
+          <section className="light-panel light-panel-left p-6 md:p-10">
+            <p className="text-gray-600">No upashrays found. Please add some from the admin panel.</p>
+          </section>
+        ) : (
+          <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            {upashrays.map((upashray) => (
+              <article key={upashray.id} className="light-panel-soft light-card-image overflow-hidden">
+                <SecureImage
+                  src={upashray.coverImage}
+                  alt={upashray.name}
+                  containerClassName="w-full h-52"
+                  className="w-full h-52 object-cover"
+                />
+
+                <div className="p-5 md:p-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="text-xl md:text-2xl font-headline text-gray-900">{upashray.name}</h2>
+                    <span
+                      className={`px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] font-bold rounded-full border ${
+                        statusClassNames[upashray.status] ?? statusClassNames.planned
+                      }`}
+                    >
+                      {t(siteCopy.statuses[upashray.status] || upashray.status)}
+                    </span>
+                  </div>
+
+                  <p className="mt-2 text-sm text-gray-600">{upashray.village}</p>
+                  <p className="mt-3 text-sm text-gray-600 leading-relaxed">{upashray.description}</p>
+
+                  <div className="mt-5">
+                    <Link
+                      to={`/upashray-jinodhar/${upashray.slug}`}
+                      className="inline-block px-5 py-2.5 bg-[#c5a059] text-white uppercase tracking-[0.16em] text-[10px] font-bold hover:bg-[#b08d4a] transition-colors"
+                    >
+                      {t(siteCopy.common.viewDetails)}
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </section>
+        )}
       </section>
     </LightPageShell>
   );

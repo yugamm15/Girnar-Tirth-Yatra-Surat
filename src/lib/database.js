@@ -275,6 +275,18 @@ export const upashrayMediaDB = {
     return data || [];
   },
 
+  async getByUpashrayIdAndType(upashrayId, mediaType) {
+    const { data, error } = await supabase
+      .from('upashray_media')
+      .select('*')
+      .eq('upashray_id', upashrayId)
+      .eq('media_type', mediaType)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
   async create(mediaItem) {
     const { data, error } = await supabase
       .from('upashray_media')
