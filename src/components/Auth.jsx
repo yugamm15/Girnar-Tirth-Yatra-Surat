@@ -346,8 +346,147 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setIsReportModalOpen(true);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const openReportAndPrint = (report) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow pop-ups to print the report');
+      return;
+    }
+
+    const pointsHtml = Array.isArray(report.points) 
+      ? report.points.map((item, index) => `
+        <div class="flex items-start py-5 px-8 ${index !== report.points.length - 1 ? 'border-b border-gray-100' : ''} ${item.isChecked ? 'bg-gray-50/50' : ''}">
+          <div class="flex-shrink-0 mt-1.5 mr-6">
+            ${item.isChecked ? `
+              <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-sm">
+                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            ` : `
+              <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center">
+                <div class="w-2 h-2 rounded-full bg-gray-100"></div>
+              </div>
+            `}
+          </div>
+          <div class="flex-grow">
+            <p class="text-[14px] font-medium text-gray-800 leading-relaxed font-body">${item.point}</p>
+            ${item.description ? `
+              <div class="mt-3 p-4 bg-white border-l-2 border-[#c5a059] italic text-gray-600 text-[13px] font-body shadow-sm">
+                "${item.description}"
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('')
+      : '<div class="p-12 text-center text-gray-400 italic text-lg">No checklist data available.</div>';
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Report - ${report.upashrayName}</title>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+          <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&display=swap" rel="stylesheet">
+          <style>
+            @theme {
+              --font-headline: "Newsreader", serif;
+              --font-body: "Manrope", sans-serif;
+            }
+            body { 
+              font-family: "Manrope", sans-serif;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              margin: 0;
+              padding: 0;
+              background: white;
+            }
+            .font-headline { font-family: "Newsreader", serif; }
+            @media print {
+              @page { 
+                size: A4; 
+                margin: 15mm; 
+              }
+              body { margin: 0; padding: 0; }
+              .page-break-inside-avoid {
+                page-break-inside: avoid;
+              }
+            }
+            .report-container {
+              max-width: 210mm;
+              margin: 0 auto;
+              padding: 10mm;
+            }
+          </style>
+        </head>
+        <body class="bg-white">
+          <div class="report-container">
+            <!-- Header Section - Balanced & Centered -->
+            <div class="flex flex-col items-center text-center mb-10 pb-10 border-b border-gray-100">
+              <div class="w-32 h-32 mb-6 flex items-center justify-center">
+                <img src="/images/logo2.png" alt="Logo" class="max-w-full max-h-full object-contain" />
+              </div>
+              <h1 class="text-3xl font-headline tracking-[0.12em] text-gray-900 uppercase mb-3">Girnar Tirth Yatra Group</h1>
+              <p class="text-[#c5a059] text-[9px] font-bold uppercase tracking-[0.4em] opacity-80">Official Checking Report</p>
+            </div>
+
+            <!-- Metadata Section - Grid Layout -->
+            <div class="grid grid-cols-2 gap-x-16 gap-y-10 mb-16 px-4">
+              <div class="space-y-6">
+                <div>
+                  <span class="block text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Upashray Name</span>
+                  <span class="text-2xl font-bold text-gray-900">${report.upashrayName}</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Location</span>
+                  <span class="text-lg text-gray-600">
+                    ${report.village || 'N/A'}
+                    ${report.route ? `<span class="block text-xs text-gray-400 uppercase tracking-wider mt-1">${report.route}</span>` : ''}
+                  </span>
+                </div>
+              </div>
+              <div class="space-y-6 text-right">
+                <div>
+                  <span class="block text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Submitted By</span>
+                  <span class="text-2xl font-bold text-gray-900">${report.memberName}</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Submission Date</span>
+                  <span class="text-lg font-bold text-gray-900">${report.date}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Checklist Section -->
+            <div class="mb-12">
+              <h3 class="text-sm font-bold uppercase tracking-widest mb-8 pb-3 border-b border-gray-200 text-[#c5a059]">Checklist Details</h3>
+              <div class="border border-gray-100 rounded-sm shadow-sm">
+                ${pointsHtml}
+              </div>
+            </div>
+
+            <!-- Footer Branding -->
+            <div class="mt-20 pt-10 border-t border-gray-100 text-center opacity-50">
+              <p class="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-medium italic">
+                This is a computer-generated report of the Girnar Tirth Yatra Group Portal.
+              </p>
+            </div>
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+              }, 800);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   const handleLogin = async (e) => {
@@ -1543,12 +1682,21 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{report.date}</td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{report.memberName}</td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{report.upashrayName}</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <td className="px-6 py-4 whitespace-nowrap text-right flex justify-end gap-2">
                                 <button
                                   onClick={() => openReportDetail(report)}
                                   className="px-4 py-2 bg-gray-50 text-[#c5a059] text-[10px] font-bold uppercase tracking-widest rounded-sm border border-gray-100 hover:bg-[#c5a059] hover:text-white transition-all"
                                 >
                                   View Full Report
+                                </button>
+                                <button
+                                  onClick={() => openReportAndPrint(report)}
+                                  className="px-4 py-2 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest rounded-sm shadow-lg shadow-[#c5a059]/10 hover:bg-[#b08d4a] transition-all flex items-center gap-2"
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                  </svg>
+                                  Print
                                 </button>
                               </td>
                             </tr>
@@ -1996,18 +2144,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
               
               <div className="relative bg-white w-full max-w-4xl shadow-2xl rounded-sm overflow-hidden animate-fade-in print:shadow-none print:w-full print:max-w-none print:p-0">
                 {/* Modal Header - Hidden in Print */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50 print:hidden">
-                  <div className="flex items-center gap-4">
-                    <button 
-                      onClick={handlePrint}
-                      className="flex items-center gap-2 px-4 py-2 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest rounded-sm shadow-lg shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                      </svg>
-                      Print Report
-                    </button>
-                  </div>
+                <div className="flex justify-end items-center p-6 border-b border-gray-100 bg-gray-50 print:hidden">
                   <button onClick={() => setIsReportModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
