@@ -14,6 +14,7 @@ const EventsPage = lazy(() => import('./pages/EventsPage.jsx'));
 const ContactUsPage = lazy(() => import('./pages/ContactUsPage.jsx'));
 const AdminPanelPage = lazy(() => import('./pages/AdminPanelPage.jsx'));
 const MemberPanelPage = lazy(() => import('./pages/MemberPanelPage.jsx'));
+const PrintReportView = lazy(() => import('./pages/PrintReportView.jsx'));
 
 const RouteLoadingFallback = () => {
   const { t } = useLanguage();
@@ -56,8 +57,9 @@ const AppRoutes = () => {
         <Route path="/monthly-bus-yatra" element={withLazyBoundary(<MonthlyBusYatraPage />)} />
         <Route path="/events" element={withLazyBoundary(<EventsPage />)} />
         <Route path="/contact-us" element={withLazyBoundary(<ContactUsPage />)} />
-        <Route path="/admin" element={withLazyBoundary(<AdminPanelPage />)} />
-        <Route path="/member" element={withLazyBoundary(<MemberPanelPage />)} />
+        <Route path="/admin/*" element={withLazyBoundary(<AdminPanelPage />)} />
+        <Route path="/member/*" element={withLazyBoundary(<MemberPanelPage />)} />
+        <Route path="/print-report/:id" element={withLazyBoundary(<PrintReportView />)} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
