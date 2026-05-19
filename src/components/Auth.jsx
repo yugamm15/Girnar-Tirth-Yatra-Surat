@@ -49,6 +49,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
   const [isJinalayaModalOpen, setIsJinalayaModalOpen] = useState(false);
   const [checkingUpashrayId, setCheckingUpashrayId] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingMessage, setProcessingMessage] = useState('Processing...');
 
   const CHECKING_POINTS = [
     "ઉપાશ્રય ના મેઈનગેટ - તથા દરેક રૂમના દરવાજા મિજાગરાના હોલડ્રોપ ચેક કરવા બરાબર ફિટ છે કે નહિ તે લખવું",
@@ -134,35 +136,43 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   // Load data from database
   const loadAllData = async () => {
     setIsLoadingData(true);
+    setProcessingMessage('Syncing with database...');
     try {
-      const [upashraysData, membersData, jinalayasData, reportsData, busData, datesData] = await Promise.all([
-        upashraysDB.getAll().catch(err => { console.error('Upashrays load error:', err); return []; }),
-        membersDB.getAll().catch(err => { console.error('Members load error:', err); return []; }),
-        jinalayasDB.getAll().catch(err => { console.error('Jinalayas load error:', err); return []; }),
-        checkingReportsDB.getAll().catch(err => { console.error('Reports load error:', err); return []; }),
-        yatrikRegistrationsDB.getAll().catch(err => { console.error('Bus Yatra load error:', err); return []; }),
-        yatraDatesDB.getAll().catch(err => { console.error('Yatra Dates load error:', err); return []; })
+      // Parallel fetch with improved error handling and immediate state updates
+      const fetchResults = await Promise.allSettled([
+        upashraysDB.getAll(),
+        membersDB.getAll(),
+        jinalayasDB.getAll(),
+        checkingReportsDB.getAll(),
+        yatrikRegistrationsDB.getAll(),
+        yatraDatesDB.getAll()
       ]);
 
-      setBusRegistrations(busData || []);
-      setYatraDates((datesData || []).map(d => ({
+      const [upashraysRes, membersRes, jinalayasRes, reportsRes, busRes, datesRes] = fetchResults;
+
+      const upashraysData = upashraysRes.status === 'fulfilled' ? upashraysRes.value : [];
+      const membersData = membersRes.status === 'fulfilled' ? membersRes.value : [];
+      const jinalayasData = jinalayasRes.status === 'fulfilled' ? jinalayasRes.value : [];
+      const reportsData = reportsRes.status === 'fulfilled' ? reportsRes.value : [];
+      const busData = busRes.status === 'fulfilled' ? busRes.value : [];
+      const datesData = datesRes.status === 'fulfilled' ? datesRes.value : [];
+
+      setBusRegistrations(busData);
+      setYatraDates(datesData.map(d => ({
         ...d,
-        registration_open: d.registration_open !== false // Default to true unless explicitly false
+        registration_open: d.registration_open !== false
       })));
 
-      if (Array.isArray(upashraysData)) {
+      if (upashraysData) {
         setUpashrays(upashraysData.map(u => {
           if (!u) return null;
-          // Find reports for this upashray
-          const uReports = Array.isArray(reportsData)
-            ? reportsData
-              .filter(r => r && String(r.upashray_id) === String(u.id))
-              .map(r => ({
-                ...r,
-                title: 'Checking Report',
-                date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
-              }))
-            : [];
+          const uReports = reportsData
+            .filter(r => r && String(r.upashray_id) === String(u.id))
+            .map(r => ({
+              ...r,
+              title: 'Checking Report',
+              date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
+            }));
 
           return {
             ...u,
@@ -177,38 +187,31 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         }).filter(Boolean));
       }
 
-      if (Array.isArray(membersData)) {
-        setMembers(membersData.map(m => {
-          if (!m) return null;
-          return {
-            ...m,
-            name: m.name || '',
-            email: m.email || '',
-            phone: m.phone || '',
-            password: m.password || '',
-            hasAccess: !!m.has_access
-          };
-        }).filter(Boolean));
+      if (membersData) {
+        setMembers(membersData.map(m => ({
+          ...m,
+          name: m.name || '',
+          email: m.email || '',
+          phone: m.phone || '',
+          password: m.password || '',
+          hasAccess: !!m.has_access
+        })));
       }
 
-      if (Array.isArray(jinalayasData)) {
-        setJinalayas(jinalayasData.map(j => {
-          if (!j) return null;
-          return {
-            ...j,
-            name: j.name || '',
-            beforeImg: j.before_img || '/images/Upasray.png',
-            processImg: j.process_img || '/images/Upasray.png',
-            afterImg: j.after_img || '/images/Upasray.png'
-          };
-        }).filter(Boolean));
+      if (jinalayasData) {
+        setJinalayas(jinalayasData.map(j => ({
+          ...j,
+          name: j.name || '',
+          beforeImg: j.before_img || '/images/Upasray.png',
+          processImg: j.process_img || '/images/Upasray.png',
+          afterImg: j.after_img || '/images/Upasray.png'
+        })));
       }
 
-      // Process all reports for the admin view
-      if (Array.isArray(reportsData)) {
+      if (reportsData) {
         const processedReports = reportsData.map(r => {
-          const upashray = Array.isArray(upashraysData) ? upashraysData.find(u => String(u.id) === String(r.upashray_id)) : null;
-          const member = Array.isArray(membersData) ? membersData.find(m => String(m.id) === String(r.member_id)) : null;
+          const upashray = upashraysData.find(u => String(u.id) === String(r.upashray_id));
+          const member = membersData.find(m => String(m.id) === String(r.member_id));
           return {
             ...r,
             upashrayName: upashray ? upashray.name : 'Unknown Upashray',
@@ -221,7 +224,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         setAllReports(processedReports);
       }
     } catch (dbError) {
-      console.log('Database error or not configured, using local data:', dbError.message);
+      console.error('Database load error:', dbError);
     } finally {
       setIsLoadingData(false);
     }
@@ -517,6 +520,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
+    setIsProcessing(true);
+    setProcessingMessage('Authenticating...');
     const normalizedEmail = email.trim().toLowerCase();
 
     try {
@@ -538,6 +543,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       } else {
         setError('Admin credentials are wrong');
       }
+      setIsProcessing(false);
       return;
     }
 
@@ -567,6 +573,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         console.error('Member login error:', err);
         setError('An error occurred during login');
       }
+      setIsProcessing(false);
       return;
     }
 
@@ -579,9 +586,12 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     } else {
       setError('Credentials are wrong');
     }
+    setIsProcessing(false);
   };
 
   const handleLogout = async () => {
+    setIsProcessing(true);
+    setProcessingMessage('Logging out...');
     localStorage.removeItem('auth_override');
     localStorage.removeItem('auth_member_id');
     try {
@@ -590,6 +600,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       }
     } catch (e) {}
     setView('login');
+    setIsProcessing(false);
   };
 
   if (isInitializing) {
@@ -659,6 +670,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
   const handleSaveUpashray = async (e) => {
     e.preventDefault();
+    setIsProcessing(true);
+    setProcessingMessage(editingId ? 'Updating Upashray...' : 'Adding new Upashray...');
     try {
       if (editingId) {
         // Update existing
@@ -677,7 +690,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             status: formData.status.toLowerCase()
           });
         } catch (dbError) {
-          console.log('Database update failed, using local state');
+          console.error('Database update failed:', dbError);
         }
         setUpashrays(upashrays.map(u => u.id === editingId ? { ...formData, id: u.id, reports: u.reports } : u));
       } else {
@@ -697,18 +710,22 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             status: formData.status.toLowerCase()
           });
         } catch (dbError) {
-          console.log('Database create failed, using local state');
+          console.error('Database create failed:', dbError);
         }
         setUpashrays([...upashrays, { ...formData, id: Date.now(), reports: [] }]);
       }
       resetForm();
     } catch (error) {
       console.error('Error saving upashray:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleSaveMember = async (e) => {
     e.preventDefault();
+    setIsProcessing(true);
+    setProcessingMessage(editingMemberId ? 'Updating member...' : 'Adding new member...');
     const code = generateMemberCode(memberFormData.name);
     try {
       if (editingMemberId) {
@@ -723,7 +740,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             has_access: memberFormData.hasAccess
           });
         } catch (dbError) {
-          console.log('Database update failed, using local state');
+          console.error('Database update failed:', dbError);
         }
         setMembers(members.map(m => m.id === editingMemberId ? { ...memberFormData, id: m.id, code } : m));
       } else {
@@ -738,18 +755,22 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             has_access: memberFormData.hasAccess
           });
         } catch (dbError) {
-          console.log('Database create failed, using local state');
+          console.error('Database create failed:', dbError);
         }
         setMembers([...members, { ...memberFormData, id: Date.now(), code }]);
       }
       resetMemberForm();
     } catch (error) {
       console.error('Error saving member:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleSaveJinalaya = async (e) => {
     e.preventDefault();
+    setIsProcessing(true);
+    setProcessingMessage(editingJinalayaId ? 'Updating Jinalaya...' : 'Adding new Jinalaya...');
     try {
       if (editingJinalayaId) {
         // Update existing
@@ -767,7 +788,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             status: jinalayaFormData.status.toLowerCase()
           });
         } catch (dbError) {
-          console.log('Database update failed, using local state');
+          console.error('Database update failed:', dbError);
         }
         setJinalayas(jinalayas.map(j => j.id === editingJinalayaId ? { ...jinalayaFormData, id: j.id } : j));
       } else {
@@ -786,13 +807,15 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             status: jinalayaFormData.status.toLowerCase()
           });
         } catch (dbError) {
-          console.log('Database create failed, using local state');
+          console.error('Database create failed:', dbError);
         }
         setJinalayas([...jinalayas, { ...jinalayaFormData, id: Date.now() }]);
       }
       resetJinalayaForm();
     } catch (error) {
       console.error('Error saving jinalaya:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -815,6 +838,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
   const handleSaveCheckingReport = async (e) => {
     e.preventDefault();
+    setIsProcessing(true);
+    setProcessingMessage('Saving your report...');
     try {
       const newReportData = {
         id: Date.now(),
@@ -830,23 +855,20 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       try {
         await checkingReportsDB.create(newReportData);
       } catch (dbError) {
-        console.log('Database create failed, using local state');
+        console.error('Database create failed:', dbError);
       }
 
-      setUpashrays(upashrays.map(u => {
+      // Update state locally for immediate feedback
+      setUpashrays(prev => prev.map(u => {
         if (String(u.id) === String(checkingUpashrayId)) {
           return {
             ...u,
-            reports: [
-              newReportData,
-              ...(u.reports || [])
-            ]
+            reports: [newReportData, ...(u.reports || [])]
           };
         }
         return u;
       }));
       
-      // Also update allReports for admin view if needed (though usually admin and member are separate sessions)
       setAllReports(prev => [
         {
           ...newReportData,
@@ -855,6 +877,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         },
         ...prev
       ]);
+
       setCheckingUpashrayId(null);
       setGeneralNotes('');
       setCheckingReport(CHECKING_POINTS.map((point, index) => ({
@@ -866,6 +889,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       })));
     } catch (error) {
       console.error('Error saving checking report:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -916,6 +941,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   };
 
   const toggleMemberAccess = async (id) => {
+    setIsProcessing(true);
+    setProcessingMessage('Updating access...');
     try {
       const member = members.find(m => m.id === id);
       if (member) {
@@ -925,62 +952,83 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             has_access: newAccessStatus
           });
         } catch (dbError) {
-          console.log('Database update failed, using local state');
+          console.error('Database update failed:', dbError);
         }
         setMembers(members.map(m => m.id === id ? { ...m, hasAccess: newAccessStatus } : m));
       }
     } catch (error) {
       console.error('Error toggling member access:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const deleteUpashray = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this Upashray?')) return;
+    setIsProcessing(true);
+    setProcessingMessage('Deleting Upashray...');
     try {
       try {
         await upashraysDB.delete(id);
       } catch (dbError) {
-        console.log('Database delete failed, using local state');
+        console.error('Database delete failed:', dbError);
       }
       setUpashrays(upashrays.filter(u => u.id !== id));
     } catch (error) {
       console.error('Error deleting upashray:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const deleteMember = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this member?')) return;
+    setIsProcessing(true);
+    setProcessingMessage('Deleting member...');
     try {
       try {
         await membersDB.delete(id);
       } catch (dbError) {
-        console.log('Database delete failed, using local state');
+        console.error('Database delete failed:', dbError);
       }
       setMembers(members.filter(m => m.id !== id));
     } catch (error) {
       console.error('Error deleting member:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const deleteJinalaya = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this Jinalaya?')) return;
+    setIsProcessing(true);
+    setProcessingMessage('Deleting Jinalaya...');
     try {
       try {
         await jinalayasDB.delete(id);
       } catch (dbError) {
-        console.log('Database delete failed, using local state');
+        console.error('Database delete failed:', dbError);
       }
       setJinalayas(jinalayas.filter(j => j.id !== id));
     } catch (error) {
       console.error('Error deleting jinalaya:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const deleteBusRegistration = async (id) => {
     if (!window.confirm('Are you sure you want to delete this registration?')) return;
+    setIsProcessing(true);
+    setProcessingMessage('Deleting registration...');
     try {
       await yatrikRegistrationsDB.delete(id);
       setBusRegistrations(busRegistrations.filter(r => r.id !== id));
     } catch (error) {
       console.error('Error deleting registration:', error);
       alert('Failed to delete registration');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -997,6 +1045,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
   const handleYatraDateSubmit = async (e) => {
     e.preventDefault();
+    setIsProcessing(true);
+    setProcessingMessage(editingYatraDateId ? 'Updating Yatra date...' : 'Adding Yatra date...');
     try {
       if (editingYatraDateId) {
         const updated = await yatraDatesDB.update(editingYatraDateId, yatraDateFormData);
@@ -1019,21 +1069,29 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     } catch (error) {
       console.error('Error saving yatra date:', error);
       alert('Failed to save yatra date');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const deleteYatraDate = async (id) => {
     if (!window.confirm('Are you sure you want to delete this yatra date? All associated registrations will be lost.')) return;
+    setIsProcessing(true);
+    setProcessingMessage('Deleting Yatra date...');
     try {
       await yatraDatesDB.delete(id);
       setYatraDates(yatraDates.filter(d => d.id !== id));
     } catch (error) {
       console.error('Error deleting yatra date:', error);
       alert('Failed to delete yatra date');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const toggleRegistrationStatus = async (id, currentStatus) => {
+    setIsProcessing(true);
+    setProcessingMessage('Updating status...');
     try {
       const updated = await yatraDatesDB.update(id, { registration_open: !currentStatus });
       const mappedUpdated = {
@@ -1044,6 +1102,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     } catch (error) {
       console.error('Error toggling status:', error);
       alert('Failed to toggle registration status');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -2967,5 +3027,24 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     );
   }
 
-  return null;
+  return (
+    <>
+      {/* Global Processing Overlay */}
+      {(isProcessing || isLoadingData) && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-[2px] transition-all duration-300">
+          <div className="bg-white p-8 rounded-sm shadow-2xl flex flex-col items-center max-w-xs w-full mx-4 animate-in fade-in zoom-in duration-200">
+            <div className="relative w-16 h-16 mb-6">
+              <div className="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-t-[#c5a059] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <img src="/images/logo2.png" alt="Loading" className="w-8 h-8 object-contain opacity-50 animate-pulse" />
+              </div>
+            </div>
+            <h3 className="text-[#c5a059] text-[10px] font-bold uppercase tracking-[0.3em] mb-2 text-center">{processingMessage}</h3>
+            <p className="text-gray-400 text-[9px] uppercase tracking-widest text-center italic">Please wait while we sync with the server...</p>
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
