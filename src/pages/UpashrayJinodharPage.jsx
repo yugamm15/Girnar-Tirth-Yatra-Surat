@@ -4,7 +4,7 @@ import { LightPageShell } from '../components/LightPageShell.jsx';
 import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { upashraysDB, upashrayMediaDB } from '../lib/database.js';
+import { dbCache, upashraysDB, upashrayMediaDB } from '../lib/database.js';
 
 const statusClassNames = {
   completed: 'bg-green-100 text-green-700 border-green-200',
@@ -22,55 +22,72 @@ const UpashrayJinodharPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const cacheKey = 'upashray_jinodhar_page';
+
+  const normalizeUpashrays = (data, media) => {
+    const mediaByUpashrayId = media.reduce((acc, item) => {
+      const upashrayId = String(item.upashray_id);
+      if (!acc[upashrayId]) {
+        acc[upashrayId] = [];
+      }
+      acc[upashrayId].push(item);
+      return acc;
+    }, {});
+
+    return data.map((upashray) => {
+      const upashrayMedia = mediaByUpashrayId[String(upashray.id)] || [];
+      const coverImage =
+        upashrayMedia.find((item) => item.media_type === 'before')?.file_url ||
+        upashrayMedia[0]?.file_url ||
+        '/images/Upasray.png';
+
+      return {
+        ...upashray,
+        coverImage,
+        slug: upashray.slug || upashray.id.toString(),
+      };
+    });
+  };
+
   useEffect(() => {
+    let cancelled = false;
+
     const loadUpashrays = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        
-        const data = await upashraysDB.getAll();
-        if (!data || data.length === 0) {
-          setUpashrays([]);
-          return;
+        const cachedUpashrays = dbCache.read(cacheKey);
+        if (cachedUpashrays) {
+          setUpashrays(cachedUpashrays);
+          setLoading(false);
         }
 
-        // For each upashray, fetch its media for cover image
-        const upashrayWithImages = await Promise.all(
-          data.map(async (upashray) => {
-            try {
-              const media = await upashrayMediaDB.getByUpashrayId(upashray.id);
-              // Use first 'before' image as cover, or any image if no 'before'
-              const coverImage = 
-                media.find((m) => m.media_type === 'before')?.file_url ||
-                media[0]?.file_url ||
-                '/images/Upasray.png';
+        const [data, media] = await Promise.all([
+          upashraysDB.getAll('id, name, village, route, slug, status, description, created_at'),
+          upashrayMediaDB.getAll('id, upashray_id, media_type, file_url, sort_order, created_at')
+        ]);
 
-              return {
-                ...upashray,
-                coverImage,
-                slug: upashray.slug || upashray.id.toString(),
-              };
-            } catch (err) {
-              console.error(`Error loading media for upashray ${upashray.id}:`, err);
-              return {
-                ...upashray,
-                coverImage: '/images/Upasray.png',
-                slug: upashray.slug || upashray.id.toString(),
-              };
-            }
-          })
-        );
+        const nextUpashrays = normalizeUpashrays(data || [], media || []);
 
-        setUpashrays(upashrayWithImages);
+        if (!cancelled) {
+          setUpashrays(nextUpashrays);
+          setError(null);
+          dbCache.write(cacheKey, nextUpashrays);
+        }
       } catch (err) {
         console.error('Error loading upashrays:', err);
-        setError('Failed to load upashrays');
+        if (!dbCache.read(cacheKey)) {
+          setError('Failed to load upashrays');
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     loadUpashrays();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -101,7 +118,7 @@ const UpashrayJinodharPage = () => {
                 height="100%"
                 style={{ border: 0, filter: 'sepia(0.3) hue-rotate(-10deg) saturate(1.2) contrast(0.9)' }}
                 allowFullScreen=""
-                loading="eager"
+                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 onLoad={(e) => e.currentTarget.parentElement.classList.add('loaded')}
                 title="India Map"

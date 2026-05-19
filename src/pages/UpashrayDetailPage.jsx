@@ -5,7 +5,7 @@ import SecureImage from '../components/SecureImage.jsx';
 import GalleryModal from '../components/GalleryModal.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { upashraysDB, upashrayMediaDB } from '../lib/database.js';
+import { dbCache, upashraysDB, upashrayMediaDB } from '../lib/database.js';
 
 const statusClassNames = {
   completed: 'bg-green-100 text-green-700 border-green-200',
@@ -32,44 +32,74 @@ const UpashrayDetailPage = () => {
   const [galleryImages, setGalleryImages] = useState([]);
   const [galleryTitle, setGalleryTitle] = useState('');
 
+  const cacheKey = `upashray_detail_${slug || 'unknown'}`;
+
+  const applyDetailState = (state) => {
+    if (!state) return;
+    setUpashray(state.upashray || null);
+    setBeforeImages(state.beforeImages || []);
+    setProcessImages(state.processImages || []);
+    setAfterImages(state.afterImages || []);
+  };
+
   useEffect(() => {
+    let cancelled = false;
+
     const loadUpashrayData = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch upashray by slug
-        const upashrayData = await upashraysDB.getBySlug(slug);
-        if (!upashrayData) {
-          setError('Upashray not found');
+        const cachedState = dbCache.read(cacheKey);
+        if (cachedState) {
+          applyDetailState(cachedState);
           setLoading(false);
+        } else {
+          setLoading(true);
+        }
+
+        const upashrayData = await upashraysDB.getBySlug(slug, 'id, name, village, route, trusty, mobile, location, description, slug, status, before_img, process_img, after_img, created_at');
+        if (!upashrayData) {
+          if (!cachedState) {
+            setError('Upashray not found');
+            setLoading(false);
+          }
           return;
         }
 
-        setUpashray(upashrayData);
-
-        // Fetch media for this upashray
-        const allMedia = await upashrayMediaDB.getByUpashrayId(upashrayData.id);
-
-        // Group media by type
+        const allMedia = await upashrayMediaDB.getByUpashrayId(upashrayData.id, 'id, upashray_id, media_type, file_url, sort_order, created_at');
         const before = allMedia.filter((m) => m.media_type === 'before');
         const process = allMedia.filter((m) => m.media_type === 'process');
         const after = allMedia.filter((m) => m.media_type === 'after');
 
-        setBeforeImages(before);
-        setProcessImages(process);
-        setAfterImages(after);
+        const nextState = {
+          upashray: upashrayData,
+          beforeImages: before,
+          processImages: process,
+          afterImages: after,
+        };
+
+        if (!cancelled) {
+          applyDetailState(nextState);
+          setError(null);
+          dbCache.write(cacheKey, nextState);
+        }
       } catch (err) {
         console.error('Error loading upashray:', err);
-        setError('Failed to load upashray data');
+        if (!dbCache.read(cacheKey)) {
+          setError('Failed to load upashray data');
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     if (slug) {
       loadUpashrayData();
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   const openGallery = (images, title) => {

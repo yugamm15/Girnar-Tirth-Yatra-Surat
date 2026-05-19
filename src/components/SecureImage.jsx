@@ -7,7 +7,16 @@ import React, { useState } from 'react';
  * 3. Shows a loading placeholder.
  * 4. Ensures original quality is maintained while being secure.
  */
-const SecureImage = ({ src, alt, className = '', containerClassName = '', style = {} }) => {
+const SecureImage = ({
+  src,
+  alt,
+  className = '',
+  containerClassName = '',
+  style = {},
+  loading = 'lazy',
+  decoding = 'async',
+  fetchPriority,
+}) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
@@ -33,7 +42,9 @@ const SecureImage = ({ src, alt, className = '', containerClassName = '', style 
         style={{ 
           ...style 
         }}
-        loading="lazy"
+        loading={loading}
+        decoding={decoding}
+        fetchPriority={fetchPriority}
         onLoad={() => setIsLoaded(true)}
         onContextMenu={(e) => e.preventDefault()}
         onDragStart={(e) => e.preventDefault()}

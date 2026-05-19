@@ -4,7 +4,7 @@ import { LightPageShell } from '../components/LightPageShell.jsx';
 import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { yatraDatesDB, yatrikRegistrationsDB } from '../lib/database.js';
+import { dbCache, yatraDatesDB, yatrikRegistrationsDB } from '../lib/database.js';
 
 const MonthlyBusYatraPage = () => {
   const { t } = useLanguage();
@@ -14,6 +14,7 @@ const MonthlyBusYatraPage = () => {
   const [registrationStatus, setRegistrationStatus] = useState(null);
   const [yatrikList, setYatrikList] = useState([]);
   const [yatraDates, setYatraDates] = useState(pageCopy.yatraDates);
+  const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
   const [currentYatrik, setCurrentYatrik] = useState({
     firstName: '',
     lastName: '',
@@ -24,32 +25,64 @@ const MonthlyBusYatraPage = () => {
     remarks: '',
   });
   const yatraListRef = useRef(null);
+  const cacheKey = 'monthly_bus_yatra_dates';
 
   useEffect(() => {
+    const updateViewport = () => {
+      setIsMobileViewport(window.innerWidth < 768);
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+
+    return () => {
+      window.removeEventListener('resize', updateViewport);
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
     const loadYatraDates = async () => {
       try {
-        const records = await yatraDatesDB.getAll();
+        const cachedDates = dbCache.read(cacheKey);
+        if (cachedDates) {
+          setYatraDates(cachedDates);
+        }
+
+        const records = await yatraDatesDB.getAll('id, date_text, description, image, registration_open, created_at');
 
         if (records.length === 0) {
-          setYatraDates(pageCopy.yatraDates);
+          if (!cancelled) {
+            setYatraDates(pageCopy.yatraDates);
+            dbCache.write(cacheKey, pageCopy.yatraDates);
+          }
           return;
         }
 
-        setYatraDates(
-          records.map((record) => ({
-            id: record.id,
-            date: { en: record.date_text, gu: record.date_text, hi: record.date_text },
-            description: { en: record.description, gu: record.description, hi: record.description },
-            image: record.image,
-          }))
-        );
+        const nextDates = records.map((record) => ({
+          id: record.id,
+          date: { en: record.date_text, gu: record.date_text, hi: record.date_text },
+          description: { en: record.description, gu: record.description, hi: record.description },
+          image: record.image,
+        }));
+
+        if (!cancelled) {
+          setYatraDates(nextDates);
+          dbCache.write(cacheKey, nextDates);
+        }
       } catch (error) {
         console.log('Database not configured yet. Using local yatra dates.', error.message);
-        setYatraDates(pageCopy.yatraDates);
+        if (!dbCache.read(cacheKey)) {
+          setYatraDates(pageCopy.yatraDates);
+        }
       }
     };
 
     loadYatraDates();
+    return () => {
+      cancelled = true;
+    };
   }, [pageCopy.yatraDates]);
 
   const scrollToYatras = () => {
@@ -183,10 +216,13 @@ const MonthlyBusYatraPage = () => {
 
           <article className="light-panel light-panel-right light-card-image overflow-hidden">
             <SecureImage
-              src="/images/girnar_Bus_picture.png"
+              src={isMobileViewport ? '/images/mobile/bus.webp' : '/images/girnar_Bus_picture.png'}
               alt={t(pageCopy.heroTitle)}
               containerClassName="h-full min-h-[280px] md:min-h-[360px] w-full"
               className="w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
             />
           </article>
         </header>

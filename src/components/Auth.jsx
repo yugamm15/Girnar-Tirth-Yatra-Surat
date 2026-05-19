@@ -133,11 +133,129 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     images: []
   })));
   const [generalNotes, setGeneralNotes] = useState('');
+  const PORTAL_CACHE_KEY = 'girnar_portal_state_v1';
+
+  const readPortalCache = () => {
+    try {
+      const raw = localStorage.getItem(PORTAL_CACHE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.state || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const writePortalCache = (state) => {
+    try {
+      localStorage.setItem(PORTAL_CACHE_KEY, JSON.stringify({
+        savedAt: Date.now(),
+        state
+      }));
+    } catch {
+      // Ignore storage quota/private mode failures.
+    }
+  };
+
+  const applyPortalState = (state) => {
+    if (!state) return;
+
+    setBusRegistrations(state.busRegistrations || []);
+    setYatraDates(state.yatraDates || []);
+    setUpashrays(state.upashrays || []);
+    setMembers(state.members || []);
+    setJinalayas(state.jinalayas || []);
+    setAllReports(state.allReports || []);
+  };
+
+  const buildPortalState = (fetchResults) => {
+    const [upashraysRes, membersRes, jinalayasRes, reportsRes, busRes, datesRes] = fetchResults;
+
+    const upashraysData = upashraysRes.status === 'fulfilled' ? upashraysRes.value : [];
+    const membersData = membersRes.status === 'fulfilled' ? membersRes.value : [];
+    const jinalayasData = jinalayasRes.status === 'fulfilled' ? jinalayasRes.value : [];
+    const reportsData = reportsRes.status === 'fulfilled' ? reportsRes.value : [];
+    const busData = busRes.status === 'fulfilled' ? busRes.value : [];
+    const datesData = datesRes.status === 'fulfilled' ? datesRes.value : [];
+
+    const yatraDatesData = datesData.map(d => ({
+      ...d,
+      registration_open: d.registration_open !== false
+    }));
+
+    const normalizedUpashrays = upashraysData.map(u => {
+      if (!u) return null;
+      const uReports = reportsData
+        .filter(r => r && String(r.upashray_id) === String(u.id))
+        .map(r => ({
+          ...r,
+          title: 'Checking Report',
+          date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
+        }));
+
+      return {
+        ...u,
+        name: u.name || '',
+        village: u.village || '',
+        route: u.route || '',
+        beforeImg: u.before_img || '/images/Upasray.png',
+        processImg: u.process_img || '/images/Upasray.png',
+        afterImg: u.after_img || '/images/Upasray.png',
+        reports: uReports.length > 0 ? uReports : (u.reports || [])
+      };
+    }).filter(Boolean);
+
+    const normalizedMembers = membersData.map(m => ({
+      ...m,
+      name: m.name || '',
+      email: m.email || '',
+      phone: m.phone || '',
+      password: m.password || '',
+      hasAccess: !!m.has_access
+    }));
+
+    const normalizedJinalayas = jinalayasData.map(j => ({
+      ...j,
+      name: j.name || '',
+      beforeImg: j.before_img || '/images/Upasray.png',
+      processImg: j.process_img || '/images/Upasray.png',
+      afterImg: j.after_img || '/images/Upasray.png'
+    }));
+
+    const processedReports = reportsData.map(r => {
+      const upashray = upashraysData.find(u => String(u.id) === String(r.upashray_id));
+      const member = membersData.find(m => String(m.id) === String(r.member_id));
+      return {
+        ...r,
+        upashrayName: upashray ? upashray.name : 'Unknown Upashray',
+        village: upashray ? upashray.village : 'Unknown Location',
+        route: upashray ? upashray.route : '',
+        memberName: member ? member.name : 'Unknown Member',
+        date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
+      };
+    });
+
+    return {
+      upashrays: normalizedUpashrays,
+      members: normalizedMembers,
+      jinalayas: normalizedJinalayas,
+      allReports: processedReports,
+      busRegistrations: busData,
+      yatraDates: yatraDatesData
+    };
+  };
 
   // Load data from database
-  const loadAllData = async () => {
-    setIsLoadingData(true);
-    setProcessingMessage('Syncing with database...');
+  const loadAllData = async ({ showLoading = false } = {}) => {
+    const cachedState = readPortalCache();
+
+    if (cachedState) {
+      applyPortalState(cachedState);
+    } else if (showLoading) {
+      setIsLoadingData(true);
+      setProcessingMessage('Loading portal data...');
+    }
+
     try {
       // Parallel fetch with improved error handling and immediate state updates
       const fetchResults = await Promise.allSettled([
@@ -149,86 +267,20 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         yatraDatesDB.getAll()
       ]);
 
-      const [upashraysRes, membersRes, jinalayasRes, reportsRes, busRes, datesRes] = fetchResults;
-
-      const upashraysData = upashraysRes.status === 'fulfilled' ? upashraysRes.value : [];
-      const membersData = membersRes.status === 'fulfilled' ? membersRes.value : [];
-      const jinalayasData = jinalayasRes.status === 'fulfilled' ? jinalayasRes.value : [];
-      const reportsData = reportsRes.status === 'fulfilled' ? reportsRes.value : [];
-      const busData = busRes.status === 'fulfilled' ? busRes.value : [];
-      const datesData = datesRes.status === 'fulfilled' ? datesRes.value : [];
-
-      setBusRegistrations(busData);
-      setYatraDates(datesData.map(d => ({
-        ...d,
-        registration_open: d.registration_open !== false
-      })));
-
-      if (upashraysData) {
-        setUpashrays(upashraysData.map(u => {
-          if (!u) return null;
-          const uReports = reportsData
-            .filter(r => r && String(r.upashray_id) === String(u.id))
-            .map(r => ({
-              ...r,
-              title: 'Checking Report',
-              date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
-            }));
-
-          return {
-            ...u,
-            name: u.name || '',
-            village: u.village || '',
-            route: u.route || '',
-            beforeImg: u.before_img || '/images/Upasray.png',
-            processImg: u.process_img || '/images/Upasray.png',
-            afterImg: u.after_img || '/images/Upasray.png',
-            reports: uReports.length > 0 ? uReports : (u.reports || [])
-          };
-        }).filter(Boolean));
-      }
-
-      if (membersData) {
-        setMembers(membersData.map(m => ({
-          ...m,
-          name: m.name || '',
-          email: m.email || '',
-          phone: m.phone || '',
-          password: m.password || '',
-          hasAccess: !!m.has_access
-        })));
-      }
-
-      if (jinalayasData) {
-        setJinalayas(jinalayasData.map(j => ({
-          ...j,
-          name: j.name || '',
-          beforeImg: j.before_img || '/images/Upasray.png',
-          processImg: j.process_img || '/images/Upasray.png',
-          afterImg: j.after_img || '/images/Upasray.png'
-        })));
-      }
-
-      if (reportsData) {
-        const processedReports = reportsData.map(r => {
-          const upashray = upashraysData.find(u => String(u.id) === String(r.upashray_id));
-          const member = membersData.find(m => String(m.id) === String(r.member_id));
-          return {
-            ...r,
-            upashrayName: upashray ? upashray.name : 'Unknown Upashray',
-            village: upashray ? upashray.village : 'Unknown Location',
-            route: upashray ? upashray.route : '',
-            memberName: member ? member.name : 'Unknown Member',
-            date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
-          };
-        });
-        setAllReports(processedReports);
-      }
+      const freshState = buildPortalState(fetchResults);
+      applyPortalState(freshState);
+      writePortalCache(freshState);
     } catch (dbError) {
       console.error('Database load error:', dbError);
     } finally {
-      setIsLoadingData(false);
+      if (showLoading && !cachedState) {
+        setIsLoadingData(false);
+      }
     }
+  };
+
+  const loadAllDataInBackground = () => {
+    void loadAllData();
   };
 
   // Check for existing session and initialize view
@@ -239,15 +291,15 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         const override = localStorage.getItem('auth_override');
         if (override === 'admin' && initialView === 'admin') {
           setView('admin');
-          await loadAllData();
           setIsInitializing(false);
+          loadAllDataInBackground();
           return;
         } else if (override === 'member' && initialView === 'member') {
           const storedMemberId = localStorage.getItem('auth_member_id');
           if (storedMemberId) setCurrentMemberId(storedMemberId);
           setView('member');
-          await loadAllData();
           setIsInitializing(false);
+          loadAllDataInBackground();
           return;
         }
 
@@ -272,11 +324,11 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
           if (initialView === 'admin' && (adminProfile || isDefaultAdminEmail)) {
             setView('admin');
-            await loadAllData();
+            loadAllDataInBackground();
           } else if (initialView === 'member' && memberRecord?.has_access) {
             setCurrentMemberId(memberRecord.id);
             setView('member');
-            await loadAllData();
+            loadAllDataInBackground();
           } else {
             setView('login');
           }
@@ -285,6 +337,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         }
       } catch (err) {
         console.error('Session check error:', err);
+        if (String(err?.message || '').toLowerCase().includes('refresh token')) {
+          await supabase.auth.signOut().catch(() => { });
+        }
         setView('login');
       } finally {
         setIsInitializing(false);
@@ -320,7 +375,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         if (canAccessAdmin || isDefaultAdminEmail) {
           setView('admin');
           setError('');
-          await loadAllData();
+          loadAllDataInBackground();
           return true;
         }
 
@@ -336,7 +391,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           setCurrentMemberId(memberRecord?.id || data.user.id);
           setView('member');
           setError('');
-          await loadAllData();
+          loadAllDataInBackground();
           return true;
         }
 
@@ -540,7 +595,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         localStorage.setItem('auth_override', 'admin');
         setView('admin');
         setError('');
-        await loadAllData();
+        loadAllDataInBackground();
       } else {
         setError('Admin credentials are wrong');
       }
@@ -561,7 +616,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             localStorage.setItem('auth_member_id', memberRecord.id);
             setView('member');
             setError('');
-            await loadAllData();
+            loadAllDataInBackground();
           } else if (!memberRecord.has_access) {
             setError('Your account does not have access. Please contact Admin.');
           } else {
@@ -583,7 +638,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       localStorage.setItem('auth_override', 'admin');
       setView('admin');
       setError('');
-      await loadAllData();
+      loadAllDataInBackground();
     } else {
       setError('Credentials are wrong');
     }

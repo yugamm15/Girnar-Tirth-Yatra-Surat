@@ -1,31 +1,60 @@
 import { supabase } from './supabaseClient';
 
+const DATABASE_CACHE_PREFIX = 'girnar_db_cache_v1';
+
+const readCache = (key) => {
+  try {
+    const raw = localStorage.getItem(`${DATABASE_CACHE_PREFIX}:${key}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.data ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const writeCache = (key, data) => {
+  try {
+    localStorage.setItem(`${DATABASE_CACHE_PREFIX}:${key}`, JSON.stringify({
+      savedAt: Date.now(),
+      data
+    }));
+  } catch {
+    // Ignore cache failures in private mode or on quota limits.
+  }
+};
+
+export const dbCache = {
+  read: readCache,
+  write: writeCache,
+};
+
 // ============== UPASHRAYS ==============
 
 export const upashraysDB = {
-  async getAll() {
+  async getAll(columns = '*') {
     const { data, error } = await supabase
       .from('upashrays')
-      .select('*')
+      .select(columns)
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },
 
-  async getById(id) {
+  async getById(id, columns = '*') {
     const { data, error } = await supabase
       .from('upashrays')
-      .select('*')
+      .select(columns)
       .eq('id', id)
       .single();
     if (error) throw error;
     return data;
   },
 
-  async getBySlug(slug) {
+  async getBySlug(slug, columns = '*') {
     const { data, error } = await supabase
       .from('upashrays')
-      .select('*')
+      .select(columns)
       .eq('slug', slug)
       .single();
     if (error && error.code !== 'PGRST116') throw error;
@@ -203,10 +232,10 @@ export const jinalayasDB = {
 // ============== YATRA DATES ==============
 
 export const yatraDatesDB = {
-  async getAll() {
+  async getAll(columns = '*') {
     const { data, error } = await supabase
       .from('yatra_dates')
-      .select('*')
+      .select(columns)
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
@@ -254,20 +283,20 @@ export const yatraDatesDB = {
 // ============== UPASHRAY MEDIA ==============
 
 export const upashrayMediaDB = {
-  async getAll() {
+  async getAll(columns = '*') {
     const { data, error } = await supabase
       .from('upashray_media')
-      .select('*')
+      .select(columns)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },
 
-  async getByUpashrayId(upashrayId) {
+  async getByUpashrayId(upashrayId, columns = '*') {
     const { data, error } = await supabase
       .from('upashray_media')
-      .select('*')
+      .select(columns)
       .eq('upashray_id', upashrayId)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
@@ -275,10 +304,10 @@ export const upashrayMediaDB = {
     return data || [];
   },
 
-  async getByUpashrayIdAndType(upashrayId, mediaType) {
+  async getByUpashrayIdAndType(upashrayId, mediaType, columns = '*') {
     const { data, error } = await supabase
       .from('upashray_media')
-      .select('*')
+      .select(columns)
       .eq('upashray_id', upashrayId)
       .eq('media_type', mediaType)
       .order('sort_order', { ascending: true })
