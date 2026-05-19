@@ -4,17 +4,17 @@ import { siteCopy } from './content/siteCopy.js';
 import { LanguageProvider } from './context/LanguageContext.jsx';
 import { useLanguage } from './context/LanguageContext.jsx';
 
-const HomePage = lazy(() => import('./pages/HomePage.jsx'));
-const AboutGirnarPage = lazy(() => import('./pages/AboutGirnarPage.jsx'));
-const UpashrayJinodharPage = lazy(() => import('./pages/UpashrayJinodharPage.jsx'));
-const JinalayJinodharPage = lazy(() => import('./pages/JinalayJinodharPage.jsx'));
-const UpashrayDetailPage = lazy(() => import('./pages/UpashrayDetailPage.jsx'));
-const MonthlyBusYatraPage = lazy(() => import('./pages/MonthlyBusYatraPage.jsx'));
-const EventsPage = lazy(() => import('./pages/EventsPage.jsx'));
-const ContactUsPage = lazy(() => import('./pages/ContactUsPage.jsx'));
-const AdminPanelPage = lazy(() => import('./pages/AdminPanelPage.jsx'));
-const MemberPanelPage = lazy(() => import('./pages/MemberPanelPage.jsx'));
-const PrintReportView = lazy(() => import('./pages/PrintReportView.jsx'));
+import HomePage from './pages/HomePage.jsx';
+import AboutGirnarPage from './pages/AboutGirnarPage.jsx';
+import UpashrayJinodharPage from './pages/UpashrayJinodharPage.jsx';
+import JinalayJinodharPage from './pages/JinalayJinodharPage.jsx';
+import UpashrayDetailPage from './pages/UpashrayDetailPage.jsx';
+import MonthlyBusYatraPage from './pages/MonthlyBusYatraPage.jsx';
+import EventsPage from './pages/EventsPage.jsx';
+import ContactUsPage from './pages/ContactUsPage.jsx';
+import AdminPanelPage from './pages/AdminPanelPage.jsx';
+import MemberPanelPage from './pages/MemberPanelPage.jsx';
+import PrintReportView from './pages/PrintReportView.jsx';
 
 const RouteLoadingFallback = () => {
   const { t } = useLanguage();

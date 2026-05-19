@@ -17,15 +17,30 @@ const PORTAL_CACHE_KEY = 'girnar_portal_state_v1';
 export const AuthView = ({ onBack, initialView = 'login' }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [view, setView] = useState('login'); // 'login', 'admin', 'member'
-  const [isInitializing, setIsInitializing] = useState(true);
+
+  // Fast-track state initialization: Check for session override synchronously
+  // This removes the 0.5s delay by deciding the view BEFORE the first render
+  const [view, setView] = useState(() => {
+    const override = localStorage.getItem('auth_override');
+    if (override === initialView) return initialView;
+    return 'login';
+  });
+  
+  const [isInitializing, setIsInitializing] = useState(() => {
+    const override = localStorage.getItem('auth_override');
+    // If we have an override, we don't need to show the "Checking Session" screen at all
+    return override !== initialView;
+  });
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [upashrays, setUpashrays] = useState([]);
   const [jinalayas, setJinalayas] = useState([]);
   const [members, setMembers] = useState([]);
-  const [currentMemberId, setCurrentMemberId] = useState(null);
+  const [currentMemberId, setCurrentMemberId] = useState(() => {
+    return localStorage.getItem('auth_member_id') || null;
+  });
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [activeTab, setActiveTab] = useState('upashrays'); // 'upashrays', 'members', 'jinalayas', 'reports', 'bus-yatra'
   const [allReports, setAllReports] = useState([]);
@@ -171,32 +186,26 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         afterImg: u.after_img || '/images/Upasray.png',
         reports: []
       }));
+      
+      // Update state
       setUpashrays(processed);
       setLoadedData(prev => ({ ...prev, upashrays: true }));
+      
+      // Update Cache immediately
       updateCache({ upashrays: processed });
-    } catch (e) { console.error(e); }
+      
+      return processed;
+    } catch (e) { 
+      console.error(e); 
+      return [];
+    }
   };
 
   const loadUpashrayReports = async () => {
-    try {
-      const reports = await checkingReportsDB.getAll();
-      const reportsByUpashray = {};
-      reports.forEach(r => {
-        if (r && r.upashray_id) {
-          if (!reportsByUpashray[r.upashray_id]) reportsByUpashray[r.upashray_id] = [];
-          reportsByUpashray[r.upashray_id].push({
-            ...r, title: 'Checking Report',
-            date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
-          });
-        }
-      });
-
-      setUpashrays(prev => {
-        const updated = prev.map(u => ({ ...u, reports: reportsByUpashray[u.id] || [] }));
-        updateCache({ upashrays: updated });
-        return updated;
-      });
-    } catch (e) { console.error(e); }
+    const reports = await loadReports();
+    if (reports && reports.length > 0) {
+      processUpashrayReports(reports);
+    }
   };
 
   const loadMembers = async () => {
@@ -206,7 +215,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       setMembers(processed);
       setLoadedData(prev => ({ ...prev, members: true }));
       updateCache({ members: processed });
-    } catch (e) { console.error(e); }
+      return processed;
+    } catch (e) { console.error(e); return []; }
   };
 
   const loadJinalayas = async () => {
@@ -221,18 +231,23 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       setJinalayas(processed);
       setLoadedData(prev => ({ ...prev, jinalayas: true }));
       updateCache({ jinalayas: processed });
-    } catch (e) { console.error(e); }
+      return processed;
+    } catch (e) { console.error(e); return []; }
   };
 
   const loadReports = async () => {
     try {
+      // Fetch reports, upashrays, and members in parallel for speed
       const [reportsData, upashraysData, membersData] = await Promise.all([
-        checkingReportsDB.getAll(), upashraysDB.getAll(), membersDB.getAll()
+        checkingReportsDB.getAll(),
+        upashraysDB.getAll(),
+        membersDB.getAll()
       ]);
       
       const processed = reportsData.map(r => {
         const upashray = upashraysData.find(u => String(u.id) === String(r.upashray_id));
         const member = membersData.find(m => String(m.id) === String(r.member_id));
+        
         return {
           ...r,
           upashrayName: upashray ? upashray.name : 'Unknown Upashray',
@@ -242,10 +257,15 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
         };
       });
+      
       setAllReports(processed);
       setLoadedData(prev => ({ ...prev, reports: true }));
       updateCache({ allReports: processed });
-    } catch (e) { console.error(e); }
+      return processed;
+    } catch (e) { 
+      console.error('Failed to load reports:', e); 
+      return []; 
+    }
   };
 
   const loadBusYatra = async () => {
@@ -258,7 +278,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       setYatraDates(processedDates);
       setLoadedData(prev => ({ ...prev, busYatra: true }));
       updateCache({ busRegistrations: busData, yatraDates: processedDates });
-    } catch (e) { console.error(e); }
+      return { busData, processedDates };
+    } catch (e) { console.error(e); return { busData: [], processedDates: [] }; }
   };
 
   const updateCache = (newState) => {
@@ -270,8 +291,13 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     const cached = readPortalCache();
     if (cached) applyPortalState(cached);
     
-    setIsLoadingData(true);
-    setProcessingMessage('Syncing initial data...');
+    // We only show the full screen loader if we don't have cached upashrays
+    if (!cached || !cached.upashrays || cached.upashrays.length === 0) {
+      setIsLoadingData(true);
+      setProcessingMessage('Loading Portal Data...');
+    }
+
+    // Load essential data first
     await loadUpashrays();
     setIsLoadingData(false);
     
@@ -283,19 +309,48 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     const cached = readPortalCache();
     if (cached) applyPortalState(cached);
 
-    setIsLoadingData(true);
-    setProcessingMessage('Syncing member database...');
+    if (!cached || !cached.upashrays || cached.upashrays.length === 0) {
+      setIsLoadingData(true);
+      setProcessingMessage('Loading Member Portal...');
+    }
+
     await loadUpashrays();
     setIsLoadingData(false);
 
     loadAllDataInBackground();
   };
 
+  const processUpashrayReports = (reports) => {
+    const reportsByUpashray = {};
+    reports.forEach(r => {
+      if (r && r.upashray_id) {
+        if (!reportsByUpashray[r.upashray_id]) reportsByUpashray[r.upashray_id] = [];
+        reportsByUpashray[r.upashray_id].push({
+          ...r, title: 'Checking Report',
+          date: r.date || (r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A')
+        });
+      }
+    });
+
+    setUpashrays(prev => {
+      const updated = prev.map(u => ({ ...u, reports: reportsByUpashray[u.id] || [] }));
+      updateCache({ upashrays: updated });
+      return updated;
+    });
+  };
+
   const loadAllDataInBackground = async () => {
     if (view === 'admin' || initialView === 'admin') {
-      await Promise.all([loadMembers(), loadJinalayas(), loadReports(), loadBusYatra(), loadUpashrayReports()]);
+      // Load most critical background data first
+      await loadMembers();
+      await loadJinalayas();
+      
+      // This will load reports and process them for upashrays in one go
+      await loadUpashrayReports();
+      
+      loadBusYatra();
     } else {
-      await Promise.all([loadReports(), loadUpashrayReports()]);
+      await loadUpashrayReports();
     }
   };
 
@@ -307,69 +362,82 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     }
   };
 
-  // Session Check
+  // Initial Data Load and Session Verification
   useEffect(() => {
+    let isMounted = true;
+
+    // Immediately load data from cache if we are already "logged in" via fast-track
+    if (!isInitializing) {
+      loadAllData();
+    }
+
     const checkSession = async () => {
-      setIsInitializing(true);
+      // 1. Supabase Session Check (Background verification)
       try {
-        const override = localStorage.getItem('auth_override');
-        if (override === 'admin' && initialView === 'admin') {
-          setView('admin');
-          setIsInitializing(false);
-          await loadAllData();
-          return;
-        } else if (override === 'member' && initialView === 'member') {
-          const storedMemberId = localStorage.getItem('auth_member_id');
-          if (storedMemberId) setCurrentMemberId(storedMemberId);
-          setView('member');
-          setIsInitializing(false);
-          await loadAllData();
+        if (!supabase?.auth) {
+          if (isMounted && isInitializing) {
+            setView('login');
+            setIsInitializing(false);
+          }
           return;
         }
 
-        if (!supabase || !supabase.auth) {
-          setView('login');
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session?.user) {
+          // If no supabase session and no local override, force login
+          const override = localStorage.getItem('auth_override');
+          if (!override && isMounted) {
+            setView('login');
+            setIsInitializing(false);
+          }
           return;
         }
 
-        const { data: { session } } = await supabase.auth.getSession();
+        const email = session.user.email?.toLowerCase() || '';
+        const isDefaultAdminEmail = email === ADMIN_CREDENTIALS.email.toLowerCase();
 
-        if (session?.user) {
-          const email = session.user.email || '';
-          const normalizedEmail = email.toLowerCase();
-
-          const [adminProfile, memberRecord] = await Promise.all([
-            adminProfilesDB.getByUserId(session.user.id).catch(() => null),
-            membersDB.getByEmail(normalizedEmail).catch(() => null)
-          ]);
-
-          const isDefaultAdminEmail = normalizedEmail === ADMIN_CREDENTIALS.email.toLowerCase();
-
-          if (initialView === 'admin' && (adminProfile || isDefaultAdminEmail)) {
-            setView('admin');
-            await loadAllData();
-          } else if (initialView === 'member' && memberRecord?.has_access) {
+        if (initialView === 'admin') {
+          if (isDefaultAdminEmail) {
+            if (isMounted) {
+              setView('admin');
+              setIsInitializing(false);
+              loadAllData();
+            }
+          } else {
+            const adminProfile = await adminProfilesDB.getByUserId(session.user.id).catch(() => null);
+            if (adminProfile && ['admin', 'editor'].includes(adminProfile.role) && isMounted) {
+              setView('admin');
+              setIsInitializing(false);
+              loadAllData();
+            } else if (isMounted) {
+              setView('login');
+              setIsInitializing(false);
+            }
+          }
+        } else if (initialView === 'member') {
+          const memberRecord = await membersDB.getByEmail(email).catch(() => null);
+          if (memberRecord?.has_access && isMounted) {
             setCurrentMemberId(memberRecord.id);
             setView('member');
-            await loadAllData();
-          } else {
+            setIsInitializing(false);
+            loadAllData();
+          } else if (isMounted) {
             setView('login');
+            setIsInitializing(false);
           }
-        } else {
+        }
+      } catch (err) { 
+        console.error('Session verification error:', err);
+        if (isMounted && isInitializing) {
           setView('login');
+          setIsInitializing(false);
         }
-      } catch (err) {
-        console.error('Session check error:', err);
-        if (String(err?.message || '').toLowerCase().includes('refresh token')) {
-          await supabase.auth.signOut().catch(() => { });
-        }
-        setView('login');
-      } finally {
-        setIsInitializing(false);
       }
     };
 
     checkSession();
+    return () => { isMounted = false; };
   }, [initialView]);
 
   const trySupabaseAuthLogin = async (normalizedEmail) => {
@@ -489,14 +557,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   };
 
   if (isInitializing) {
-    return (
-      <div className="fixed inset-0 z-[200] bg-[#f8f9fa] flex items-center justify-center p-6">
-        <div className="bg-white border border-gray-200 rounded-sm shadow-lg p-8">
-          <div className="w-8 h-8 border-2 border-[#c5a059] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="mt-4 text-[#8f6d2f] text-xs uppercase tracking-[0.2em] font-bold">Checking Session...</p>
-        </div>
-      </div>
-    );
+    // If we are fast-tracking, we don't show any loading screen at all to ensure 0ms delay
+    return null;
   }
 
   const handleMultipleFilesChange = (e, field) => {
