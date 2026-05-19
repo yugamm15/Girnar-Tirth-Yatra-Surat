@@ -538,6 +538,16 @@ export const checkingReportsDB = {
     return data || [];
   },
 
+  async getById(id) {
+    const { data, error } = await supabase
+      .from('checking_reports')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
   async getByUpashrayId(upashrayId) {
     const { data, error } = await supabase
       .from('checking_reports')
