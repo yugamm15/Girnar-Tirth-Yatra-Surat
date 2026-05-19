@@ -31,6 +31,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const [selectedReport, setSelectedReport] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [memberActiveTab, setMemberActiveTab] = useState('upashray-reports');
   
   // Report Filters
   const [reportUpashrayFilter, setReportUpashrayFilter] = useState('all');
@@ -155,9 +156,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           // Find reports for this upashray
           const uReports = Array.isArray(reportsData)
             ? reportsData
-              .filter(r => r && r.upashray_id === u.id)
+              .filter(r => r && String(r.upashray_id) === String(u.id))
               .map(r => ({
-                id: r.id,
+                ...r,
                 title: 'Checking Report',
                 date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
               }))
@@ -815,34 +816,45 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const handleSaveCheckingReport = async (e) => {
     e.preventDefault();
     try {
+      const newReportData = {
+        id: Date.now(),
+        upashray_id: checkingUpashrayId,
+        member_id: currentMemberId,
+        report_date: new Date().toISOString().split('T')[0],
+        points: checkingReport,
+        general_notes: generalNotes,
+        title: 'Checking Report',
+        date: new Date().toLocaleDateString()
+      };
+
       try {
-        await checkingReportsDB.create({
-          upashray_id: checkingUpashrayId,
-          member_id: currentMemberId,
-          report_date: new Date().toISOString().split('T')[0],
-          points: checkingReport,
-          general_notes: generalNotes
-        });
+        await checkingReportsDB.create(newReportData);
       } catch (dbError) {
         console.log('Database create failed, using local state');
       }
 
       setUpashrays(upashrays.map(u => {
-        if (u.id === checkingUpashrayId) {
+        if (String(u.id) === String(checkingUpashrayId)) {
           return {
             ...u,
             reports: [
-              {
-                title: 'Checking Report',
-                id: Date.now(),
-                date: new Date().toLocaleDateString()
-              },
+              newReportData,
               ...(u.reports || [])
             ]
           };
         }
         return u;
       }));
+      
+      // Also update allReports for admin view if needed (though usually admin and member are separate sessions)
+      setAllReports(prev => [
+        {
+          ...newReportData,
+          upashrayName: upashrays.find(u => String(u.id) === String(checkingUpashrayId))?.name || 'Unknown',
+          memberName: members.find(m => String(m.id) === String(currentMemberId))?.name || 'Me'
+        },
+        ...prev
+      ]);
       setCheckingUpashrayId(null);
       setGeneralNotes('');
       setCheckingReport(CHECKING_POINTS.map((point, index) => ({
@@ -2574,80 +2586,199 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         `}</style>
 
         {/* Member Header - Light Mode */}
-        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 md:px-16 shrink-0 shadow-sm">
-          <div className="flex items-center gap-4">
-            <span className="text-[#c5a059] font-headline text-lg tracking-widest uppercase font-bold">Member Portal</span>
-            <span className="h-4 w-[1px] bg-gray-300"></span>
-            <span className="text-gray-500 text-xs uppercase tracking-widest font-body">Upashray Reports</span>
+        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 md:px-16 shrink-0 shadow-sm relative z-[250]">
+          <div className="flex items-center gap-8">
+            <span className="text-[#c5a059] font-headline text-lg tracking-widest uppercase font-bold whitespace-nowrap">Member Portal</span>
+            
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex items-center h-20">
+              <button
+                onClick={() => setMemberActiveTab('upashray-reports')}
+                className={`px-4 h-full text-[10px] uppercase tracking-widest font-bold transition-all border-b-2 flex items-center ${memberActiveTab === 'upashray-reports' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              >
+                Upashray Reports
+              </button>
+              <button
+                onClick={() => setMemberActiveTab('my-reports')}
+                className={`px-4 h-full text-[10px] uppercase tracking-widest font-bold transition-all border-b-2 flex items-center ${memberActiveTab === 'my-reports' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+              >
+                My Reports
+              </button>
+            </nav>
+
+            {/* Mobile Nav Toggle */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-gray-500 hover:text-[#c5a059] transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+              </svg>
+            </button>
           </div>
+
           <button
             onClick={handleLogout}
-            className="px-6 py-2 border border-[#c5a059] text-[#c5a059] text-[10px] uppercase tracking-widest hover:bg-[#c5a059] hover:text-white transition-all font-bold"
+            className="px-6 py-2 border border-[#c5a059] text-[#c5a059] text-[10px] uppercase tracking-widest hover:bg-[#c5a059] hover:text-white transition-all font-bold whitespace-nowrap"
           >
             Logout
           </button>
+
+          {/* Mobile Menu Overlay for Members */}
+          {isMobileMenuOpen && (
+            <div className="absolute top-20 left-0 w-full bg-white border-b border-gray-200 shadow-xl md:hidden animate-in slide-in-from-top duration-300">
+              <nav className="flex flex-col p-4">
+                <button
+                  onClick={() => { setMemberActiveTab('upashray-reports'); setIsMobileMenuOpen(false); }}
+                  className={`w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-l-4 mb-2 ${memberActiveTab === 'upashray-reports' ? 'border-[#c5a059] bg-[#c5a059]/5 text-[#c5a059]' : 'border-transparent text-gray-500'}`}
+                >
+                  Upashray Reports
+                </button>
+                <button
+                  onClick={() => { setMemberActiveTab('my-reports'); setIsMobileMenuOpen(false); }}
+                  className={`w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-l-4 mb-2 ${memberActiveTab === 'my-reports' ? 'border-[#c5a059] bg-[#c5a059]/5 text-[#c5a059]' : 'border-transparent text-gray-500'}`}
+                >
+                  My Reports
+                </button>
+              </nav>
+            </div>
+          )}
         </header>
 
         <main className="flex-grow overflow-y-auto overflow-x-hidden p-8 md:p-16 space-y-12">
           <section className="max-w-5xl mx-auto">
-            {/* Checking Report Modal Overlay */}
-            {checkingUpashrayId && (
-              <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-black/80" onClick={() => setCheckingUpashrayId(null)}></div>
-                <div className="relative bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl rounded-sm p-8 md:p-12 animate-fade-in border-t-4 border-[#c5a059]">
-                  <div className="flex justify-between items-start mb-8">
-                    <div>
-                      <h3 className="text-3xl font-headline text-gray-900 mb-2">Upashray Yearly Checking Report</h3>
-                      <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-sm border border-gray-100">
-                        <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Upashray</strong> {upashrays.find(u => u.id === checkingUpashrayId)?.name}</span>
-                        <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Village</strong> {upashrays.find(u => u.id === checkingUpashrayId)?.village}</span>
-                        <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Route</strong> {upashrays.find(u => u.id === checkingUpashrayId)?.route}</span>
-                        <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Trusty</strong> {upashrays.find(u => u.id === checkingUpashrayId)?.trusty || '-'}</span>
+            {memberActiveTab === 'upashray-reports' ? (
+              <>
+                {/* Checking Report Modal Overlay */}
+                {checkingUpashrayId && (
+                  <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/80" onClick={() => setCheckingUpashrayId(null)}></div>
+                    <div className="relative bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl rounded-sm p-8 md:p-12 animate-fade-in border-t-4 border-[#c5a059]">
+                      <div className="flex justify-between items-start mb-8">
+                        <div>
+                          <h3 className="text-3xl font-headline text-gray-900 mb-2">Upashray Yearly Checking Report</h3>
+                          <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-sm border border-gray-100">
+                            <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Upashray</strong> {upashrays.find(u => u.id === checkingUpashrayId)?.name}</span>
+                            <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Village</strong> {upashrays.find(u => u.id === checkingUpashrayId)?.village}</span>
+                            <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Route</strong> {upashrays.find(u => u.id === checkingUpashrayId)?.route}</span>
+                            <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Trusty</strong> {upashrays.find(u => u.id === checkingUpashrayId)?.trusty || '-'}</span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setCheckingUpashrayId(null)}
+                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
                       </div>
-                    </div>
-                    <button
-                      onClick={() => setCheckingUpashrayId(null)}
-                      className="text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
 
-                  <form onSubmit={handleSaveCheckingReport}>
-                    <div className="border border-gray-100 rounded-sm mb-8 bg-white shadow-inner overflow-hidden">
-                      {/* Desktop Table View */}
-                      <table className="hidden md:table w-full border-collapse">
-                        <thead className="bg-gray-50 border-b border-gray-200">
-                          <tr>
-                            <th className="p-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold text-left border-r border-gray-100 w-[60%]">Points / વિગત</th>
-                            <th className="p-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold text-left border-r border-gray-100 w-[30%]">Description / વિગત</th>
-                            <th className="p-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold text-center w-[10%]">Verified / ચેક</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                          {checkingReport.map((item, index) => (
-                            <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="p-4 border-r border-gray-100 align-top">
-                                <div className="flex items-start">
-                                  <span className="text-[#c5a059] mr-2 font-bold text-xs">{index + 1}.</span>
-                                  <div className="flex-grow">
-                                    <span className="text-[11px] text-gray-800 leading-relaxed font-body block mb-3">{item.point}</span>
-                                    
-                                    {/* Images Preview & Upload */}
-                                    <div className="flex flex-wrap gap-2 mt-2">
+                      <form onSubmit={handleSaveCheckingReport}>
+                        <div className="border border-gray-100 rounded-sm mb-8 bg-white shadow-inner overflow-hidden">
+                          {/* Desktop Table View */}
+                          <table className="hidden md:table w-full border-collapse">
+                            <thead className="bg-gray-50 border-b border-gray-200">
+                              <tr>
+                                <th className="p-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold text-left border-r border-gray-100 w-[60%]">Points / વિગત</th>
+                                <th className="p-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold text-left border-r border-gray-100 w-[30%]">Description / વિગત</th>
+                                <th className="p-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold text-center w-[10%]">Verified / ચેક</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                              {checkingReport.map((item, index) => (
+                                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                                  <td className="p-4 border-r border-gray-100 align-top">
+                                    <div className="flex items-start">
+                                      <span className="text-[#c5a059] mr-2 font-bold text-xs">{index + 1}.</span>
+                                      <div className="flex-grow">
+                                        <span className="text-[11px] text-gray-800 leading-relaxed font-body block mb-3">{item.point}</span>
+                                        
+                                        {/* Images Preview & Upload */}
+                                        <div className="flex flex-wrap gap-2 mt-2">
+                                          {item.images && item.images.map((img, imgIdx) => (
+                                            <div key={imgIdx} className="relative w-12 h-12 group">
+                                              <img src={img} className="w-full h-full object-cover rounded-sm border border-gray-200" />
+                                              <button 
+                                                type="button"
+                                                onClick={() => removePointImage(index, imgIdx)}
+                                                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"
+                                              >×</button>
+                                            </div>
+                                          ))}
+                                          <label className="w-12 h-12 border-2 border-dashed border-gray-200 rounded-sm flex items-center justify-center cursor-pointer hover:border-[#c5a059] transition-colors">
+                                            <input 
+                                              type="file" 
+                                              accept="image/*" 
+                                              capture="environment"
+                                              onChange={(e) => handlePointImageUpload(index, e.target.files[0])}
+                                              className="hidden" 
+                                            />
+                                            <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="p-4 border-r border-gray-100 align-middle">
+                                    <input
+                                      type="text"
+                                      value={item.description}
+                                      onChange={(e) => {
+                                        const newReport = [...checkingReport];
+                                        newReport[index].description = e.target.value;
+                                        setCheckingReport(newReport);
+                                      }}
+                                      placeholder="Enter details..."
+                                      className="w-full bg-gray-50 border border-gray-200 px-4 py-2 text-xs focus:border-[#c5a059] outline-none transition-all rounded-sm shadow-sm"
+                                    />
+                                  </td>
+                                  <td className="p-4 text-center align-middle">
+                                    <input
+                                      type="checkbox"
+                                      checked={item.isChecked}
+                                      onChange={(e) => {
+                                        const newReport = [...checkingReport];
+                                        newReport[index].isChecked = e.target.checked;
+                                        setCheckingReport(newReport);
+                                      }}
+                                      className="w-5 h-5 accent-[#c5a059] cursor-pointer rounded-sm"
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+
+                          {/* Mobile Stacked View */}
+                          <div className="md:hidden divide-y divide-gray-100">
+                            {checkingReport.map((item, index) => (
+                              <div key={item.id} className="p-6 hover:bg-gray-50/50 transition-colors">
+                                {/* Point Text */}
+                                <div className="text-sm text-gray-800 leading-relaxed font-body mb-4">
+                                  <span className="text-[#c5a059] mr-3 font-bold text-lg">{index + 1}.</span>
+                                  {item.point}
+                                </div>
+
+                                <div className="space-y-4">
+                                  {/* Images Preview & Upload - Mobile */}
+                                  <div className="bg-gray-50 p-4 rounded-sm border border-gray-100">
+                                    <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-3">Pictures / ફોટા</label>
+                                    <div className="flex flex-wrap gap-3">
                                       {item.images && item.images.map((img, imgIdx) => (
-                                        <div key={imgIdx} className="relative w-12 h-12 group">
+                                        <div key={imgIdx} className="relative w-16 h-16 group">
                                           <img src={img} className="w-full h-full object-cover rounded-sm border border-gray-200" />
                                           <button 
                                             type="button"
                                             onClick={() => removePointImage(index, imgIdx)}
-                                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md"
                                           >×</button>
                                         </div>
                                       ))}
-                                      <label className="w-12 h-12 border-2 border-dashed border-gray-200 rounded-sm flex items-center justify-center cursor-pointer hover:border-[#c5a059] transition-colors">
+                                      <label className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-sm flex flex-col items-center justify-center cursor-pointer hover:border-[#c5a059] transition-colors bg-white">
                                         <input 
                                           type="file" 
                                           accept="image/*" 
@@ -2655,201 +2786,181 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                                           onChange={(e) => handlePointImageUpload(index, e.target.files[0])}
                                           className="hidden" 
                                         />
-                                        <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-6 h-6 text-gray-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
+                                        <span className="text-[8px] text-gray-400 uppercase font-bold">Add</span>
                                       </label>
                                     </div>
                                   </div>
+
+                                  {/* Description Input */}
+                                  <div>
+                                    <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2">Description / વિગત</label>
+                                    <input
+                                      type="text"
+                                      value={item.description}
+                                      onChange={(e) => {
+                                        const newReport = [...checkingReport];
+                                        newReport[index].description = e.target.value;
+                                        setCheckingReport(newReport);
+                                      }}
+                                      placeholder="Enter details here..."
+                                      className="w-full bg-gray-50 border border-gray-200 px-6 py-4 text-sm focus:border-[#c5a059] outline-none transition-all rounded-sm shadow-sm"
+                                    />
+                                  </div>
+
+                                  {/* Checkbox */}
+                                  <div className="flex items-center justify-between bg-gray-50 p-3 rounded-sm">
+                                    <label className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">Verified / ચેક</label>
+                                    <input
+                                      type="checkbox"
+                                      checked={item.isChecked}
+                                      onChange={(e) => {
+                                        const newReport = [...checkingReport];
+                                        newReport[index].isChecked = e.target.checked;
+                                        setCheckingReport(newReport);
+                                      }}
+                                      className="w-8 h-8 accent-[#c5a059] cursor-pointer rounded-sm"
+                                    />
+                                  </div>
                                 </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="mt-8">
+                          <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">General Remarks / વધારાની વિગત</label>
+                          <textarea
+                            value={generalNotes}
+                            onChange={(e) => setGeneralNotes(e.target.value)}
+                            placeholder="Any additional observation or general feedback..."
+                            className="w-full bg-white border border-gray-200 p-4 text-sm focus:border-[#c5a059] outline-none transition-all rounded-sm shadow-sm h-32 resize-none"
+                          />
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row justify-center md:justify-end gap-4 sm:gap-6 mt-8">
+                          <button
+                            type="button"
+                            onClick={() => setCheckingUpashrayId(null)}
+                            className="w-full sm:w-auto px-10 py-4 border border-gray-300 text-gray-500 font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition-all"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="w-full sm:w-auto px-12 py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
+                          >
+                            Save Report
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-white overflow-x-auto shadow-md rounded-sm border border-gray-100">
+                  <table className="w-full min-w-[800px] text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold w-32">Image</th>
+                        <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Upashray Details</th>
+                        <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Latest Reports</th>
+                        <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {upashrays.map((u) => (
+                        <tr key={u.id} className="hover:bg-gray-50 transition-colors group">
+                          <td className="p-6">
+                            <div className="w-20 h-20 rounded-sm overflow-hidden bg-gray-100 border border-gray-200">
+                              <img src={u.afterImg} alt={u.name} className="w-full h-full object-cover" />
+                            </div>
+                          </td>
+                          <td className="p-6">
+                            <div className="text-gray-900 text-sm font-bold tracking-wider mb-1 uppercase">{u.name}</div>
+                            <div className={`text-[9px] inline-block px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${u.status === 'Done' ? 'bg-green-100 text-green-600' :
+                              u.status === 'Process' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'
+                              }`}>
+                              {u.status || 'Plan'}
+                            </div>
+                          </td>
+                          <td className="p-6">
+                            {u.reports && u.reports.length > 0 ? (
+                              <div className="text-[10px] border-l-2 border-[#c5a059] pl-2 py-0.5">
+                                <span className="font-bold text-gray-700 block">{u.reports[0].title}</span>
+                                <span className="text-gray-400">{u.reports[0].date}</span>
+                              </div>
+                            ) : (
+                              <span className="text-gray-300 text-[10px] uppercase tracking-widest">No reports yet</span>
+                            )}
+                          </td>
+                          <td className="p-6 text-right">
+                            <button
+                              onClick={() => setCheckingUpashrayId(u.id)}
+                              className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-all rounded-sm shadow-md"
+                            >
+                              Add Report
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            ) : (
+              <div className="bg-white overflow-hidden shadow-md rounded-sm border border-gray-100">
+                <div className="p-6 bg-gray-50 border-b border-gray-100">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-[#c5a059]">My Submitted Reports</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[800px] text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="px-6 py-4 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Date</th>
+                        <th className="px-6 py-4 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Upashray</th>
+                        <th className="px-6 py-4 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Location</th>
+                        <th className="px-6 py-4 text-right text-gray-400 text-[10px] uppercase tracking-widest font-bold">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {allReports.filter(r => String(r.member_id) === String(currentMemberId))
+                        .sort((a, b) => new Date(b.report_date || 0) - new Date(a.report_date || 0)).length > 0 ? (
+                        allReports.filter(r => String(r.member_id) === String(currentMemberId))
+                          .sort((a, b) => new Date(b.report_date || 0) - new Date(a.report_date || 0))
+                          .map((report, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600 font-bold">{report.date}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 uppercase">{report.upashrayName}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                {report.village}
+                                <span className="block text-[9px] text-gray-400 uppercase tracking-tighter">{report.route}</span>
                               </td>
-                              <td className="p-4 border-r border-gray-100 align-middle">
-                                <input
-                                  type="text"
-                                  value={item.description}
-                                  onChange={(e) => {
-                                    const newReport = [...checkingReport];
-                                    newReport[index].description = e.target.value;
-                                    setCheckingReport(newReport);
+                              <td className="px-6 py-4 text-right">
+                                <button
+                                  onClick={() => {
+                                    setSelectedReport(report);
+                                    setIsReportModalOpen(true);
                                   }}
-                                  placeholder="Enter details..."
-                                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2 text-xs focus:border-[#c5a059] outline-none transition-all rounded-sm shadow-sm"
-                                />
-                              </td>
-                              <td className="p-4 text-center align-middle">
-                                <input
-                                  type="checkbox"
-                                  checked={item.isChecked}
-                                  onChange={(e) => {
-                                    const newReport = [...checkingReport];
-                                    newReport[index].isChecked = e.target.checked;
-                                    setCheckingReport(newReport);
-                                  }}
-                                  className="w-5 h-5 accent-[#c5a059] cursor-pointer rounded-sm"
-                                />
+                                  className="px-4 py-2 bg-gray-50 text-[#c5a059] text-[10px] font-bold uppercase tracking-widest rounded-sm border border-gray-100 hover:bg-[#c5a059] hover:text-white transition-all"
+                                >
+                                  View Details
+                                </button>
                               </td>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-
-                      {/* Mobile Stacked View */}
-                      <div className="md:hidden divide-y divide-gray-100">
-                        {checkingReport.map((item, index) => (
-                          <div key={item.id} className="p-6 hover:bg-gray-50/50 transition-colors">
-                            {/* Point Text */}
-                            <div className="text-sm text-gray-800 leading-relaxed font-body mb-4">
-                              <span className="text-[#c5a059] mr-3 font-bold text-lg">{index + 1}.</span>
-                              {item.point}
-                            </div>
-
-                            <div className="space-y-4">
-                              {/* Images Preview & Upload - Mobile */}
-                              <div className="bg-gray-50 p-4 rounded-sm border border-gray-100">
-                                <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-3">Pictures / ફોટા</label>
-                                <div className="flex flex-wrap gap-3">
-                                  {item.images && item.images.map((img, imgIdx) => (
-                                    <div key={imgIdx} className="relative w-16 h-16 group">
-                                      <img src={img} className="w-full h-full object-cover rounded-sm border border-gray-200" />
-                                      <button 
-                                        type="button"
-                                        onClick={() => removePointImage(index, imgIdx)}
-                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md"
-                                      >×</button>
-                                    </div>
-                                  ))}
-                                  <label className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-sm flex flex-col items-center justify-center cursor-pointer hover:border-[#c5a059] transition-colors bg-white">
-                                    <input 
-                                      type="file" 
-                                      accept="image/*" 
-                                      capture="environment"
-                                      onChange={(e) => handlePointImageUpload(index, e.target.files[0])}
-                                      className="hidden" 
-                                    />
-                                    <svg className="w-6 h-6 text-gray-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                    </svg>
-                                    <span className="text-[8px] text-gray-400 uppercase font-bold">Add</span>
-                                  </label>
-                                </div>
-                              </div>
-
-                              {/* Description Input */}
-                              <div>
-                                <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2">Description / વિગત</label>
-                                <input
-                                  type="text"
-                                  value={item.description}
-                                  onChange={(e) => {
-                                    const newReport = [...checkingReport];
-                                    newReport[index].description = e.target.value;
-                                    setCheckingReport(newReport);
-                                  }}
-                                  placeholder="Enter details here..."
-                                  className="w-full bg-gray-50 border border-gray-200 px-6 py-4 text-sm focus:border-[#c5a059] outline-none transition-all rounded-sm shadow-sm"
-                                />
-                              </div>
-
-                              {/* Checkbox */}
-                              <div className="flex items-center justify-between bg-gray-50 p-3 rounded-sm">
-                                <label className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">Verified / ચેક</label>
-                                <input
-                                  type="checkbox"
-                                  checked={item.isChecked}
-                                  onChange={(e) => {
-                                    const newReport = [...checkingReport];
-                                    newReport[index].isChecked = e.target.checked;
-                                    setCheckingReport(newReport);
-                                  }}
-                                  className="w-8 h-8 accent-[#c5a059] cursor-pointer rounded-sm"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mt-8">
-                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">General Remarks / વધારાની વિગત</label>
-                      <textarea
-                        value={generalNotes}
-                        onChange={(e) => setGeneralNotes(e.target.value)}
-                        placeholder="Any additional observation or general feedback..."
-                        className="w-full bg-white border border-gray-200 p-4 text-sm focus:border-[#c5a059] outline-none transition-all rounded-sm shadow-sm h-32 resize-none"
-                      />
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row justify-center md:justify-end gap-4 sm:gap-6 mt-8">
-                      <button
-                        type="button"
-                        onClick={() => setCheckingUpashrayId(null)}
-                        className="w-full sm:w-auto px-10 py-4 border border-gray-300 text-gray-500 font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition-all"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="w-full sm:w-auto px-12 py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
-                      >
-                        Save Report
-                      </button>
-                    </div>
-                  </form>
+                          ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4" className="px-6 py-20 text-center text-gray-300 italic uppercase tracking-widest text-[10px]">You haven't submitted any reports yet.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
-
-            <div className="bg-white overflow-x-auto shadow-md rounded-sm border border-gray-100">
-              <table className="w-full min-w-[800px] text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold w-32">Image</th>
-                    <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Upashray Details</th>
-                    <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Latest Reports</th>
-                    <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {upashrays.map((u) => (
-                    <tr key={u.id} className="hover:bg-gray-50 transition-colors group">
-                      <td className="p-6">
-                        <div className="w-20 h-20 rounded-sm overflow-hidden bg-gray-100 border border-gray-200">
-                          <img src={u.afterImg} alt={u.name} className="w-full h-full object-cover" />
-                        </div>
-                      </td>
-                      <td className="p-6">
-                        <div className="text-gray-900 text-sm font-bold tracking-wider mb-1 uppercase">{u.name}</div>
-                        <div className={`text-[9px] inline-block px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${u.status === 'Done' ? 'bg-green-100 text-green-600' :
-                          u.status === 'Process' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'
-                          }`}>
-                          {u.status || 'Plan'}
-                        </div>
-                      </td>
-                      <td className="p-6">
-                        {u.reports && u.reports.length > 0 ? (
-                          <div className="text-[10px] border-l-2 border-[#c5a059] pl-2 py-0.5">
-                            <span className="font-bold text-gray-700 block">{u.reports[0].title}</span>
-                            <span className="text-gray-400">{u.reports[0].date}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-300 text-[10px] uppercase tracking-widest">No reports yet</span>
-                        )}
-                      </td>
-                      <td className="p-6 text-right">
-                        <button
-                          onClick={() => setCheckingUpashrayId(u.id)}
-                          className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-all rounded-sm shadow-md"
-                        >
-                          Add Report
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </section>
         </main>
       </div>
