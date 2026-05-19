@@ -30,6 +30,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const [yatraDates, setYatraDates] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Report Filters
   const [reportUpashrayFilter, setReportUpashrayFilter] = useState('all');
@@ -39,6 +40,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const [upashraySearch, setUpashraySearch] = useState('');
   const [memberSearch, setMemberSearch] = useState('');
   const [jinalayaSearch, setJinalayaSearch] = useState('');
+  const [yatraSearch, setYatraSearch] = useState('');
+  const [registrationYatraFilter, setRegistrationYatraFilter] = useState('all');
   const [editingId, setEditingId] = useState(null);
   const [editingMemberId, setEditingMemberId] = useState(null);
   const [editingJinalayaId, setEditingJinalayaId] = useState(null);
@@ -123,8 +126,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     id: index,
     point,
     description: '',
-    isChecked: false
+    isChecked: false,
+    images: []
   })));
+  const [generalNotes, setGeneralNotes] = useState('');
 
   // Load data from database
   const loadAllData = async () => {
@@ -347,8 +352,167 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setIsReportModalOpen(true);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const openReportAndPrint = (report) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow pop-ups to print the report');
+      return;
+    }
+
+    const pointsHtml = Array.isArray(report.points) 
+      ? report.points.map((item, index) => `
+        <div class="flex items-start py-5 px-8 ${index !== report.points.length - 1 ? 'border-b border-gray-100' : ''} ${item.isChecked ? 'bg-gray-50/50' : ''}">
+          <div class="flex-shrink-0 mt-1.5 mr-6">
+            ${item.isChecked ? `
+              <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-sm">
+                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            ` : `
+              <div class="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center">
+                <div class="w-2 h-2 rounded-full bg-gray-100"></div>
+              </div>
+            `}
+          </div>
+          <div class="flex-grow">
+            <p class="text-[14px] font-medium text-gray-800 leading-relaxed font-body">${item.point}</p>
+            ${item.description ? `
+              <div class="mt-3 p-4 bg-white border-l-2 border-[#c5a059] italic text-gray-600 text-[13px] font-body shadow-sm">
+                "${item.description}"
+              </div>
+            ` : ''}
+            
+            ${item.images && item.images.length > 0 ? `
+              <div class="flex flex-wrap gap-5 mt-6">
+                ${item.images.map(img => `
+                  <div class="w-56 h-56 rounded-sm overflow-hidden border-2 border-gray-100 shadow-md bg-gray-50 page-break-inside-avoid">
+                    <img src="${img}" class="w-full h-full object-cover" />
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('')
+      : '<div class="p-12 text-center text-gray-400 italic text-lg">No checklist data available.</div>';
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Report - ${report.upashrayName}</title>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+          <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&display=swap" rel="stylesheet">
+          <style>
+            @theme {
+              --font-headline: "Newsreader", serif;
+              --font-body: "Manrope", sans-serif;
+            }
+            body { 
+              font-family: "Manrope", sans-serif;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              margin: 0;
+              padding: 0;
+              background: white;
+            }
+            .font-headline { font-family: "Newsreader", serif; }
+            @media print {
+              @page { 
+                size: A4; 
+                margin: 15mm; 
+              }
+              body { margin: 0; padding: 0; }
+              .page-break-inside-avoid {
+                page-break-inside: avoid;
+              }
+            }
+            .report-container {
+              max-width: 210mm;
+              margin: 0 auto;
+              padding: 10mm;
+            }
+          </style>
+        </head>
+        <body class="bg-white">
+          <div class="report-container">
+            <!-- Header Section - Balanced & Centered -->
+            <div class="flex flex-col items-center text-center mb-10 pb-10 border-b border-gray-100">
+              <div class="w-32 h-32 mb-6 flex items-center justify-center">
+                <img src="/images/logo2.png" alt="Logo" class="max-w-full max-h-full object-contain" />
+              </div>
+              <h1 class="text-3xl font-headline tracking-[0.12em] text-gray-900 uppercase mb-3">Girnar Tirth Yatra Group</h1>
+              <p class="text-[#c5a059] text-[9px] font-bold uppercase tracking-[0.4em] opacity-80">Official Checking Report</p>
+            </div>
+
+            <!-- Metadata Section - Grid Layout -->
+            <div class="grid grid-cols-2 gap-x-16 gap-y-10 mb-16 px-4">
+              <div class="space-y-6">
+                <div>
+                  <span class="block text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Upashray Name</span>
+                  <span class="text-2xl font-bold text-gray-900">${report.upashrayName}</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Location</span>
+                  <span class="text-lg text-gray-600">
+                    ${report.village || 'N/A'}
+                    ${report.route ? `<span class="block text-xs text-gray-400 uppercase tracking-wider mt-1">${report.route}</span>` : ''}
+                  </span>
+                </div>
+              </div>
+              <div class="space-y-6 text-right">
+                <div>
+                  <span class="block text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Submitted By</span>
+                  <span class="text-2xl font-bold text-gray-900">${report.memberName}</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Submission Date</span>
+                  <span class="text-lg font-bold text-gray-900">${report.date}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Checklist Section -->
+            <div class="mb-12">
+              <h3 class="text-sm font-bold uppercase tracking-widest mb-8 pb-3 border-b border-gray-200 text-[#c5a059]">Checklist Details</h3>
+              <div class="border border-gray-100 rounded-sm shadow-sm">
+                ${pointsHtml}
+              </div>
+            </div>
+
+            ${report.general_notes ? `
+              <!-- General Remarks Section -->
+              <div class="mb-12 page-break-inside-avoid">
+                <h3 class="text-sm font-bold uppercase tracking-widest mb-4 pb-2 border-b border-gray-100 text-[#c5a059]">General Remarks</h3>
+                <div class="p-6 bg-gray-50 border border-gray-100 rounded-sm text-gray-700 italic leading-relaxed text-sm">
+                  "${report.general_notes}"
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Footer Branding -->
+            <div class="mt-20 pt-10 border-t border-gray-100 text-center opacity-50">
+              <p class="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-medium italic">
+                This is a computer-generated report of the Girnar Tirth Yatra Group Portal.
+              </p>
+            </div>
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+              }, 800);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   const handleLogin = async (e) => {
@@ -729,6 +893,23 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     }
   };
 
+  const handlePointImageUpload = (index, file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const newReport = [...checkingReport];
+      newReport[index].images = [...(newReport[index].images || []), reader.result];
+      setCheckingReport(newReport);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removePointImage = (pointIndex, imgIndex) => {
+    const newReport = [...checkingReport];
+    newReport[pointIndex].images = newReport[pointIndex].images.filter((_, i) => i !== imgIndex);
+    setCheckingReport(newReport);
+  };
+
   const handleSaveCheckingReport = async (e) => {
     e.preventDefault();
     try {
@@ -737,7 +918,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           upashray_id: checkingUpashrayId,
           member_id: currentMemberId,
           report_date: new Date().toISOString().split('T')[0],
-          points: checkingReport
+          points: checkingReport,
+          general_notes: generalNotes
         });
       } catch (dbError) {
         console.log('Database create failed, using local state');
@@ -747,21 +929,26 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         if (u.id === checkingUpashrayId) {
           return {
             ...u,
-            reports: [...(u.reports || []), {
-              title: 'Checking Report',
-              id: Date.now(),
-              date: new Date().toLocaleDateString()
-            }]
+            reports: [
+              {
+                title: 'Checking Report',
+                id: Date.now(),
+                date: new Date().toLocaleDateString()
+              },
+              ...(u.reports || [])
+            ]
           };
         }
         return u;
       }));
       setCheckingUpashrayId(null);
+      setGeneralNotes('');
       setCheckingReport(CHECKING_POINTS.map((point, index) => ({
         id: index,
         point,
         description: '',
-        isChecked: false
+        isChecked: false,
+        images: []
       })));
     } catch (error) {
       console.error('Error saving checking report:', error);
@@ -946,6 +1133,47 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     }
   };
 
+  const exportRegistrationsToCSV = () => {
+    const filteredRegs = busRegistrations.filter(reg => 
+      registrationYatraFilter === 'all' || String(reg.yatra_id) === String(registrationYatraFilter)
+    );
+
+    if (filteredRegs.length === 0) {
+      alert('No registrations to export');
+      return;
+    }
+
+    const headers = ['Yatra Date', 'First Name', 'Last Name', 'Phone', 'Alt Phone', 'Gender', 'Birthdate', 'Village', 'Remarks'];
+    const csvRows = [
+      headers.join(','),
+      ...filteredRegs.map(reg => {
+        const yatraDate = yatraDates.find(d => String(d.id) === String(reg.yatra_id))?.date_text || 'Unknown';
+        return [
+          `"${yatraDate}"`,
+          `"${reg.first_name}"`,
+          `"${reg.last_name}"`,
+          `"${reg.phone}"`,
+          `"${reg.alt_phone || ''}"`,
+          `"${reg.gender}"`,
+          `"${reg.birthdate}"`,
+          `"${reg.village}"`,
+          `"${reg.remarks || ''}"`
+        ].join(',');
+      })
+    ];
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bus_yatra_registrations_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (view === 'login') {
     return (
       <div className="fixed inset-0 z-[200] bg-[#f8f9fa] flex items-center justify-center p-6">
@@ -1017,54 +1245,113 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           }
         `}</style>
         {/* Admin Header - Light Mode */}
-        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 md:px-16 shrink-0 shadow-sm overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-8 md:gap-12">
+        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-6 md:px-16 shrink-0 shadow-sm relative z-[250]">
+          <div className="flex items-center gap-4 md:gap-12">
+            {/* Hamburger Menu - Mobile Only */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-gray-500 hover:text-[#c5a059] transition-colors"
+            >
+              {isMobileMenuOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+
             <span className="text-[#c5a059] font-headline text-lg tracking-widest uppercase font-bold whitespace-nowrap">Admin Portal</span>
 
-            <nav className="flex items-center">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center">
               <button
                 onClick={() => setActiveTab('upashrays')}
-                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'upashrays' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                className={`px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'upashrays' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
                   }`}
               >
                 Manage Upashrays
               </button>
               <button
                 onClick={() => setActiveTab('members')}
-                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'members' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                className={`px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'members' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
                   }`}
               >
                 Manage Members
               </button>
               <button
                 onClick={() => setActiveTab('jinalayas')}
-                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'jinalayas' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                className={`px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'jinalayas' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
                   }`}
               >
                 Manage Jinalayas
               </button>
               <button
                 onClick={() => setActiveTab('reports')}
-                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'reports' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                className={`px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'reports' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
                   }`}
               >
                 Reports
               </button>
               <button
                 onClick={() => setActiveTab('bus-yatra')}
-                className={`px-4 py-2 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'bus-yatra' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
+                className={`px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'bus-yatra' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'
                   }`}
               >
                 Bus Yatra
               </button>
             </nav>
           </div>
-          <button
-            onClick={handleLogout}
-            className="px-6 py-2 border border-[#c5a059] text-[#c5a059] text-[10px] uppercase tracking-widest hover:bg-[#c5a059] hover:text-white transition-all font-bold whitespace-nowrap ml-4"
-          >
-            Logout
-          </button>
+
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleLogout}
+              className="hidden sm:block px-6 py-2 border border-[#c5a059] text-[#c5a059] text-[10px] uppercase tracking-widest hover:bg-[#c5a059] hover:text-white transition-all font-bold whitespace-nowrap"
+            >
+              Logout
+            </button>
+            {/* Small Logout Icon for very small screens */}
+            <button
+              onClick={handleLogout}
+              className="sm:hidden p-2 text-gray-400 hover:text-red-500 transition-colors"
+              title="Logout"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Mobile Menu Overlay */}
+          {isMobileMenuOpen && (
+            <div className="absolute top-20 left-0 w-full bg-white border-b border-gray-200 shadow-xl md:hidden animate-in slide-in-from-top duration-300">
+              <nav className="flex flex-col p-4">
+                {[
+                  { id: 'upashrays', label: 'Manage Upashrays' },
+                  { id: 'members', label: 'Manage Members' },
+                  { id: 'jinalayas', label: 'Manage Jinalayas' },
+                  { id: 'reports', label: 'Reports' },
+                  { id: 'bus-yatra', label: 'Bus Yatra' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-l-4 mb-2 ${activeTab === tab.id 
+                      ? 'border-[#c5a059] bg-[#c5a059]/5 text-[#c5a059]' 
+                      : 'border-transparent text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </nav>
+            </div>
+          )}
         </header>
 
         {/* Admin Content - Light Mode */}
@@ -1165,21 +1452,38 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           {activeTab === 'bus-yatra' && (
             <>
               <div className="max-w-5xl mx-auto mb-12">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col md:flex-row justify-center md:justify-between items-center md:items-end mb-12 gap-8 md:gap-0">
                   <div className="text-center md:text-left">
                     <h2 className="text-4xl font-headline text-gray-900 mb-2">Bus Yatra Management</h2>
                     <p className="text-gray-500 text-sm font-light">Manage yatra dates and view registrations.</p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setEditingYatraDateId(null);
-                      setYatraDateFormData({ date_text: '', description: '', image: '', registration_open: true });
-                      setIsYatraDateModalOpen(true);
-                    }}
-                    className="px-6 py-3 bg-[#c5a059] text-white text-[11px] font-bold uppercase tracking-widest rounded-sm shadow-lg shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
-                  >
-                    Add Yatra Date
-                  </button>
+                  <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-4">
+                    <div className="relative w-full md:w-64">
+                      <input
+                        type="text"
+                        value={yatraSearch}
+                        onChange={(e) => setYatraSearch(e.target.value)}
+                        placeholder="Search yatra date..."
+                        className="w-full bg-white border border-gray-200 rounded-sm pl-10 pr-4 py-3 text-sm focus:border-[#c5a059] outline-none transition-all h-[52px]"
+                      />
+                      <svg className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setEditingYatraDateId(null);
+                        setYatraDateFormData({ date_text: '', description: '', image: '', registration_open: true });
+                        setIsYatraDateModalOpen(true);
+                      }}
+                      className="w-full md:w-auto px-8 py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all flex items-center justify-center gap-3 h-[52px]"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Add Yatra Date
+                    </button>
+                  </div>
                 </div>
 
                 {/* Yatra Dates Table */}
@@ -1198,8 +1502,12 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {yatraDates.length > 0 ? (
-                          yatraDates.map((date) => {
+                        {yatraDates
+                          .filter(date => (date.date_text || '').toLowerCase().includes((yatraSearch || '').toLowerCase()))
+                          .length > 0 ? (
+                          yatraDates
+                            .filter(date => (date.date_text || '').toLowerCase().includes((yatraSearch || '').toLowerCase()))
+                            .map((date) => {
                             const registrationCount = busRegistrations.filter(r => String(r.yatra_id) === String(date.id)).length;
                             return (
                               <tr key={date.id} className="hover:bg-gray-50/50 transition-colors">
@@ -1269,7 +1577,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                           })
                         ) : (
                           <tr>
-                            <td colSpan="5" className="px-6 py-20 text-center text-gray-400 italic">No yatra dates added yet.</td>
+                            <td colSpan="6" className="px-6 py-20 text-center text-gray-400 italic">No yatra dates matching your search.</td>
                           </tr>
                         )}
                       </tbody>
@@ -1277,8 +1585,38 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   </div>
                 </div>
 
-                <div className="mb-6">
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-[#c5a059]">All Registrations</h3>
+                <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-6 gap-6">
+                  <div className="w-full md:w-auto">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-[#c5a059] mb-4">Registration Filter</h3>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="relative w-full sm:w-64">
+                        <select 
+                          value={registrationYatraFilter}
+                          onChange={(e) => setRegistrationYatraFilter(e.target.value)}
+                          className="w-full bg-white border border-gray-200 text-xs py-3 px-4 outline-none focus:border-[#c5a059] transition-colors appearance-none cursor-pointer font-bold text-gray-700 h-[52px] rounded-sm shadow-sm"
+                        >
+                          <option value="all">All Yatra Dates</option>
+                          {yatraDates.map(date => (
+                            <option key={date.id} value={date.id}>{date.date_text}</option>
+                          ))}
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
+                      <button
+                        onClick={exportRegistrationsToCSV}
+                        className="px-6 py-4 bg-green-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-sm shadow-lg shadow-green-600/10 hover:bg-green-700 transition-all flex items-center justify-center gap-2 h-[52px]"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Export CSV
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1287,6 +1625,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                   <table className="w-full min-w-[900px] text-left border-collapse">
                     <thead>
                       <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Yatra Date</th>
                         <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Yatrik Name</th>
                         <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Contact</th>
                         <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Gender</th>
@@ -1295,38 +1634,46 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {busRegistrations.length > 0 ? (
-                        busRegistrations.map((reg) => (
-                          <tr key={reg.id} className="hover:bg-gray-50/50 transition-colors">
-                            <td className="px-6 py-4">
-                              <div className="text-sm font-bold text-gray-900">{reg.first_name} {reg.last_name}</div>
-                              <div className="text-[10px] text-gray-400">DOB: {reg.birthdate}</div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="text-sm text-gray-600">{reg.phone}</div>
-                              {reg.alt_phone && <div className="text-[10px] text-gray-400">Alt: {reg.alt_phone}</div>}
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase rounded-sm border border-gray-200">
-                                {reg.gender}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500 max-w-[200px] truncate">{reg.remarks || '-'}</td>
-                            <td className="px-6 py-4 text-right">
-                              <button
-                                onClick={() => deleteBusRegistration(reg.id)}
-                                className="p-2 text-red-400 hover:text-red-600 transition-colors"
-                              >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                              </button>
-                            </td>
-                          </tr>
-                        ))
+                      {busRegistrations
+                        .filter(reg => registrationYatraFilter === 'all' || String(reg.yatra_id) === String(registrationYatraFilter))
+                        .length > 0 ? (
+                        busRegistrations
+                          .filter(reg => registrationYatraFilter === 'all' || String(reg.yatra_id) === String(registrationYatraFilter))
+                          .map((reg) => {
+                            const yatraDate = yatraDates.find(d => String(d.id) === String(reg.yatra_id))?.date_text || 'Unknown';
+                            return (
+                              <tr key={reg.id} className="hover:bg-gray-50/50 transition-colors">
+                                <td className="px-6 py-4 whitespace-nowrap text-[10px] font-bold text-[#c5a059] uppercase tracking-wider">{yatraDate}</td>
+                                <td className="px-6 py-4">
+                                  <div className="text-sm font-bold text-gray-900">{reg.first_name} {reg.last_name}</div>
+                                  <div className="text-[10px] text-gray-400">DOB: {reg.birthdate}</div>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="text-sm text-gray-600">{reg.phone}</div>
+                                  {reg.alt_phone && <div className="text-[10px] text-gray-400">Alt: {reg.alt_phone}</div>}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase rounded-sm border border-gray-200">
+                                    {reg.gender}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-500 max-w-[200px] truncate">{reg.remarks || '-'}</td>
+                                <td className="px-6 py-4 text-right">
+                                  <button
+                                    onClick={() => deleteBusRegistration(reg.id)}
+                                    className="p-2 text-red-400 hover:text-red-600 transition-colors"
+                                  >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
                       ) : (
                         <tr>
-                          <td colSpan="5" className="px-6 py-20 text-center text-gray-400 italic">No bus yatra registrations found.</td>
+                          <td colSpan="6" className="px-6 py-20 text-center text-gray-400 italic">No bus yatra registrations found for this date.</td>
                         </tr>
                       )}
                     </tbody>
@@ -1641,12 +1988,21 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{report.date}</td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{report.memberName}</td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{report.upashrayName}</td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <td className="px-6 py-4 whitespace-nowrap text-right flex justify-end gap-2">
                                 <button
                                   onClick={() => openReportDetail(report)}
                                   className="px-4 py-2 bg-gray-50 text-[#c5a059] text-[10px] font-bold uppercase tracking-widest rounded-sm border border-gray-100 hover:bg-[#c5a059] hover:text-white transition-all"
                                 >
                                   View Full Report
+                                </button>
+                                <button
+                                  onClick={() => openReportAndPrint(report)}
+                                  className="px-4 py-2 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest rounded-sm shadow-lg shadow-[#c5a059]/10 hover:bg-[#b08d4a] transition-all flex items-center gap-2"
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                  </svg>
+                                  Print
                                 </button>
                               </td>
                             </tr>
@@ -2160,18 +2516,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
               
               <div className="relative bg-white w-full max-w-4xl shadow-2xl rounded-sm overflow-hidden animate-fade-in print:shadow-none print:w-full print:max-w-none print:p-0">
                 {/* Modal Header - Hidden in Print */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50 print:hidden">
-                  <div className="flex items-center gap-4">
-                    <button 
-                      onClick={handlePrint}
-                      className="flex items-center gap-2 px-4 py-2 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest rounded-sm shadow-lg shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                      </svg>
-                      Print Report
-                    </button>
-                  </div>
+                <div className="flex justify-end items-center p-6 border-b border-gray-100 bg-gray-50 print:hidden">
                   <button onClick={() => setIsReportModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -2243,6 +2588,16 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                                 "{item.description}"
                               </div>
                             )}
+                            
+                            {item.images && item.images.length > 0 && (
+                              <div className="flex flex-wrap gap-5 mt-6">
+                                {item.images.map((img, imgIdx) => (
+                                  <div key={imgIdx} className="w-56 h-56 rounded-sm overflow-hidden border-2 border-gray-100 shadow-md bg-gray-50">
+                                    <img src={img} className="w-full h-full object-cover" />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       )) : (
@@ -2250,6 +2605,15 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       )}
                     </div>
                   </div>
+
+                  {selectedReport.general_notes && (
+                    <div className="mb-12">
+                      <h3 className="text-sm font-bold uppercase tracking-widest mb-4 pb-2 border-b border-gray-100 text-[#c5a059]">General Remarks</h3>
+                      <div className="p-6 bg-gray-50 border border-gray-100 rounded-sm text-gray-700 italic leading-relaxed text-sm">
+                        "{selectedReport.general_notes}"
+                      </div>
+                    </div>
+                  )}
 
                   {/* Footer Branding */}
                   <div className="mt-20 pt-8 border-t border-gray-100 text-center">
@@ -2432,7 +2796,36 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                               <td className="p-4 border-r border-gray-100 align-top">
                                 <div className="flex items-start">
                                   <span className="text-[#c5a059] mr-2 font-bold text-xs">{index + 1}.</span>
-                                  <span className="text-[11px] text-gray-800 leading-relaxed font-body">{item.point}</span>
+                                  <div className="flex-grow">
+                                    <span className="text-[11px] text-gray-800 leading-relaxed font-body block mb-3">{item.point}</span>
+                                    
+                                    {/* Images Preview & Upload */}
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                      {item.images && item.images.map((img, imgIdx) => (
+                                        <div key={imgIdx} className="relative w-12 h-12 group">
+                                          <img src={img} className="w-full h-full object-cover rounded-sm border border-gray-200" />
+                                          <button 
+                                            type="button"
+                                            onClick={() => removePointImage(index, imgIdx)}
+                                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"
+                                          >×</button>
+                                        </div>
+                                      ))}
+                                      <label className="w-12 h-12 border-2 border-dashed border-gray-200 rounded-sm flex items-center justify-center cursor-pointer hover:border-[#c5a059] transition-colors">
+                                        <input 
+                                          type="file" 
+                                          accept="image/*" 
+                                          capture="environment"
+                                          onChange={(e) => handlePointImageUpload(index, e.target.files[0])}
+                                          className="hidden" 
+                                        />
+                                        <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                      </label>
+                                    </div>
+                                  </div>
                                 </div>
                               </td>
                               <td className="p-4 border-r border-gray-100 align-middle">
@@ -2476,6 +2869,36 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                             </div>
 
                             <div className="space-y-4">
+                              {/* Images Preview & Upload - Mobile */}
+                              <div className="bg-gray-50 p-4 rounded-sm border border-gray-100">
+                                <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-3">Pictures / ફોટા</label>
+                                <div className="flex flex-wrap gap-3">
+                                  {item.images && item.images.map((img, imgIdx) => (
+                                    <div key={imgIdx} className="relative w-16 h-16 group">
+                                      <img src={img} className="w-full h-full object-cover rounded-sm border border-gray-200" />
+                                      <button 
+                                        type="button"
+                                        onClick={() => removePointImage(index, imgIdx)}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md"
+                                      >×</button>
+                                    </div>
+                                  ))}
+                                  <label className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-sm flex flex-col items-center justify-center cursor-pointer hover:border-[#c5a059] transition-colors bg-white">
+                                    <input 
+                                      type="file" 
+                                      accept="image/*" 
+                                      capture="environment"
+                                      onChange={(e) => handlePointImageUpload(index, e.target.files[0])}
+                                      className="hidden" 
+                                    />
+                                    <svg className="w-6 h-6 text-gray-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    </svg>
+                                    <span className="text-[8px] text-gray-400 uppercase font-bold">Add</span>
+                                  </label>
+                                </div>
+                              </div>
+
                               {/* Description Input */}
                               <div>
                                 <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2">Description / વિગત</label>
@@ -2510,6 +2933,16 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                           </div>
                         ))}
                       </div>
+                    </div>
+
+                    <div className="mt-8">
+                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">General Remarks / વધારાની વિગત</label>
+                      <textarea
+                        value={generalNotes}
+                        onChange={(e) => setGeneralNotes(e.target.value)}
+                        placeholder="Any additional observation or general feedback..."
+                        className="w-full bg-white border border-gray-200 p-4 text-sm focus:border-[#c5a059] outline-none transition-all rounded-sm shadow-sm h-32 resize-none"
+                      />
                     </div>
 
                     <div className="flex flex-col sm:flex-row justify-center md:justify-end gap-4 sm:gap-6 mt-8">
@@ -2560,13 +2993,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
                       </td>
                       <td className="p-6">
                         {u.reports && u.reports.length > 0 ? (
-                          <div className="space-y-2">
-                            {u.reports.slice(-2).map(r => (
-                              <div key={r.id} className="text-[10px] border-l-2 border-[#c5a059] pl-2 py-0.5">
-                                <span className="font-bold text-gray-700 block">{r.title}</span>
-                                <span className="text-gray-400">{r.date}</span>
-                              </div>
-                            ))}
+                          <div className="text-[10px] border-l-2 border-[#c5a059] pl-2 py-0.5">
+                            <span className="font-bold text-gray-700 block">{u.reports[0].title}</span>
+                            <span className="text-gray-400">{u.reports[0].date}</span>
                           </div>
                         ) : (
                           <span className="text-gray-300 text-[10px] uppercase tracking-widest">No reports yet</span>
