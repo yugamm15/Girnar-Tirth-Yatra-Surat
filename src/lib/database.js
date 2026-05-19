@@ -259,12 +259,7 @@ export const yatraDatesDB = {
   async update(id, updates) {
     const { data, error } = await supabase
       .from('yatra_dates')
-      .update({
-        date_text: updates.date_text,
-        description: updates.description,
-        image: updates.image,
-        registration_open: updates.registration_open
-      })
+      .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select();
     if (error) throw error;

@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LightPageShell } from '../components/LightPageShell.jsx';
+import ConfirmModal from '../components/ConfirmModal.jsx';
+import TopLineLoader from '../components/TopLineLoader.jsx';
+import ToastViewport from '../components/ToastViewport.jsx';
 import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -14,6 +17,36 @@ const MonthlyBusYatraPage = () => {
   const [registrationStatus, setRegistrationStatus] = useState(null);
   const [yatrikList, setYatrikList] = useState([]);
   const [yatraDates, setYatraDates] = useState(pageCopy.yatraDates);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingDates, setIsLoadingDates] = useState(false);
+  const [toasts, setToasts] = useState([]);
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    title: '',
+    message: '',
+    confirmLabel: 'Confirm',
+    cancelLabel: 'Cancel',
+    danger: false,
+    onConfirm: () => {}
+  });
+
+  const requestConfirmation = (options) => {
+    return new Promise((resolve) => {
+      setConfirmState({
+        open: true,
+        title: options.title || 'Confirm',
+        message: options.message || 'Are you sure?',
+        confirmLabel: options.confirmLabel || 'Confirm',
+        cancelLabel: options.cancelLabel || 'Cancel',
+        danger: options.danger || false,
+        onConfirm: () => {
+          setConfirmState(prev => ({ ...prev, open: false }));
+          resolve(true);
+        }
+      });
+    });
+  };
+
   const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
   const [currentYatrik, setCurrentYatrik] = useState({
     firstName: '',
@@ -26,6 +59,16 @@ const MonthlyBusYatraPage = () => {
   });
   const yatraListRef = useRef(null);
   const cacheKey = 'monthly_bus_yatra_dates';
+
+  const dismissToast = (id) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  };
+
+  const pushToast = (message, type = 'info') => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setToasts((prev) => [...prev, { id, message, type }]);
+    window.setTimeout(() => dismissToast(id), 4000);
+  };
 
   useEffect(() => {
     const updateViewport = () => {
@@ -44,6 +87,7 @@ const MonthlyBusYatraPage = () => {
     let cancelled = false;
 
     const loadYatraDates = async () => {
+      setIsLoadingDates(true);
       try {
         const cachedDates = dbCache.read(cacheKey);
         if (cachedDates) {
@@ -76,6 +120,9 @@ const MonthlyBusYatraPage = () => {
         if (!dbCache.read(cacheKey)) {
           setYatraDates(pageCopy.yatraDates);
         }
+        pushToast('Could not refresh yatra dates. Showing latest available data.', 'info');
+      } finally {
+        setIsLoadingDates(false);
       }
     };
 
@@ -127,8 +174,19 @@ const MonthlyBusYatraPage = () => {
 
   const handleRegistrationSubmit = async (e) => {
     e.preventDefault();
-    const finalYatrikList = [...yatrikList, currentYatrik];
     
+    const confirmed = await requestConfirmation({
+      title: 'Submit Registration?',
+      message: `Are you sure you want to register ${yatrikList.length + 1} person(s) for the yatra on ${selectedYatra?.date?.[t('lang') || 'en']}? Please ensure all details are correct.`,
+      confirmLabel: 'Confirm Registration',
+      cancelLabel: 'Review Details'
+    });
+    
+    if (!confirmed) return;
+
+    const finalYatrikList = [...yatrikList, currentYatrik];
+    setIsSubmitting(true);
+
     try {
       // Save birthdate records directly to the database
       const registrationsToSave = finalYatrikList.map(yatrik => ({
@@ -139,24 +197,19 @@ const MonthlyBusYatraPage = () => {
         birthdate: yatrik.birthdate,  // Store birthdate
         gender: yatrik.gender,
         remarks: yatrik.remarks,
-        yatra_id: null,  // Set if you have yatra IDs in database
+        yatra_id: selectedYatra.id,
       }));
 
       // Attempt to save to database
-      // If Supabase is not configured, still show success but log to console
       try {
         await yatrikRegistrationsDB.createMultiple(registrationsToSave);
       } catch (dbError) {
-        console.log('Database not configured yet. Registration data:', finalYatrikList);
+        console.error('Database error during registration:', dbError);
+        throw dbError; // Re-throw to be caught by the outer catch block
       }
 
-      console.log('Final Registration Data:', {
-        yatra: selectedYatra,
-        yatrikList: finalYatrikList,
-        registrations: registrationsToSave
-      });
-
       setRegistrationStatus('success');
+      pushToast('Registration submitted successfully.', 'success');
       setTimeout(() => {
         setShowRegistrationForm(false);
         setSelectedYatra(null);
@@ -166,9 +219,12 @@ const MonthlyBusYatraPage = () => {
     } catch (error) {
       console.error('Error submitting registration:', error);
       setRegistrationStatus('error');
+      pushToast('Registration failed. Please try again.', 'error');
       setTimeout(() => {
         setRegistrationStatus(null);
       }, 4000);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -176,8 +232,46 @@ const MonthlyBusYatraPage = () => {
     setCurrentYatrik((prev) => ({ ...prev, [field]: value }));
   };
 
+  const hasUnsavedRegistration = () => {
+    const hasCurrentDraft = Object.values(currentYatrik).some((value) => String(value || '').trim() !== '');
+    return hasCurrentDraft || yatrikList.length > 0;
+  };
+
+  const requestCloseRegistration = async () => {
+    if (registrationStatus || !hasUnsavedRegistration()) {
+      setShowRegistrationForm(false);
+      return;
+    }
+    
+    const confirmed = await requestConfirmation({
+      title: 'Discard registration draft?',
+      message: 'You have unsaved yatrik details. If you close now, entered data will be lost.',
+      confirmLabel: 'Discard',
+      danger: true
+    });
+
+    if (confirmed) {
+      setShowRegistrationForm(false);
+      setYatrikList([]);
+      resetForm();
+      pushToast('Draft discarded.', 'info');
+    }
+  };
+
   return (
     <LightPageShell>
+      <TopLineLoader active={isSubmitting || isLoadingDates} label={isSubmitting ? 'Submitting registration' : 'Refreshing yatra dates'} />
+      <ToastViewport toasts={toasts} onDismiss={dismissToast} />
+      <ConfirmModal
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        cancelLabel={confirmState.cancelLabel}
+        danger={confirmState.danger}
+        onConfirm={confirmState.onConfirm}
+        onCancel={() => setConfirmState(prev => ({ ...prev, open: false }))}
+      />
       <section className="max-w-7xl mx-auto space-y-12 md:space-y-16 pb-12">
         <header className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-6 md:gap-8 items-stretch">
           <article className="light-panel light-panel-left p-6 md:p-10">
@@ -282,7 +376,7 @@ const MonthlyBusYatraPage = () => {
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-6">
             <div 
               className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-              onClick={() => !registrationStatus && setShowRegistrationForm(false)} 
+              onClick={() => !isSubmitting && requestCloseRegistration()} 
             />
             <div className="relative w-full max-w-lg bg-white rounded-sm shadow-2xl overflow-hidden border border-gray-200 animate-in fade-in zoom-in duration-300">
               <div className="bg-[#c5a059] p-6 text-white flex justify-between items-center">
@@ -440,15 +534,17 @@ const MonthlyBusYatraPage = () => {
                         </button>
                         <button
                           type="submit"
-                          className="flex-1 px-6 py-4 bg-[#c5a059] text-white uppercase tracking-widest text-[10px] font-bold hover:bg-[#b08d4a] transition-all shadow-lg shadow-yellow-900/10"
+                          disabled={isSubmitting}
+                          className="flex-1 px-6 py-4 bg-[#c5a059] text-white uppercase tracking-widest text-[10px] font-bold hover:bg-[#b08d4a] transition-all shadow-lg shadow-yellow-900/10 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                          {t(pageCopy.registrationForm.submit)}
+                          {isSubmitting ? 'Submitting...' : t(pageCopy.registrationForm.submit)}
                         </button>
                       </div>
                       <button
                         type="button"
-                        onClick={() => setShowRegistrationForm(false)}
-                        className="w-full py-3 text-gray-400 uppercase tracking-widest text-[10px] font-bold hover:text-gray-600 transition-all"
+                        onClick={requestCloseRegistration}
+                        disabled={isSubmitting}
+                        className="w-full py-3 text-gray-400 uppercase tracking-widest text-[10px] font-bold hover:text-gray-600 transition-all disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {t(pageCopy.registrationForm.cancel)}
                       </button>

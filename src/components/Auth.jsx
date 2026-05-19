@@ -6,6 +6,9 @@ import LoginForm from './auth/LoginForm';
 import LoadingOverlay from './auth/LoadingOverlay';
 import AdminPanel from './admin/AdminPanel';
 import MemberPanel from './member/MemberPanel';
+import ConfirmModal from './ConfirmModal.jsx';
+import TopLineLoader from './TopLineLoader.jsx';
+import ToastViewport from './ToastViewport.jsx';
 
 const ADMIN_CREDENTIALS = {
   email: 'GirnarTirthYatraGroup@gmail.com',
@@ -90,6 +93,29 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const [checkingUpashrayId, setCheckingUpashrayId] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingMessage, setProcessingMessage] = useState('Processing...');
+
+  const [toasts, setToasts] = useState([]);
+  const [confirmState, setConfirmState] = useState({
+    open: false, title: '', message: '', confirmLabel: 'Confirm', cancelLabel: 'Cancel', danger: false, onConfirm: () => {}
+  });
+
+  const dismissToast = (id) => setToasts(prev => prev.filter(t => t.id !== id));
+  const pushToast = (message, type = 'info') => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setToasts(prev => [...prev, { id, message, type }]);
+    window.setTimeout(() => dismissToast(id), 4000);
+  };
+
+  const requestConfirmation = (options) => {
+    return new Promise((resolve) => {
+      setConfirmState({
+        open: true, title: options.title || 'Confirm', message: options.message || 'Are you sure?',
+        confirmLabel: options.confirmLabel || 'Confirm', cancelLabel: options.cancelLabel || 'Cancel',
+        danger: options.danger || false,
+        onConfirm: () => { setConfirmState(prev => ({ ...prev, open: false })); resolve(true); }
+      });
+    });
+  };
 
   // Overlay threshold state to prevent blinking
   const [showOverlay, setShowOverlay] = useState(false);
@@ -588,7 +614,15 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   };
 
   const deleteExistingMedia = async (mediaId, category) => {
-    if (!window.confirm('Are you sure you want to delete this image?')) return;
+    const confirmed = await requestConfirmation({
+      title: 'Delete this image?',
+      message: 'This will permanently remove the image from the database and storage.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Keep',
+      danger: true
+    });
+    if (!confirmed) return;
+    
     setIsProcessing(true);
     setProcessingMessage('Deleting media...');
     try {
@@ -596,7 +630,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       const fieldName = `existing${category}Media`;
       setFormData(prev => ({ ...prev, [fieldName]: prev[fieldName].filter(m => m.id !== mediaId) }));
       await loadUpashrays();
-    } catch (err) { alert('Failed to delete media'); } finally { setIsProcessing(false); }
+      pushToast('Media removed successfully.', 'success');
+    } catch (err) { pushToast('Failed to delete media.', 'error'); } finally { setIsProcessing(false); }
   };
 
   const handleSaveUpashray = async (e) => {
@@ -639,7 +674,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       if (editingId) { setUpashrays(prev => prev.map(u => u.id === editingId ? { ...u, ...processedUpashray } : u)); }
       else { setUpashrays(prev => [processedUpashray, ...prev]); }
       loadUpashrayReports(); resetForm();
-    } catch (err) { alert('Failed to save upashray'); } finally { setIsProcessing(false); }
+      pushToast(editingId ? 'Upashray updated successfully.' : 'Upashray created successfully.', 'success');
+    } catch (err) { pushToast('Failed to save upashray', 'error'); } finally { setIsProcessing(false); }
   };
 
   const startEdit = async (u) => {
@@ -661,10 +697,22 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   };
 
   const deleteUpashray = async (id) => {
-    if (window.confirm('Are you sure you want to delete this upashray?')) {
+    const confirmed = await requestConfirmation({
+      title: 'Delete Upashray?',
+      message: 'Are you sure you want to delete this upashray? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      danger: true
+    });
+    if (confirmed) {
       const originalUpashrays = [...upashrays];
       setUpashrays(prev => prev.filter(u => u.id !== id));
-      try { await upashraysDB.delete(id); } catch (err) { setUpashrays(originalUpashrays); alert('Failed to delete upashray'); }
+      try { 
+        await upashraysDB.delete(id); 
+        pushToast('Upashray deleted successfully.', 'success');
+      } catch (err) { 
+        setUpashrays(originalUpashrays); 
+        pushToast('Failed to delete upashray', 'error'); 
+      }
     }
   };
 
@@ -697,7 +745,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         setMembers(prev => [{ ...savedMember, hasAccess: !!savedMember.has_access }, ...prev]);
       }
       resetMemberForm();
-    } catch (err) { alert('Failed to save member'); } finally { setIsProcessing(false); }
+      pushToast(editingMemberId ? 'Member updated successfully.' : 'Member added successfully.', 'success');
+    } catch (err) { pushToast('Failed to save member', 'error'); } finally { setIsProcessing(false); }
   };
 
   const startEditMember = (m) => {
@@ -711,16 +760,44 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const toggleMemberAccess = async (id) => {
     const member = members.find(m => m.id === id);
     if (!member) return;
+
+    const confirmed = await requestConfirmation({
+      title: member.hasAccess ? 'Revoke Access?' : 'Grant Access?',
+      message: member.hasAccess 
+        ? `Are you sure you want to revoke portal access for ${member.name}?` 
+        : `Are you sure you want to grant portal access to ${member.name}?`,
+      confirmLabel: member.hasAccess ? 'Revoke' : 'Grant',
+      danger: member.hasAccess
+    });
+    if (!confirmed) return;
+
     setMembers(prev => prev.map(m => m.id === id ? { ...m, hasAccess: !m.hasAccess } : m));
-    try { await membersDB.update(id, { has_access: !member.hasAccess }); }
-    catch (err) { setMembers(prev => prev.map(m => m.id === id ? { ...m, hasAccess: member.hasAccess } : m)); }
+    try { 
+      await membersDB.update(id, { has_access: !member.hasAccess }); 
+      pushToast(`Member access ${!member.hasAccess ? 'enabled' : 'disabled'} successfully.`, 'success');
+    } catch (err) { 
+      setMembers(prev => prev.map(m => m.id === id ? { ...m, hasAccess: member.hasAccess } : m));
+      pushToast('Failed to toggle member access', 'error');
+    }
   };
 
   const deleteMember = async (id) => {
-    if (window.confirm('Are you sure you want to delete this member?')) {
+    const confirmed = await requestConfirmation({
+      title: 'Delete Member?',
+      message: 'Are you sure you want to delete this member? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      danger: true
+    });
+    if (confirmed) {
       const originalMembers = [...members];
       setMembers(prev => prev.filter(m => m.id !== id));
-      try { await membersDB.delete(id); } catch (err) { setMembers(originalMembers); alert('Failed to delete member'); }
+      try { 
+        await membersDB.delete(id); 
+        pushToast('Member deleted successfully.', 'success');
+      } catch (err) { 
+        setMembers(originalMembers); 
+        pushToast('Failed to delete member', 'error'); 
+      }
     }
   };
 
@@ -751,7 +828,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         setJinalayas(prev => [{ ...savedJinalaya, beforeImg: savedJinalaya.before_img, processImg: savedJinalaya.process_img, afterImg: savedJinalaya.after_img }, ...prev]);
       }
       resetJinalayaForm();
-    } catch (err) { alert('Failed to save jinalaya'); } finally { setIsProcessing(false); }
+      pushToast(editingJinalayaId ? 'Jinalaya updated successfully.' : 'Jinalaya added successfully.', 'success');
+    } catch (err) { pushToast('Failed to save jinalaya', 'error'); } finally { setIsProcessing(false); }
   };
 
   const startEditJinalaya = (j) => {
@@ -764,10 +842,22 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   };
 
   const deleteJinalaya = async (id) => {
-    if (window.confirm('Are you sure you want to delete this jinalaya?')) {
+    const confirmed = await requestConfirmation({
+      title: 'Delete Jinalaya?',
+      message: 'Are you sure you want to delete this jinalaya? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      danger: true
+    });
+    if (confirmed) {
       const originalJinalayas = [...jinalayas];
       setJinalayas(prev => prev.filter(j => j.id !== id));
-      try { await jinalayasDB.delete(id); } catch (err) { setJinalayas(originalJinalayas); alert('Failed to delete jinalaya'); }
+      try { 
+        await jinalayasDB.delete(id); 
+        pushToast('Jinalaya deleted successfully.', 'success');
+      } catch (err) { 
+        setJinalayas(originalJinalayas); 
+        pushToast('Failed to delete jinalaya', 'error'); 
+      }
     }
   };
 
@@ -802,28 +892,68 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       else await yatraDatesDB.create(data);
       await loadBusYatra();
       setIsYatraDateModalOpen(false);
-    } catch (err) { } finally { setIsProcessing(false); }
+      pushToast(editingYatraDateId ? 'Yatra date updated.' : 'Yatra date added.', 'success');
+    } catch (err) { pushToast('Failed to save yatra date', 'error'); } finally { setIsProcessing(false); }
   };
 
   const toggleRegistrationStatus = async (id, currentStatus) => {
+    const confirmed = await requestConfirmation({
+      title: currentStatus ? 'Close Registration?' : 'Open Registration?',
+      message: currentStatus 
+        ? 'New registrations will be blocked for this date.' 
+        : 'Users will be able to register for this yatra date.',
+      confirmLabel: currentStatus ? 'Close' : 'Open',
+      danger: currentStatus
+    });
+    if (!confirmed) return;
+
     setYatraDates(prev => prev.map(d => d.id === id ? { ...d, registration_open: !currentStatus } : d));
-    try { await yatraDatesDB.update(id, { registration_open: !currentStatus }); }
-    catch (err) { setYatraDates(prev => prev.map(d => d.id === id ? { ...d, registration_open: currentStatus } : d)); }
+    try { 
+      await yatraDatesDB.update(id, { registration_open: !currentStatus }); 
+      pushToast(`Registration ${!currentStatus ? 'opened' : 'closed'} successfully.`, 'success');
+    } catch (err) { 
+      setYatraDates(prev => prev.map(d => d.id === id ? { ...d, registration_open: currentStatus } : d)); 
+      pushToast('Failed to toggle registration status', 'error');
+    }
   };
 
   const deleteYatraDate = async (id) => {
-    if (window.confirm('Are you sure you want to delete this yatra date?')) {
+    const confirmed = await requestConfirmation({
+      title: 'Delete Yatra Date?',
+      message: 'Are you sure you want to delete this yatra date? All associated registrations will also be removed.',
+      confirmLabel: 'Delete',
+      danger: true
+    });
+    if (confirmed) {
       const originalDates = [...yatraDates];
       setYatraDates(prev => prev.filter(d => d.id !== id));
-      try { await yatraDatesDB.delete(id); } catch (err) { setYatraDates(originalDates); alert('Failed to delete yatra date'); }
+      try { 
+        await yatraDatesDB.delete(id); 
+        pushToast('Yatra date deleted.', 'success');
+      } catch (err) { 
+        setYatraDates(originalDates); 
+        pushToast('Failed to delete yatra date', 'error'); 
+      }
     }
   };
 
   const deleteRegistration = async (id) => {
-    if (window.confirm('Are you sure you want to delete this registration?')) {
+    const confirmed = await requestConfirmation({
+      title: 'Delete Registration?',
+      message: 'Are you sure you want to delete this registration? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      danger: true
+    });
+    if (confirmed) {
       const originalRegs = [...busRegistrations];
       setBusRegistrations(prev => prev.filter(r => r.id !== id));
-      try { await yatrikRegistrationsDB.delete(id); } catch (err) { setBusRegistrations(originalRegs); alert('Failed to delete registration'); }
+      try { 
+        await yatrikRegistrationsDB.delete(id); 
+        pushToast('Registration deleted.', 'success');
+      } catch (err) { 
+        setBusRegistrations(originalRegs); 
+        pushToast('Failed to delete registration', 'error'); 
+      }
     }
   };
 
@@ -873,23 +1003,48 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       setCheckingUpashrayId(null);
       setCheckingReport(CHECKING_POINTS.map((point, index) => ({ id: index, point, description: '', isChecked: false, images: [] })));
       setGeneralNotes('');
-      alert('Report saved successfully!');
-    } catch (err) { alert('Failed to save report'); } finally { setIsProcessing(false); }
+      pushToast('Report saved successfully!', 'success');
+    } catch (err) { pushToast('Failed to save report', 'error'); } finally { setIsProcessing(false); }
   };
 
   const openReportAndPrint = (report) => { window.open(`/print-report/${report.id}`, '_blank'); };
 
   const deleteReport = async (id) => {
-    if (window.confirm('Are you sure you want to delete this report?')) {
+    const confirmed = await requestConfirmation({
+      title: 'Delete Report?',
+      message: 'Are you sure you want to delete this report? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      danger: true
+    });
+    if (confirmed) {
       const originalReports = [...allReports];
       setAllReports(prev => prev.filter(r => r.id !== id));
-      try { await checkingReportsDB.delete(id); } catch (err) { setAllReports(originalReports); alert('Failed to delete report'); }
+      try { 
+        await checkingReportsDB.delete(id); 
+        pushToast('Report deleted.', 'success');
+      } catch (err) { 
+        setAllReports(originalReports); 
+        pushToast('Failed to delete report', 'error'); 
+      }
     }
   };
+
+  const GlobalUX = () => (
+    <>
+      <TopLineLoader active={isProcessing || isLoadingData || isInitializing} label={processingMessage || 'Loading...'} />
+      <ToastViewport toasts={toasts} onDismiss={dismissToast} />
+      <ConfirmModal
+        open={confirmState.open} title={confirmState.title} message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel} cancelLabel={confirmState.cancelLabel} danger={confirmState.danger}
+        onConfirm={confirmState.onConfirm} onCancel={() => setConfirmState(prev => ({ ...prev, open: false }))}
+      />
+    </>
+  );
 
   if (view === 'login') {
     return (
       <>
+        <GlobalUX />
         <LoginForm initialView={initialView} onBack={onBack} email={email} setEmail={setEmail} password={password} setPassword={setPassword} error={error} handleLogin={handleLogin} />
         {showOverlay && <LoadingOverlay message={processingMessage} />}
       </>
@@ -899,6 +1054,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   if (view === 'admin') {
     return (
       <>
+        <GlobalUX />
         <AdminPanel 
           activeTab={activeTab} setActiveTab={(tab) => navigate(`/admin/${tab}`)} loadedData={loadedData} loadMembers={loadMembers} loadJinalayas={loadJinalayas} loadReports={loadReports} loadBusYatra={loadBusYatra} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} handleLogout={handleLogout}
           upashrays={upashrays} upashraySearch={upashraySearch} setUpashraySearch={setUpashraySearch} setIsModalOpen={setIsModalOpen} startEdit={startEdit} deleteUpashray={deleteUpashray} isModalOpen={isModalOpen} resetForm={resetForm} editingId={editingId} formData={formData} setFormData={setFormData} handleSaveUpashray={handleSaveUpashray} handleMultipleFilesChange={handleMultipleFilesChange} removeMediaFile={removeMediaFile} deleteExistingMedia={deleteExistingMedia}
@@ -915,6 +1071,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   if (view === 'member') {
     return (
       <>
+        <GlobalUX />
         <MemberPanel 
           memberActiveTab={memberActiveTab} setMemberActiveTab={(tab) => navigate(`/member/${tab}`)} loadedData={loadedData} loadReports={loadReports} loadUpashrayReports={loadUpashrayReports} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} handleLogout={handleLogout}
           upashrays={upashrays} setCheckingUpashrayId={setCheckingUpashrayId} checkingUpashrayId={checkingUpashrayId} handleSaveCheckingReport={handleSaveCheckingReport} checkingReport={checkingReport} setCheckingReport={setCheckingReport} removePointImage={removePointImage} handlePointImageUpload={handlePointImageUpload} generalNotes={generalNotes} setGeneralNotes={setGeneralNotes}
@@ -925,5 +1082,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     );
   }
 
-  return showOverlay ? <LoadingOverlay message={processingMessage} /> : null;
+  return showOverlay ? (
+    <>
+      <GlobalUX />
+      <LoadingOverlay message={processingMessage} />
+    </>
+  ) : <GlobalUX />;
 };
