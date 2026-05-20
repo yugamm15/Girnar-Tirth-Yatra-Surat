@@ -651,9 +651,12 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setProcessingMessage(editingId ? 'Updating Upashray...' : 'Adding Upashray...');
     try {
       const upashrayData = {
-        name: formData.name, village: formData.village, route: formData.route,
+        name: formData.name,
+        village: formData.village,
+        route: formData.route,
+        description: formData.description,
         trusty: formData.trusty, mobile: formData.mobile, location: formData.location,
-        description: formData.description, slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
+        slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
         status: formData.status
       };
 
@@ -696,8 +699,12 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       const media = await upashrayMediaDB.getByUpashrayId(u.id);
       setEditingId(u.id);
       setFormData({
-        name: u.name || '', village: u.village || '', route: u.route || '', trusty: u.trusty || '', mobile: u.mobile || '',
-        location: u.location || '', description: u.description || '', slug: u.slug || '', status: u.status || 'Plan',
+        name: u.name || '',
+        village: u.village || '',
+        route: u.route || '',
+        description: u.description || '',
+        trusty: u.trusty || '', mobile: u.mobile || '',
+        location: u.location || '', slug: u.slug || '', status: u.status || 'Plan',
         beforeFiles: [], processFiles: [], afterFiles: [],
         existingBeforeMedia: media.filter(m => m.category === 'Before'),
         existingProcessMedia: media.filter(m => m.category === 'Process'),
@@ -825,8 +832,12 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setProcessingMessage(editingJinalayaId ? 'Updating Jinalaya...' : 'Adding Jinalaya...');
     try {
       const data = {
-        name: jinalayaFormData.name, village: jinalayaFormData.village, route: jinalayaFormData.route,
-        mulnayak: jinalayaFormData.mulnayak, location: jinalayaFormData.location, description: jinalayaFormData.description,
+        name: jinalayaFormData.name,
+        village: jinalayaFormData.village,
+        route: jinalayaFormData.route,
+        mulnayak: jinalayaFormData.mulnayak,
+        description: jinalayaFormData.description,
+        location: jinalayaFormData.location, 
         status: jinalayaFormData.status, before_img: jinalayaFormData.beforeImg,
         process_img: jinalayaFormData.processImg, after_img: jinalayaFormData.afterImg
       };
@@ -846,8 +857,13 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const startEditJinalaya = (j) => {
     setEditingJinalayaId(j.id);
     setJinalayaFormData({
-      name: j.name, village: j.village, route: j.route, mulnayak: j.mulnayak, location: j.location, description: j.description,
-      status: j.status, beforeImg: j.beforeImg, processImg: j.processImg, afterImg: j.afterImg
+      name: j.name || '',
+      village: j.village || '',
+      route: j.route || '',
+      mulnayak: j.mulnayak || '',
+      description: j.description || '',
+      location: j.location || '', status: j.status || 'Plan', 
+      beforeImg: j.beforeImg || '', processImg: j.processImg || '', afterImg: j.afterImg || ''
     });
     setIsJinalayaModalOpen(true);
   };

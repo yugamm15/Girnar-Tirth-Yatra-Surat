@@ -51,19 +51,20 @@ WHERE NOT EXISTS (
   WHERE j.name = v.name
 );
 
-INSERT INTO yatra_dates (date_text, description, image)
-SELECT v.date_text, v.description, v.image
-FROM (
-  VALUES
-    ('11th April Tuesday', 'Yatra starts from 10th April and finish by 12th April', '/image/1.JPG'),
-    ('5th May Friday', 'Yatra starts from 4th May and finish by 6th May', '/image/2.JPG'),
-    ('26th June Monday', 'Yatra starts from 25th June and finish by 27th June', '/image/4.JPG')
-) AS v(date_text, description, image)
-WHERE NOT EXISTS (
-  SELECT 1
-  FROM yatra_dates yd
-  WHERE yd.date_text = v.date_text
-);
+-- Yatra Dates (Optional initial dates)
+-- INSERT INTO yatra_dates (date_text, description, image)
+-- SELECT v.date_text, v.description, v.image
+-- FROM (
+--   VALUES
+--     ('11th April Tuesday', 'Yatra starts from 10th April and finish by 12th April', '/image/1.JPG'),
+--     ('5th May Friday', 'Yatra starts from 4th May and finish by 6th May', '/image/2.JPG'),
+--     ('26th June Monday', 'Yatra starts from 25th June and finish by 27th June', '/image/4.JPG')
+-- ) AS v(date_text, description, image)
+-- WHERE NOT EXISTS (
+--   SELECT 1
+--   FROM yatra_dates yd
+--   WHERE yd.date_text = v.date_text
+-- );
 
 -- 2) Seed a couple of monthly yatra dates if table exists
 INSERT INTO yatra_dates (date_text, description)

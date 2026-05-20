@@ -38,6 +38,7 @@ const UpashrayModal = ({
                 required
               />
             </div>
+
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">URL Slug (auto-generated from name)</label>
               <input
@@ -48,6 +49,7 @@ const UpashrayModal = ({
                 placeholder="e.g., vagad, ranpur"
               />
             </div>
+
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Village Name</label>
               <input
@@ -58,6 +60,7 @@ const UpashrayModal = ({
                 required
               />
             </div>
+
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Route</label>
               <input
@@ -65,10 +68,10 @@ const UpashrayModal = ({
                 value={formData.route}
                 onChange={(e) => setFormData({ ...formData, route: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
-                placeholder="e.g., Surat to Girnar"
                 required
               />
             </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Trusty Name (Optional)</label>
@@ -114,6 +117,7 @@ const UpashrayModal = ({
                 <option value="Done">Done</option>
               </select>
             </div>
+            
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Description</label>
               <textarea

@@ -35,6 +35,7 @@ const JinalayaModal = ({
                 required
               />
             </div>
+
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Village Name</label>
               <input
@@ -45,6 +46,7 @@ const JinalayaModal = ({
                 required
               />
             </div>
+
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Route</label>
               <input
@@ -52,10 +54,10 @@ const JinalayaModal = ({
                 value={jinalayaFormData.route}
                 onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, route: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
-                placeholder="e.g., Main Taleti or Vihar Route"
                 required
               />
             </div>
+
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Google Map Link</label>
               <input
@@ -76,9 +78,9 @@ const JinalayaModal = ({
                 value={jinalayaFormData.mulnayak}
                 onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, mulnayak: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
-                placeholder="e.g., Shri Neminath Bhagwan"
               />
             </div>
+
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Status</label>
               <select
@@ -91,6 +93,7 @@ const JinalayaModal = ({
                 <option value="Done">Done</option>
               </select>
             </div>
+
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Description</label>
               <textarea

@@ -224,43 +224,53 @@ const MonthlyBusYatraPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {yatraDates.map((yatra, index) => (
-              <article 
-                key={index}
-                onClick={() => handleYatraSelect(yatra)}
-                className="light-panel-soft group cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full"
-              >
-                <div className="p-6 flex gap-5 flex-1 relative">
-                  {!yatra.registration_open && (
-                    <div className="absolute top-2 right-2 bg-gray-100 text-gray-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm border border-gray-200">
-                      Closed
-                    </div>
-                  )}
-                  <SecureImage 
-                    src={yatra.image} 
-                    alt={t(yatra.date)} 
-                    containerClassName="w-24 h-24 shrink-0 rounded-sm border border-gray-100 shadow-sm"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="flex flex-col">
-                    <h3 className="text-xl font-headline text-[#d32f2f] leading-tight group-hover:text-[#b71c1c] transition-colors">
-                      {t(yatra.date)}
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed font-light line-clamp-2">
-                      {t(yatra.description)}
-                    </p>
-                    <div className="mt-auto pt-4 flex items-center justify-between">
-                      <span className="text-[10px] uppercase tracking-widest font-bold text-[#c5a059]">
-                        {yatra.registration_open ? 'Book Now' : 'Closed'}
-                      </span>
-                      <svg className="w-5 h-5 text-gray-300 group-hover:text-[#c5a059] group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
+            {yatraDates.length > 0 ? (
+              yatraDates.map((yatra, index) => (
+                <article 
+                  key={index}
+                  onClick={() => handleYatraSelect(yatra)}
+                  className="light-panel-soft group cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full"
+                >
+                  <div className="p-6 flex gap-5 flex-1 relative">
+                    {!yatra.registration_open && (
+                      <div className="absolute top-2 right-2 bg-gray-100 text-gray-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm border border-gray-200">
+                        Closed
+                      </div>
+                    )}
+                    <SecureImage 
+                      src={yatra.image} 
+                      alt={t(yatra.date)} 
+                      containerClassName="w-24 h-24 shrink-0 rounded-sm border border-gray-100 shadow-sm"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="flex flex-col">
+                      <h3 className="text-xl font-headline text-[#d32f2f] leading-tight group-hover:text-[#b71c1c] transition-colors">
+                        {t(yatra.date)}
+                      </h3>
+                      <p className="mt-2 text-sm text-gray-600 leading-relaxed font-light line-clamp-2">
+                        {t(yatra.description)}
+                      </p>
+                      <div className="mt-auto pt-4 flex items-center justify-between">
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-[#c5a059]">
+                          {yatra.registration_open ? 'Book Now' : 'Closed'}
+                        </span>
+                        <svg className="w-5 h-5 text-gray-300 group-hover:text-[#c5a059] group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
+                </article>
+              ))
+            ) : (
+              <div className="col-span-full py-20 text-center light-panel-soft">
+                <div className="w-16 h-16 bg-[#fcf9f2] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#c5a059]/10">
+                  <span className="text-2xl opacity-50">✨</span>
                 </div>
-              </article>
-            ))}
+                <h3 className="text-xl font-headline text-gray-800">New Dates Coming Soon</h3>
+                <p className="text-sm text-gray-500 mt-2">We are planning the next batch of spiritual journeys. Please check back later.</p>
+              </div>
+            )}
           </div>
         </section>
       </section>

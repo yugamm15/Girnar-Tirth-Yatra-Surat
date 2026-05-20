@@ -58,7 +58,7 @@ const NavDropdown = ({ item, t, isDark, activeLinkClass, idleLinkClass, navLinkT
               <Link
                 key={subItem.key}
                 to={subItem.path}
-                className={`block px-5 py-4 text-[11px] 2xl:text-[12px] font-headline tracking-widest uppercase transition-colors ${
+                className={`block px-5 py-4 text-[11px] 2xl:text-[12px] font-headline tracking-widest uppercase transition-colors whitespace-nowrap ${
                   isSubActive 
                     ? isDark ? 'text-primary bg-white/5' : 'text-[#c5a059] bg-gray-50'
                     : isDark ? 'hover:text-primary hover:bg-white/5 text-white/70' : 'hover:text-[#c5a059] hover:bg-gray-50 text-gray-600'

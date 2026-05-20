@@ -366,23 +366,7 @@ export const siteCopy = {
       },
     ],
     upcomingYatrasTitle: tr('Upcoming Yatra Dates', 'આગામી યાત્રાની તારીખો', 'आगामी यात्रा की तिथियां'),
-    yatraDates: [
-      {
-        date: tr('11th April Tuesday', '૧૧ એપ્રિલ મંગળવાર', '11 अप्रैल मंगलवार'),
-        description: tr('Yatra starts from 10th April and finish by 12th April', 'યાત્રા ૧૦ એપ્રિલથી શરૂ થઈ ૧૨ એપ્રિલ સુધી ચાલશે', 'यात्रा 10 अप्रैल से शुरू होकर 12 अप्रैल तक चलेगी'),
-        image: '/image/1.JPG'
-      },
-      {
-        date: tr('5th May Friday', '૫ મે શુક્રવાર', '5 मई शुक्रवार'),
-        description: tr('Yatra starts from 4th May and finish by 6th May', 'યાત્રા ૪ મેથી શરૂ થઈ ૬ મે સુધી ચાલશે', 'यात्रा 4 मई से शुरू होकर 6 मई तक चलेगी'),
-        image: '/image/2.JPG'
-      },
-      {
-        date: tr('26th June Monday', '૨૬ જૂન સોમવાર', '26 जून सोमवार'),
-        description: tr('Yatra starts from 25th June and finish by 27th June', 'યાત્રા ૨૫ જૂનથી શરૂ થઈ ૨૭ જૂન સુધી ચાલશે', 'यात्रा 25 जून से शुरू होकर 27 जून तक चलेगी'),
-        image: '/image/4.JPG'
-      }
-    ],
+    yatraDates: [],
     registrationForm: {
       title: tr('Yatra Registration', 'યાત્રા નોંધણી', 'यात्रा पंजीकरण'),
       subtitle: tr('Fill in details for:', 'વિગતો ભરો:', 'विवरण भरें:'),
