@@ -15,19 +15,19 @@ export const siteCopy = {
     { key: 'home', path: '/', label: tr('Home', 'મુખપૃષ્ઠ', 'होम') },
     { key: 'about', path: '/about-girnar', label: tr('About Girnar', 'ગિરનાર વિષે', 'गिरनार परिचय') },
     {
-      key: 'jinodhar',
+      key: 'jirnodhar',
       path: '#',
-      label: tr('Jinodhar', 'જીર્ણોધ્ધાર', 'जीर्णोद्धार'),
+      label: tr('Jirnodhar', 'જીર્ણોદ્ધાર', 'जीर्णोद्धार'),
       dropdown: [
         {
           key: 'upashray',
-          path: '/upashray-jinodhar',
-          label: tr('Upashray Jinodhar', 'ઉપાશ્રય જીર્ણોધ્ધાર', 'उपाश्रय जीर्णोद्धार'),
+          path: '/upashray-jirnodhar',
+          label: tr('Upashray Jirnodhar', 'ઉપાશ્રય જીર્ણોદ્ધાર', 'उपाश्रय जीर्णोद्धार'),
         },
         {
           key: 'jinalay',
-          path: '/jinalay-jinodhar',
-          label: tr('Jinalay Jinodhar', 'જિનાલય જીર્ણોધ્ધાર', 'जिनालय जीर्णोद्धार'),
+          path: '/jinalay-jirnodhar',
+          label: tr('Jinalay Jirnodhar', 'જિનાલય જીર્ણોદ્ધાર', 'जिनालय जीर्णोद्धार'),
         },
       ],
     },
@@ -115,7 +115,7 @@ export const siteCopy = {
         ),
         tr(
           'From yatra planning to upashray renewal and educational support, devotees contribute together in one spiritual direction.',
-          'યાત્રા આયોજનથી લઈને ઉપાશ્રય જીર્ણોધ્ધાર અને શૈક્ષણિક સહાય સુધી, સેવકો એક જ આધ્યાત્મિક દિશામાં સાથે કાર્ય કરે છે.',
+          'યાત્રા આયોજનથી લઈને ઉપાશ્રય જીર્ણોદ્ધાર અને શૈક્ષણિક સહાય સુધી, સેવકો એક જ આધ્યાત્મિક દિશામાં સાથે કાર્ય કરે છે.',
           'यात्रा आयोजन से लेकर उपाश्रय जीर्णोद्धार और शैक्षिक सहयोग तक, सेवक एक ही आध्यात्मिक दिशा में साथ काम करते हैं।',
         ),
       ],
@@ -138,8 +138,8 @@ export const siteCopy = {
       ),
     },
     upashray: {
-      badge: tr('Architecture · 02', 'જીર્ણોધ્ધાર · ૦૨', 'जीर्णोद्धार · 02'),
-      title: tr('Upashray Jinodhar', 'ઉપાશ્રય જીર્ણોધ્ધાર', 'उपाश्रय जीर्णोद्धार'),
+      badge: tr('Architecture · 02', 'જીર્ણોદ્ધાર · ૦૨', 'जीर्णोद्धार · 02'),
+        title: tr('Upashray Jirnodhar', 'ઉપાશ્રય જીર્ણોદ્ધાર', 'उपाश्रय जीर्णोद्धार'),
       paragraph: tr(
         'On the routes of Girnar and Palitana, Upashray spaces are renewed into clean, practical, and spiritually supportive halting points.',
         'ગિરનાર અને પાલિતાણા માર્ગ પર ઉપાશ્રયોને સ્વચ્છ, સુવિધાસભર અને સાધનાસહાયક વિરામસ્થળ તરીકે નવનિર્મિત કરવામાં આવે છે.',
@@ -274,10 +274,10 @@ export const siteCopy = {
         ),
       },
       {
-        title: tr('Upashray Restoration', 'ઉપાશ્રય જીર્ણોધ્ધાર', 'उपाश्रय जीर्णोद्धार'),
+        title: tr('Upashray Restoration', 'ઉપાશ્રય જીર્ણોદ્ધાર', 'उपाश्रय जीर्णोद्धार'),
         body: tr(
           'Renovation-focused seva keeps travel halts hygienic, safe, and spiritually suitable for sangh movement.',
-          'જીર્ણોધ્ધાર આધારિત સેવા દ્વારા વિરામસ્થળોને સ્વચ્છ, સુરક્ષિત અને સંઘવિહાર માટે યોગ્ય બનાવવામાં આવે છે.',
+          'જીર્ણોદ્ધાર આધારિત સેવા દ્વારા વિરામસ્થળોને સ્વચ્છ, સુરક્ષિત અને સંઘવિહાર માટે યોગ્ય બનાવવામાં આવે છે.',
           'जीर्णोद्धार सेवा के माध्यम से विश्राम स्थलों को स्वच्छ, सुरक्षित और संघ-विहार के अनुकूल बनाया जाता है।',
         ),
       },
@@ -292,7 +292,7 @@ export const siteCopy = {
     ],
   },
   upashrayPage: {
-    heroBadge: tr('Upashray Jinodhar', 'ઉપાશ્રય જીર્ણોધ્ધાર', 'उपाश्रय जीर्णोद्धार'),
+    heroBadge: tr('Upashray Jirnodhar', 'ઉપાશ્રય જીર્ણોદ્ધાર', 'उपाश्रय जीर्णोद्धार'),
     heroTitle: tr('Route-Wise Upashray Restoration', 'માર્ગ મુજબ ઉપાશ્રય સુધાર કાર્ય', 'मार्ग-आधारित उपाश्रय सुधार कार्य'),
     heroDescription: tr(
       'A data-driven listing of Upashrays being planned, upgraded, and completed by the group.',

@@ -105,7 +105,7 @@ const JinalayDetailPage = () => {
           <h1 className="text-3xl font-headline text-gray-900">Jinalaya Not Found</h1>
           <p className="mt-3 text-gray-600">The requested Jinalaya record does not exist.</p>
           <Link
-            to="/jinalay-jinodhar"
+            to="/jinalay-jirnodhar"
             className="inline-block mt-6 px-6 py-3 bg-[#c5a059] text-white uppercase tracking-[0.16em] text-[10px] font-bold"
           >
             Back to Jinalay List
@@ -180,7 +180,7 @@ const JinalayDetailPage = () => {
                 </a>
               )}
               <Link
-                to="/jinalay-jinodhar"
+                to="/jinalay-jirnodhar"
                 className="px-6 py-3 border border-[#c5a059] text-[#8f6d2f] uppercase tracking-[0.16em] text-[10px] font-bold hover:bg-[#f7f0df] transition-colors"
               >
                 Back to List

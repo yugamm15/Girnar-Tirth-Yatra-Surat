@@ -15,14 +15,14 @@ const statusClassNames = {
   plan: 'bg-slate-100 text-slate-700 border-slate-200',
 };
 
-const UpashrayJinodharPage = () => {
+const UpashrayJirnodharPage = () => {
   const { t } = useLanguage();
   const pageCopy = siteCopy.upashrayPage;
   const [upashrays, setUpashrays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const cacheKey = 'upashray_jinodhar_page';
+  const cacheKey = 'upashray_jirnodhar_page';
 
   const normalizeUpashrays = (data, media) => {
     const mediaByUpashrayId = media.reduce((acc, item) => {
@@ -189,8 +189,8 @@ const UpashrayJinodharPage = () => {
 
                   <div className="mt-5">
                     <Link
-                      to={`/upashray-jinodhar/${upashray.slug}`}
-                      className="inline-block px-5 py-2.5 bg-[#c5a059] text-white uppercase tracking-[0.16em] text-[10px] font-bold hover:bg-[#b08d4a] transition-colors"
+                      to={`/upashray-jirnodhar/${upashray.slug}`}
+                      className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-colors"
                     >
                       {t(siteCopy.common.viewDetails)}
                     </Link>
@@ -205,4 +205,4 @@ const UpashrayJinodharPage = () => {
   );
 };
 
-export default UpashrayJinodharPage;
+export default UpashrayJirnodharPage;

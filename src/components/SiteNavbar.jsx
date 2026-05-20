@@ -9,7 +9,7 @@ const isActivePath = (pathname, targetPath) => {
     return pathname === '/';
   }
 
-  if (targetPath === '/upashray-jinodhar' || targetPath === '/jinalay-jinodhar') {
+  if (targetPath === '/upashray-jirnodhar' || targetPath === '/jinalay-jirnodhar') {
     return pathname === targetPath || pathname.startsWith(targetPath + '/');
   }
 

@@ -6,8 +6,8 @@ import { useLanguage } from './context/LanguageContext.jsx';
 
 import HomePage from './pages/HomePage.jsx';
 import AboutGirnarPage from './pages/AboutGirnarPage.jsx';
-import UpashrayJinodharPage from './pages/UpashrayJinodharPage.jsx';
-import JinalayJinodharPage from './pages/JinalayJinodharPage.jsx';
+import UpashrayJirnodharPage from './pages/UpashrayJirnodharPage.jsx';
+import JinalayJirnodharPage from './pages/JinalayJirnodharPage.jsx';
 import UpashrayDetailPage from './pages/UpashrayDetailPage.jsx';
 import JinalayDetailPage from './pages/JinalayDetailPage.jsx';
 import MonthlyBusYatraPage from './pages/MonthlyBusYatraPage.jsx';
@@ -55,10 +55,10 @@ const AppRoutes = () => {
       <Routes location={location}>
         <Route path="/" element={withLazyBoundary(<HomePage />)} />
         <Route path="/about-girnar" element={withLazyBoundary(<AboutGirnarPage />)} />
-        <Route path="/upashray-jinodhar" element={withLazyBoundary(<UpashrayJinodharPage />)} />
-        <Route path="/jinalay-jinodhar" element={withLazyBoundary(<JinalayJinodharPage />)} />
-        <Route path="/upashray-jinodhar/:slug" element={withLazyBoundary(<UpashrayDetailPage />)} />
-        <Route path="/jinalay-jinodhar/:id" element={withLazyBoundary(<JinalayDetailPage />)} />
+        <Route path="/upashray-jirnodhar" element={withLazyBoundary(<UpashrayJirnodharPage />)} />
+        <Route path="/jinalay-jirnodhar" element={withLazyBoundary(<JinalayJirnodharPage />)} />
+        <Route path="/upashray-jirnodhar/:slug" element={withLazyBoundary(<UpashrayDetailPage />)} />
+        <Route path="/jinalay-jirnodhar/:id" element={withLazyBoundary(<JinalayDetailPage />)} />
         <Route path="/monthly-bus-yatra" element={withLazyBoundary(<MonthlyBusYatraPage />)} />
         <Route path="/monthly-bus-yatra/booking/:yatraId" element={withLazyBoundary(<YatraBookingPage />)} />
         <Route path="/monthly-bus-yatra/payment" element={withLazyBoundary(<YatraPaymentPage />)} />

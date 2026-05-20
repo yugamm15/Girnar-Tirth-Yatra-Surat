@@ -69,7 +69,7 @@ export const upashrays = [
     upashrayCount: tr('1 active renovation site', '1 સક્રિય સુધાર સ્થળ', '1 सक्रिय सुधार स्थल'),
     description: tr(
       'Ranpur Upashray is in active renovation with structural cleanup, utility updates, and pilgrim-friendly reorganization.',
-      'રાણપુર ઉપાશ્રયમાં હાલ સક્રિય જીર્ણોધ્ધાર ચાલી રહ્યો છે, જેમાં માળખાકીય સફાઈ, સુવિધા સુધારા અને યાત્રિક અનુકૂળ આયોજન થાય છે.',
+      'રાણપુર ઉપાશ્રયમાં હાલ સક્રિય જીર્ણોદ્ધાર ચાલી રહ્યો છે, જેમાં માળખાકીય સફાઈ, સુવિધા સુધારા અને યાત્રિક અનુકૂળ આયોજન થાય છે.',
       'राणपुर उपाश्रय में वर्तमान में सक्रिय जीर्णोद्धार चल रहा है, जिसमें संरचनात्मक सफाई, सुविधा उन्नयन और यात्री-अनुकूल पुनर्संयोजन शामिल है।',
     ),
     locationText: tr(
@@ -117,7 +117,7 @@ export const upashrays = [
     ),
     locationText: tr(
       'Village-facing access with space for phased renovation and service logistics.',
-      'ગામ તરફથી સરળ પ્રવેશ સાથે તબક્કાવાર જીર્ણોધ્ધાર અને સેવા વ્યવસ્થા માટે યોગ્ય જગ્યા.',
+      'ગામ તરફથી સરળ પ્રવેશ સાથે તબક્કાવાર જીર્ણોદ્ધાર અને સેવા વ્યવસ્થા માટે યોગ્ય જગ્યા.',
       'गांव की ओर से सहज पहुंच, चरणबद्ध जीर्णोद्धार और सेवा व्यवस्थापन के लिए पर्याप्त स्थान।',
     ),
     mapUrl: 'https://maps.google.com/?q=Umrala%20Gujarat',

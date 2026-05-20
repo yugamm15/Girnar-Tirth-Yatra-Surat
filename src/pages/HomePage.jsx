@@ -736,7 +736,7 @@ const HomePage = () => {
               </div>
               <div>
                 <Link
-                  to="/upashray-jinodhar"
+                  to="/upashray-jirnodhar"
                   className="home-reveal inline-block mt-6 px-6 py-3 border border-primary/60 text-primary font-bold tracking-[0.2em] uppercase text-[10px] hover:bg-primary hover:text-black transition-colors"
                 >
                   {t(siteCopy.common.viewDetails)}

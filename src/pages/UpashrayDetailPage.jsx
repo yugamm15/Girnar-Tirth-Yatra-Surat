@@ -127,7 +127,7 @@ const UpashrayDetailPage = () => {
           <h1 className="text-3xl font-headline text-gray-900">{t(pageCopy.notFoundTitle)}</h1>
           <p className="mt-3 text-gray-600">{t(pageCopy.notFoundBody)}</p>
           <Link
-            to="/upashray-jinodhar"
+            to="/upashray-jirnodhar"
             className="inline-block mt-6 px-6 py-3 bg-[#c5a059] text-white uppercase tracking-[0.16em] text-[10px] font-bold"
           >
             {t(siteCopy.common.backToList)}
@@ -207,7 +207,7 @@ const UpashrayDetailPage = () => {
                 </a>
               )}
               <Link
-                to="/upashray-jinodhar"
+                to="/upashray-jirnodhar"
                 className="px-6 py-3 border border-[#c5a059] text-[#8f6d2f] uppercase tracking-[0.16em] text-[10px] font-bold hover:bg-[#f7f0df] transition-colors"
               >
                 {t(siteCopy.common.backToList)}

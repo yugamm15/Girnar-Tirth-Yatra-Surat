@@ -15,13 +15,13 @@ const statusClassNames = {
   plan: 'bg-slate-100 text-slate-700 border-slate-200',
 };
 
-const JinalayJinodharPage = () => {
+const JinalayJirnodharPage = () => {
   const { t } = useLanguage();
   const [jinalayas, setJinalayas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const cacheKey = 'jinalay_jinodhar_page';
+  const cacheKey = 'jinalay_jirnodhar_page';
 
   useEffect(() => {
     let cancelled = false;
@@ -68,10 +68,10 @@ const JinalayJinodharPage = () => {
       <section className="max-w-7xl mx-auto space-y-8 md:space-y-10">
         <header className="light-panel light-panel-left p-6 md:p-10">
           <span className="text-[#c5a059] font-headline text-[10px] tracking-[0.45em] uppercase opacity-80 font-bold">
-            {t(siteCopy.navItems.find(i => i.key === 'jinodhar')?.dropdown?.find(d => d.key === 'jinalay')?.label) || 'Jinalay Jinodhar'}
+            {t(siteCopy.navItems.find(i => i.key === 'jirnodhar')?.dropdown?.find(d => d.key === 'jinalay')?.label) || 'Jinalay Jirnodhar'}
           </span>
           <h1 className="text-3xl md:text-5xl font-headline mt-4 text-gray-900 leading-tight max-w-4xl">
-            {t(siteCopy.navItems.find(i => i.key === 'jinodhar')?.dropdown?.find(d => d.key === 'jinalay')?.label) || 'Jinalay Jinodhar'}
+            {t(siteCopy.navItems.find(i => i.key === 'jirnodhar')?.dropdown?.find(d => d.key === 'jinalay')?.label) || 'Jinalay Jirnodhar'}
           </h1>
           <p className="mt-5 text-sm md:text-base text-gray-600 max-w-4xl leading-relaxed">
             Our group is dedicated to the restoration and maintenance of sacred Jinalayas. Explore our ongoing and completed Jinalay projects across various routes.
@@ -173,9 +173,9 @@ const JinalayJinodharPage = () => {
                   </p>
 
                   <div className="mt-5">
-                    <Link
-                      to={`/jinalay-jinodhar/${jinalaya.id}`}
-                      className="inline-block px-5 py-2.5 bg-[#c5a059] text-white uppercase tracking-[0.16em] text-[10px] font-bold hover:bg-[#b08d4a] transition-colors"
+                    <Link 
+                      to={`/jinalay-jirnodhar/${jinalaya.id}`}
+                      className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-colors"
                     >
                       {t(siteCopy.common.viewDetails)}
                     </Link>
@@ -190,4 +190,4 @@ const JinalayJinodharPage = () => {
   );
 };
 
-export default JinalayJinodharPage;
+export default JinalayJirnodharPage;
