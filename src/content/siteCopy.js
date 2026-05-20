@@ -183,8 +183,14 @@ export const siteCopy = {
     ),
     pilgrimageSteps: [
       {
+        id: 'aadinath-jinalay',
+        title: tr('1. Shri Aadinath Jinalay', '૧. શ્રી આદિનાથ જિનાલય', '1. श्री आदिनाथ जिनालय'),
+        description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जल्द आ रहा है...'),
+        image: '/images/about-girnar/shri aadinath jinalay.JPG'
+      },
+      {
         id: 'taleti',
-        title: tr('1. Girnar Taleti', '૧. ગિરનાર તળેટી', '1. गिरनार तलेटी'),
+        title: tr('2. Girnar Taleti', '૨. ગિરનાર તળેટી', '2. गिरनार तलेटी'),
         description: tr(
           'A million bows to the feet of Girnarji, the great holy Siddha Kshetra. This is the sacred land where infinite souls have attained salvation at every step. Before starting the journey, let us bow our heads to the Taleti and resolve to climb the holy Giriraj with energy and devotion.',
           'મહાન પવિત્ર સિદ્ધક્ષેત્ર ગિરનારજીના ચરણોમાં કોટિ-કોટિ વંદન. આ એ પાવન ભૂમિ છે જ્યાં ડગલે ને પગલે અનંત આત્માઓ મોક્ષે ગયા છે. યાત્રાની શરૂઆત કરતાં પહેલાં આપણે તળેટીને મસ્તક નમાવી, ઉર્જા અને ભક્તિભાવ સાથે પાવન ગિરિરાજ ચડવાના સંકલ્પ કરીએ.',
@@ -194,7 +200,7 @@ export const siteCopy = {
       },
       {
         id: 'first-step',
-        title: tr('2. Girnar First Step', '૨. ગિરનાર પ્રથમ પગથિયું', '2. गिरनार प्रथम सोपान'),
+        title: tr('3. Girnar First Step', '૩. ગિરનાર પ્રથમ પગથિયું', '3. गिरनार प्रथम सोपान'),
         description: tr(
           'Let us bow our heads at the first step with the chant of "Jai Girnari". O Giriraj! Give me the strength so that my emotional journey is completed without any obstacles and my karmas are destroyed. Every step takes us upwards towards liberation from the world and towards devotion to God.',
           '"જય ગિરનારી" ના નાદ સાથે પ્રથમ પગથિયે મસ્તક ઝુકાવીએ. હે ગિરિરાજ! મારી આ ભાવયાત્રા નિર્વિઘ્ને પૂર્ણ થાય અને મારા કર્મોનો ક્ષય થાય તેવી શક્તિ આપજો. દરેક પગથિયું આપણને સંસારથી મુક્તિ તરફ અને પ્રભુ ભક્તિ તરફ ઉપર લઈ જાય છે.',
@@ -204,7 +210,7 @@ export const siteCopy = {
       },
       {
         id: 'ambika',
-        title: tr('3. Ambika Mata Mandir', '૩. અંબિકા માતા મંદિર', '3. अम्बिका माता मंदिर'),
+        title: tr('4. Ambika Mata Mandir', '૪. અંબિકા માતા મંદિર', '4. अम्बिका माता मंदिर'),
         description: tr(
           'Bows at the feet of Shri Ambika Mataji, the presiding deity of Girnar Tirth. Mataji always protects the Jain Shasan and the devotees coming to the journey of Girnar. Let us pray to Mataji that our devotion remains unbroken and we get the strength to serve the Shasan.',
           'ગિરનાર તીર્થના અધિષ્ઠાયિકા દેવી શાસનદેવી શ્રી અંબિકા માતાજીના ચરણોમાં વંદન. માતાજી હંમેશા જૈન શાસનની અને ગિરનારની યાત્રાએ આવતા ભક્તોની રક્ષા કરે છે. માતાજી પાસે પ્રાર્થના કરીએ કે આપણી ભક્તિ અખંડ રહે અને શાસનની સેવા કરવાની શક્તિ મળે.',
@@ -214,7 +220,7 @@ export const siteCopy = {
       },
       {
         id: 'neminath-2750',
-        title: tr('4. Neminath Bhagvan at 2750 Step', '૪. ૨૭૫૦ પગથિયે નેમિનાથ ભગવાન', '4. 2750 सीढ़ी पर नेमिनाथ भगवान'),
+        title: tr('5. Neminath Bhagvan at 2750 Step', '૫. ૨૭૫૦ પગથિયે નેમિનાથ ભગવાન', '5. 2750 सीढ़ी पर नेमिनाथ भगवान'),
         description: tr(
           'When 3700 steps are completed while climbing, the premises of the main temples of Girnar begin. As soon as you come here, the mind becomes very calm and you feel close to the Lord.',
           'ચડતાં ચડતાં જ્યારે ૩૭૦૦ પગથિયાં પૂરાં થાય, ત્યારે ગિરનારના મુખ્ય દેરાસરોનો પરિસર શરૂ થાય છે. અહીં આવતા જ મન એકદમ શાંત થઈ જાય છે અને પ્રભુની નિકટ હોવાનો અહેસાસ થાય છે.',
@@ -224,7 +230,7 @@ export const siteCopy = {
       },
       {
         id: 'main-gate',
-        title: tr('5. Girnar Tonk Main Gate', '૫. ગિરનાર ટૂંક મુખ્ય દરવાજો', '5. गिरनार टोंक मुख्य द्वार'),
+        title: tr('6. Girnar Tonk Main Gate', '૬. ગિરનાર ટૂંક મુખ્ય દરવાજો', '6. गिरनार टोंक मुख्य द्वार'),
         description: tr(
           'This is the main entrance to move towards the holy aura of Lord Neminath. Entering this gate, it feels as if we are leaving all the attachments and aversions of the world and entering the supreme abode of the Lord.',
           'ભગવાન નેમિનાથની પવિત્ર ઓરા તરફ આગળ વધવાનું આ મુખ્ય પ્રવેશદ્વાર છે. આ દ્વારમાં પ્રવેશતા જ એવું લાગે છે કે આપણે સંસારના તમામ રાગ-દ્વેષ છોડીને પ્રભુના પરમ ધામમાં પ્રવેશી રહ્યા છીએ.',
@@ -234,21 +240,27 @@ export const siteCopy = {
       },
       {
         id: 'tonk',
-        title: tr('6. Girnar Tonk', '૬. ગિરનાર ટૂંક', '6. गिरनार टोंक'),
+        title: tr('7. Girnar Tonk', '૭. ગિરનાર ટૂંક', '7. गिरनार टोंक'),
         description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जल्द आ रहा है...'),
         image: '/images/about-girnar/girnar-tonk.jpeg'
       },
       {
         id: 'derashar',
-        title: tr('7. Girnar Derashar', '૭. ગિરનાર દેરાસર', '7. गिरनार देरासर'),
+        title: tr('8. Girnar Derashar', '૮. ગિરનાર દેરાસર', '8. गिरनार देरासर'),
         description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जલ્દ આ રહા હૈ...'),
         image: '/images/about-girnar/girnar-derashar.jpg'
       },
       {
         id: 'neminath-bhagvan',
-        title: tr('8. Neminath Bhagvan', '૮. નેમિનાથ ભગવાન', '8. नेमिनाथ भगवान'),
+        title: tr('9. Neminath Bhagvan', '૯. નેમિનાથ ભગવાન', '9. नेमिनाथ भगवान'),
         description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जल्द आ रहा है...'),
         image: '/images/about-girnar/neminath-bhagvan.jpg'
+      },
+      {
+        id: 'sahesavan',
+        title: tr('10. Sahesavan', '૧૦. સહેસાવન', '10. सहेसावन'),
+        description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जल्द आ रहा है...'),
+        image: '/images/about-girnar/sahesavan.jpg'
       }
     ],
     supportHeading: tr('How the Group Serves', 'સમૂહ કેવી રીતે સેવા આપે છે', 'समूह कैसे सेवा करता है'),

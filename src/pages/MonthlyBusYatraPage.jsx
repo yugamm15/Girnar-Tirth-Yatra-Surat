@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LightPageShell } from '../components/LightPageShell.jsx';
 import ConfirmModal from '../components/ConfirmModal.jsx';
 import TopLineLoader from '../components/TopLineLoader.jsx';
@@ -7,19 +7,18 @@ import ToastViewport from '../components/ToastViewport.jsx';
 import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { dbCache, yatraDatesDB, yatrikRegistrationsDB } from '../lib/database.js';
+import { dbCache, yatraDatesDB } from '../lib/database.js';
 
 const MonthlyBusYatraPage = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const pageCopy = siteCopy.monthlyBusPage;
-  const [selectedYatra, setSelectedYatra] = useState(null);
-  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
-  const [registrationStatus, setRegistrationStatus] = useState(null);
-  const [yatrikList, setYatrikList] = useState([]);
   const [yatraDates, setYatraDates] = useState(pageCopy.yatraDates);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingDates, setIsLoadingDates] = useState(false);
   const [toasts, setToasts] = useState([]);
+  const [showComingSoon, setShowComingSoon] = useState(false);
+  const [selectedYatraName, setSelectedYatraName] = useState('');
+  
   const [confirmState, setConfirmState] = useState({
     open: false,
     title: '',
@@ -30,33 +29,7 @@ const MonthlyBusYatraPage = () => {
     onConfirm: () => {}
   });
 
-  const requestConfirmation = (options) => {
-    return new Promise((resolve) => {
-      setConfirmState({
-        open: true,
-        title: options.title || 'Confirm',
-        message: options.message || 'Are you sure?',
-        confirmLabel: options.confirmLabel || 'Confirm',
-        cancelLabel: options.cancelLabel || 'Cancel',
-        danger: options.danger || false,
-        onConfirm: () => {
-          setConfirmState(prev => ({ ...prev, open: false }));
-          resolve(true);
-        }
-      });
-    });
-  };
-
   const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
-  const [currentYatrik, setCurrentYatrik] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    altPhone: '',
-    birthdate: '',  // CHANGED: age -> birthdate
-    gender: '',
-    remarks: '',
-  });
   const yatraListRef = useRef(null);
   const cacheKey = 'monthly_bus_yatra_dates';
 
@@ -94,7 +67,7 @@ const MonthlyBusYatraPage = () => {
           setYatraDates(cachedDates);
         }
 
-        const records = await yatraDatesDB.getAll('id, date_text, description, image, registration_open, created_at');
+        const records = await yatraDatesDB.getAll();
 
         if (records.length === 0) {
           if (!cancelled) {
@@ -109,6 +82,8 @@ const MonthlyBusYatraPage = () => {
           date: { en: record.date_text, gu: record.date_text, hi: record.date_text },
           description: { en: record.description, gu: record.description, hi: record.description },
           image: record.image,
+          registration_open: record.registration_open,
+          date_raw: record.date_text // for parsing if needed
         }));
 
         if (!cancelled) {
@@ -116,11 +91,10 @@ const MonthlyBusYatraPage = () => {
           dbCache.write(cacheKey, nextDates);
         }
       } catch (error) {
-        console.log('Database not configured yet. Using local yatra dates.', error.message);
+        console.log('Database error:', error.message);
         if (!dbCache.read(cacheKey)) {
           setYatraDates(pageCopy.yatraDates);
         }
-        pushToast('Could not refresh yatra dates. Showing latest available data.', 'info');
       } finally {
         setIsLoadingDates(false);
       }
@@ -137,130 +111,19 @@ const MonthlyBusYatraPage = () => {
   };
 
   const handleYatraSelect = (yatra) => {
-    setSelectedYatra(yatra);
-    setShowRegistrationForm(true);
-    setRegistrationStatus(null);
-    setYatrikList([]);
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setCurrentYatrik({
-      firstName: '',
-      lastName: '',
-      phone: '',
-      altPhone: '',
-      birthdate: '',  // CHANGED: age -> birthdate
-      gender: '',
-      remarks: '',
-    });
-  };
-
-  const handleAddAnother = () => {
-    if (!validateCurrentYatrik()) return;
-    setYatrikList([...yatrikList, currentYatrik]);
-    resetForm();
-  };
-
-  const validateCurrentYatrik = () => {
-    return (
-      currentYatrik.firstName &&
-      currentYatrik.lastName &&
-      currentYatrik.phone &&
-      currentYatrik.birthdate &&  // CHANGED: age -> birthdate
-      currentYatrik.gender
-    );
-  };
-
-  const handleRegistrationSubmit = async (e) => {
-    e.preventDefault();
-    
-    const confirmed = await requestConfirmation({
-      title: 'Submit Registration?',
-      message: `Are you sure you want to register ${yatrikList.length + 1} person(s) for the yatra on ${selectedYatra?.date?.[t('lang') || 'en']}? Please ensure all details are correct.`,
-      confirmLabel: 'Confirm Registration',
-      cancelLabel: 'Review Details'
-    });
-    
-    if (!confirmed) return;
-
-    const finalYatrikList = [...yatrikList, currentYatrik];
-    setIsSubmitting(true);
-
-    try {
-      // Save birthdate records directly to the database
-      const registrationsToSave = finalYatrikList.map(yatrik => ({
-        first_name: yatrik.firstName,
-        last_name: yatrik.lastName,
-        phone: yatrik.phone,
-        alt_phone: yatrik.altPhone,
-        birthdate: yatrik.birthdate,  // Store birthdate
-        gender: yatrik.gender,
-        remarks: yatrik.remarks,
-        yatra_id: selectedYatra.id,
-      }));
-
-      // Attempt to save to database
-      try {
-        await yatrikRegistrationsDB.createMultiple(registrationsToSave);
-      } catch (dbError) {
-        console.error('Database error during registration:', dbError);
-        throw dbError; // Re-throw to be caught by the outer catch block
-      }
-
-      setRegistrationStatus('success');
-      pushToast('Registration submitted successfully.', 'success');
-      setTimeout(() => {
-        setShowRegistrationForm(false);
-        setSelectedYatra(null);
-        setYatrikList([]);
-        resetForm();
-      }, 4000);
-    } catch (error) {
-      console.error('Error submitting registration:', error);
-      setRegistrationStatus('error');
-      pushToast('Registration failed. Please try again.', 'error');
-      setTimeout(() => {
-        setRegistrationStatus(null);
-      }, 4000);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleInputChange = (field, value) => {
-    setCurrentYatrik((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const hasUnsavedRegistration = () => {
-    const hasCurrentDraft = Object.values(currentYatrik).some((value) => String(value || '').trim() !== '');
-    return hasCurrentDraft || yatrikList.length > 0;
-  };
-
-  const requestCloseRegistration = async () => {
-    if (registrationStatus || !hasUnsavedRegistration()) {
-      setShowRegistrationForm(false);
-      return;
-    }
-    
-    const confirmed = await requestConfirmation({
-      title: 'Discard registration draft?',
-      message: 'You have unsaved yatrik details. If you close now, entered data will be lost.',
-      confirmLabel: 'Discard',
-      danger: true
-    });
-
-    if (confirmed) {
-      setShowRegistrationForm(false);
-      setYatrikList([]);
-      resetForm();
-      pushToast('Draft discarded.', 'info');
+    if (yatra.registration_open) {
+      navigate(`/monthly-bus-yatra/booking/${yatra.id}`);
+    } else {
+      // Logic for "Coming Soon"
+      // If closed but it's a future date
+      setSelectedYatraName(t(yatra.date));
+      setShowComingSoon(true);
     }
   };
 
   return (
     <LightPageShell>
-      <TopLineLoader active={isSubmitting || isLoadingDates} label={isSubmitting ? 'Submitting registration' : 'Refreshing yatra dates'} />
+      <TopLineLoader active={isLoadingDates} label="Refreshing yatra dates" />
       <ToastViewport toasts={toasts} onDismiss={dismissToast} />
       <ConfirmModal
         open={confirmState.open}
@@ -272,6 +135,30 @@ const MonthlyBusYatraPage = () => {
         onConfirm={confirmState.onConfirm}
         onCancel={() => setConfirmState(prev => ({ ...prev, open: false }))}
       />
+
+      {/* Coming Soon Modal */}
+      {showComingSoon && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowComingSoon(false)} />
+          <div className="relative w-full max-w-md bg-white p-10 text-center shadow-2xl border border-[#c5a059]/20 animate-in fade-in zoom-in duration-300">
+            <div className="w-20 h-20 bg-[#fcf9f2] rounded-full flex items-center justify-center mx-auto mb-8 border border-[#c5a059]/10">
+              <span className="text-3xl animate-pulse">✨</span>
+            </div>
+            <h3 className="text-3xl font-headline text-gray-900 mb-4">Coming Soon</h3>
+            <p className="text-gray-500 leading-relaxed mb-8">
+              Bookings for <span className="text-[#c5a059] font-bold">{selectedYatraName}</span> haven't started yet. 
+              Please check back soon to secure your seat!
+            </p>
+            <button 
+              onClick={() => setShowComingSoon(false)}
+              className="w-full py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs hover:bg-[#b08d4a] transition-all"
+            >
+              Got it, thanks!
+            </button>
+          </div>
+        </div>
+      )}
+
       <section className="max-w-7xl mx-auto space-y-12 md:space-y-16 pb-12">
         <header className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-6 md:gap-8 items-stretch">
           <article className="light-panel light-panel-left p-6 md:p-10">
@@ -315,8 +202,6 @@ const MonthlyBusYatraPage = () => {
               containerClassName="h-full min-h-[280px] md:min-h-[360px] w-full"
               className="w-full h-full object-cover"
               loading="eager"
-              decoding="async"
-              fetchPriority="high"
             />
           </article>
         </header>
@@ -345,7 +230,12 @@ const MonthlyBusYatraPage = () => {
                 onClick={() => handleYatraSelect(yatra)}
                 className="light-panel-soft group cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full"
               >
-                <div className="p-6 flex gap-5 flex-1">
+                <div className="p-6 flex gap-5 flex-1 relative">
+                  {!yatra.registration_open && (
+                    <div className="absolute top-2 right-2 bg-gray-100 text-gray-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm border border-gray-200">
+                      Closed
+                    </div>
+                  )}
                   <SecureImage 
                     src={yatra.image} 
                     alt={t(yatra.date)} 
@@ -356,10 +246,13 @@ const MonthlyBusYatraPage = () => {
                     <h3 className="text-xl font-headline text-[#d32f2f] leading-tight group-hover:text-[#b71c1c] transition-colors">
                       {t(yatra.date)}
                     </h3>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed font-light">
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed font-light line-clamp-2">
                       {t(yatra.description)}
                     </p>
-                    <div className="mt-auto pt-4">
+                    <div className="mt-auto pt-4 flex items-center justify-between">
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-[#c5a059]">
+                        {yatra.registration_open ? 'Book Now' : 'Closed'}
+                      </span>
                       <svg className="w-5 h-5 text-gray-300 group-hover:text-[#c5a059] group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
@@ -370,191 +263,6 @@ const MonthlyBusYatraPage = () => {
             ))}
           </div>
         </section>
-
-        {/* Registration Modal */}
-        {showRegistrationForm && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-6">
-            <div 
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-              onClick={() => !isSubmitting && requestCloseRegistration()} 
-            />
-            <div className="relative w-full max-w-lg bg-white rounded-sm shadow-2xl overflow-hidden border border-gray-200 animate-in fade-in zoom-in duration-300">
-              <div className="bg-[#c5a059] p-6 text-white flex justify-between items-center">
-                <div>
-                  <h3 className="text-2xl font-headline">{t(pageCopy.registrationForm.title)}</h3>
-                  <p className="text-sm opacity-90 mt-1">
-                    {t(pageCopy.registrationForm.subtitle)} <span className="font-bold">{t(selectedYatra.date)}</span>
-                  </p>
-                </div>
-                {yatrikList.length > 0 && (
-                  <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                    {yatrikList.length} {t(pageCopy.registrationForm.yatrikCount).replace('#', '')}Added
-                  </div>
-                )}
-              </div>
-
-              <div className="p-6 md:p-8 max-h-[70vh] overflow-y-auto">
-                {registrationStatus === 'success' ? (
-                  <div className="py-12 text-center space-y-6">
-                    <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-                      <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <p className="text-2xl font-headline text-gray-900 px-4 leading-tight">{t(pageCopy.registrationForm.success)}</p>
-                  </div>
-                ) : (
-                  <form onSubmit={handleRegistrationSubmit} className="space-y-6">
-                    <div className="flex items-center gap-3 pb-2 border-b border-gray-100">
-                      <div className="w-6 h-6 bg-[#c5a059]/10 text-[#c5a059] rounded-full flex items-center justify-center text-xs font-bold">
-                        {yatrikList.length + 1}
-                      </div>
-                      <span className="text-xs uppercase tracking-[0.2em] font-bold text-gray-400">
-                        {t(pageCopy.registrationForm.yatrikCount).replace('#', yatrikList.length + 1)}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-widest font-bold text-gray-500">
-                          {t(pageCopy.registrationForm.firstName)}
-                        </label>
-                        <input 
-                          required
-                          type="text" 
-                          value={currentYatrik.firstName}
-                          onChange={(e) => handleInputChange('firstName', e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:border-[#c5a059] focus:ring-0 outline-none transition-colors rounded-sm text-gray-900"
-                          placeholder={t(pageCopy.registrationForm.firstName)}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-widest font-bold text-gray-500">
-                          {t(pageCopy.registrationForm.lastName)}
-                        </label>
-                        <input 
-                          required
-                          type="text" 
-                          value={currentYatrik.lastName}
-                          onChange={(e) => handleInputChange('lastName', e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:border-[#c5a059] focus:ring-0 outline-none transition-colors rounded-sm text-gray-900"
-                          placeholder={t(pageCopy.registrationForm.lastName)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-widest font-bold text-gray-500">
-                          {t(pageCopy.registrationForm.phone)}
-                        </label>
-                        <input 
-                          required
-                          type="tel" 
-                          value={currentYatrik.phone}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:border-[#c5a059] focus:ring-0 outline-none transition-colors rounded-sm text-gray-900"
-                          placeholder="99887 76655"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-widest font-bold text-gray-500">
-                          {t(pageCopy.registrationForm.altPhone)}
-                        </label>
-                        <input 
-                          type="tel" 
-                          value={currentYatrik.altPhone}
-                          onChange={(e) => handleInputChange('altPhone', e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:border-[#c5a059] focus:ring-0 outline-none transition-colors rounded-sm text-gray-900"
-                          placeholder="99887 76655"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-widest font-bold text-gray-500">
-                          {t(pageCopy.registrationForm.birthdate) || 'Date of Birth'}
-                        </label>
-                        <input 
-                          required
-                          type="date" 
-                          value={currentYatrik.birthdate}
-                          onChange={(e) => handleInputChange('birthdate', e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:border-[#c5a059] focus:ring-0 outline-none transition-colors rounded-sm text-gray-900"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-widest font-bold text-gray-500">
-                          {t(pageCopy.registrationForm.gender)}
-                        </label>
-                        <div className="flex gap-4 mt-2">
-                          {['male', 'female', 'other'].map((option) => (
-                            <label key={option} className="flex items-center gap-2 cursor-pointer group">
-                              <input 
-                                required
-                                type="radio" 
-                                name="gender" 
-                                value={option}
-                                checked={currentYatrik.gender === option}
-                                onChange={(e) => handleInputChange('gender', e.target.value)}
-                                className="w-4 h-4 border-gray-300 text-[#c5a059] focus:ring-[#c5a059]"
-                              />
-                              <span className="text-xs text-gray-600 group-hover:text-gray-900">
-                                {t(pageCopy.registrationForm.genderOptions[option])}
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] uppercase tracking-widest font-bold text-gray-500">
-                        {t(pageCopy.registrationForm.remarks)}
-                      </label>
-                      <textarea 
-                        rows={2}
-                        value={currentYatrik.remarks}
-                        onChange={(e) => handleInputChange('remarks', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:border-[#c5a059] focus:ring-0 outline-none transition-colors rounded-sm text-gray-900 resize-none"
-                        placeholder="..."
-                      />
-                    </div>
-
-                    <div className="pt-4 flex flex-col gap-3">
-                      <div className="flex flex-col md:flex-row gap-3">
-                        <button
-                          type="button"
-                          onClick={handleAddAnother}
-                          disabled={!validateCurrentYatrik()}
-                          className="flex-1 px-6 py-4 border-2 border-[#c5a059] text-[#c5a059] uppercase tracking-widest text-[10px] font-bold hover:bg-[#c5a059] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {t(pageCopy.registrationForm.addAnother)}
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="flex-1 px-6 py-4 bg-[#c5a059] text-white uppercase tracking-widest text-[10px] font-bold hover:bg-[#b08d4a] transition-all shadow-lg shadow-yellow-900/10 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {isSubmitting ? 'Submitting...' : t(pageCopy.registrationForm.submit)}
-                        </button>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={requestCloseRegistration}
-                        disabled={isSubmitting}
-                        className="w-full py-3 text-gray-400 uppercase tracking-widest text-[10px] font-bold hover:text-gray-600 transition-all disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {t(pageCopy.registrationForm.cancel)}
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </section>
     </LightPageShell>
   );

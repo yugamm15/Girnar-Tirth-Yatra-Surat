@@ -9,7 +9,11 @@ import AboutGirnarPage from './pages/AboutGirnarPage.jsx';
 import UpashrayJinodharPage from './pages/UpashrayJinodharPage.jsx';
 import JinalayJinodharPage from './pages/JinalayJinodharPage.jsx';
 import UpashrayDetailPage from './pages/UpashrayDetailPage.jsx';
+import JinalayDetailPage from './pages/JinalayDetailPage.jsx';
 import MonthlyBusYatraPage from './pages/MonthlyBusYatraPage.jsx';
+import YatraBookingPage from './pages/YatraBookingPage.jsx';
+import YatraPaymentPage from './pages/YatraPaymentPage.jsx';
+import YatraSuccessPage from './pages/YatraSuccessPage.jsx';
 import EventsPage from './pages/EventsPage.jsx';
 import ContactUsPage from './pages/ContactUsPage.jsx';
 import AdminPanelPage from './pages/AdminPanelPage.jsx';
@@ -54,7 +58,11 @@ const AppRoutes = () => {
         <Route path="/upashray-jinodhar" element={withLazyBoundary(<UpashrayJinodharPage />)} />
         <Route path="/jinalay-jinodhar" element={withLazyBoundary(<JinalayJinodharPage />)} />
         <Route path="/upashray-jinodhar/:slug" element={withLazyBoundary(<UpashrayDetailPage />)} />
+        <Route path="/jinalay-jinodhar/:id" element={withLazyBoundary(<JinalayDetailPage />)} />
         <Route path="/monthly-bus-yatra" element={withLazyBoundary(<MonthlyBusYatraPage />)} />
+        <Route path="/monthly-bus-yatra/booking/:yatraId" element={withLazyBoundary(<YatraBookingPage />)} />
+        <Route path="/monthly-bus-yatra/payment" element={withLazyBoundary(<YatraPaymentPage />)} />
+        <Route path="/monthly-bus-yatra/success" element={withLazyBoundary(<YatraSuccessPage />)} />
         <Route path="/events" element={withLazyBoundary(<EventsPage />)} />
         <Route path="/contact-us" element={withLazyBoundary(<ContactUsPage />)} />
         <Route path="/admin/*" element={withLazyBoundary(<AdminPanelPage />)} />

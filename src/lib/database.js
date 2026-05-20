@@ -241,6 +241,16 @@ export const yatraDatesDB = {
     return data || [];
   },
 
+  async getById(id, columns = '*') {
+    const { data, error } = await supabase
+      .from('yatra_dates')
+      .select(columns)
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
   async create(yatraDate) {
     const { data, error } = await supabase
       .from('yatra_dates')
