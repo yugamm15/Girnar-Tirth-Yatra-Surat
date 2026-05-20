@@ -12,8 +12,8 @@ const MemberModal = ({
   if (!isMemberModalOpen) return null;
 
   return (
-    <div className="fixed top-0 left-0 w-full h-screen z-[100] overflow-y-auto p-4">
-      <div className="fixed top-0 left-0 w-full h-screen bg-black/60 backdrop-blur-sm" onClick={resetMemberForm}></div>
+    <div className="fixed inset-0 z-[500] overflow-y-auto p-4">
+      <div className="fixed inset-0 bg-black/80" onClick={resetMemberForm}></div>
       <div className="relative bg-white w-full max-w-2xl shadow-2xl rounded-sm p-8 md:p-12 animate-fade-in border-t-4 border-[#c5a059] mx-auto my-12">
         <div className="flex justify-between items-center mb-10">
           <h3 className="text-2xl font-headline text-gray-900">{editingMemberId ? 'Edit Member' : 'Add New Member'}</h3>

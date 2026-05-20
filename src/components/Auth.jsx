@@ -430,8 +430,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           const override = localStorage.getItem('auth_override');
           if (!override && isMounted) {
             setView('login');
-            setIsInitializing(false);
           }
+          if (isMounted) setIsInitializing(false);
           return;
         }
 
@@ -560,25 +560,36 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             setCurrentMemberId(memberRecord.id);
             localStorage.setItem('auth_override', 'member');
             localStorage.setItem('auth_member_id', memberRecord.id);
+            
+            // Load data BEFORE switching view to ensure a smooth transition
+            setProcessingMessage('Loading your dashboard...');
+            await loadAllData();
+            
             setView('member');
             setError('');
             navigate('/member/upashray-reports');
-            await loadAllData();
           } else if (!memberRecord.has_access) {
             setError('Your account does not have access. Please contact Admin.');
           } else { setError('Member credentials are wrong'); }
         } else { setError('Member not found or access not granted'); }
-      } catch (err) { setError('An error occurred during login'); }
-      setIsProcessing(false);
+      } catch (err) { 
+        console.error('Login error:', err);
+        setError('An error occurred during login'); 
+      } finally {
+        setIsProcessing(false);
+      }
       return;
     }
 
     if (normalizedEmail === ADMIN_CREDENTIALS.email.toLowerCase() && password === ADMIN_CREDENTIALS.password) {
       localStorage.setItem('auth_override', 'admin');
+      
+      setProcessingMessage('Loading Admin Portal...');
+      await loadAllData();
+      
       setView('admin');
       setError('');
       navigate('/admin/upashrays');
-      await loadAllData();
     } else { setError('Credentials are wrong'); }
     setIsProcessing(false);
   };
@@ -1063,7 +1074,6 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           jinalayas={jinalayas} jinalayaSearch={jinalayaSearch} setJinalayaSearch={setJinalayaSearch} setIsJinalayaModalOpen={setIsJinalayaModalOpen} startEditJinalaya={startEditJinalaya} deleteJinalaya={deleteJinalaya} isJinalayaModalOpen={isJinalayaModalOpen} resetJinalayaForm={resetJinalayaForm} editingJinalayaId={editingJinalayaId} jinalayaFormData={jinalayaFormData} setJinalayaFormData={setJinalayaFormData} handleSaveJinalaya={handleSaveJinalaya}
           allReports={allReports} reportUpashrayFilter={reportUpashrayFilter} setReportUpashrayFilter={setReportUpashrayFilter} reportMemberFilter={reportMemberFilter} setReportMemberFilter={setReportMemberFilter} reportDateFilter={reportDateFilter} setReportDateFilter={setReportDateFilter} setSelectedReport={setSelectedReport} deleteReport={deleteReport} isReportModalOpen={isReportModalOpen} setIsReportModalOpen={setIsReportModalOpen} selectedReport={selectedReport} openReportAndPrint={openReportAndPrint}
         />
-        {showOverlay && <LoadingOverlay message={processingMessage} />}
       </>
     );
   }
@@ -1077,7 +1087,6 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
           upashrays={upashrays} setCheckingUpashrayId={setCheckingUpashrayId} checkingUpashrayId={checkingUpashrayId} handleSaveCheckingReport={handleSaveCheckingReport} checkingReport={checkingReport} setCheckingReport={setCheckingReport} removePointImage={removePointImage} handlePointImageUpload={handlePointImageUpload} generalNotes={generalNotes} setGeneralNotes={setGeneralNotes}
           allReports={allReports} currentMemberId={currentMemberId} setSelectedReport={setSelectedReport} setIsReportModalOpen={setIsReportModalOpen} isReportModalOpen={isReportModalOpen} selectedReport={selectedReport}
         />
-        {showOverlay && <LoadingOverlay message={processingMessage} />}
       </>
     );
   }
