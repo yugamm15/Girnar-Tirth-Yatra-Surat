@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { LightPageShell } from '../components/LightPageShell.jsx';
 import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
@@ -21,6 +21,11 @@ const UpashrayJirnodharPage = () => {
   const [upashrays, setUpashrays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const listingsRef = useRef(null);
+  const shouldScrollRef = useRef(false);
+
+  const itemsPerPage = 6;
 
   const cacheKey = 'upashray_jirnodhar_page';
 
@@ -89,6 +94,37 @@ const UpashrayJirnodharPage = () => {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [upashrays.length]);
+
+  const totalPages = Math.max(1, Math.ceil(upashrays.length / itemsPerPage));
+  const visibleUpashrays = upashrays.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const goToPage = (nextPage) => {
+    setCurrentPage(Math.min(Math.max(nextPage, 1), totalPages));
+  };
+
+  const goToPageAndScroll = (nextPage) => {
+    shouldScrollRef.current = true;
+    goToPage(nextPage);
+  };
+
+  useEffect(() => {
+    if (!shouldScrollRef.current) {
+      return;
+    }
+
+    shouldScrollRef.current = false;
+    const targetElement = listingsRef.current;
+    if (!targetElement) {
+      return;
+    }
+
+    const targetTop = window.scrollY + targetElement.getBoundingClientRect().top - 120;
+    window.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
+  }, [currentPage]);
 
   return (
     <LightPageShell>
@@ -162,42 +198,88 @@ const UpashrayJirnodharPage = () => {
             <p className="text-gray-600">No upashrays found. Please add some from the admin panel.</p>
           </section>
         ) : (
-          <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {upashrays.map((upashray) => (
-              <article key={upashray.id} className="light-panel-soft light-card-image overflow-hidden">
-                <SecureImage
-                  src={upashray.coverImage}
-                  alt={upashray.name}
-                  containerClassName="w-full h-52"
-                  className="w-full h-52 object-cover"
-                />
+          <section ref={listingsRef} className="space-y-6 scroll-mt-24">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              {visibleUpashrays.map((upashray) => (
+                <article key={upashray.id} className="light-panel-soft light-card-image overflow-hidden">
+                  <SecureImage
+                    src={upashray.coverImage}
+                    alt={upashray.name}
+                    containerClassName="w-full h-52"
+                    className="w-full h-52 object-cover"
+                  />
 
-                <div className="p-5 md:p-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <h2 className="text-xl md:text-2xl font-headline text-gray-900">{upashray.name}</h2>
-                    <span
-                      className={`px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] font-bold rounded-full border ${
-                        statusClassNames[upashray.status] ?? statusClassNames.planned
+                  <div className="p-5 md:p-6">
+                    <div className="flex items-center justify-between gap-3">
+                      <h2 className="text-xl md:text-2xl font-headline text-gray-900">{upashray.name}</h2>
+                      <span
+                        className={`px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] font-bold rounded-full border ${
+                          statusClassNames[upashray.status] ?? statusClassNames.planned
+                        }`}
+                      >
+                        {t(siteCopy.statuses[upashray.status] || upashray.status)}
+                      </span>
+                    </div>
+
+                    <p className="mt-2 text-sm text-gray-600">{upashray.village}</p>
+                    <p className="mt-3 text-sm text-gray-600 leading-relaxed">{upashray.description}</p>
+
+                    <div className="mt-5">
+                      <Link
+                        to={`/upashray-jirnodhar/${upashray.slug}`}
+                        className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-colors"
+                      >
+                        {t(siteCopy.common.viewDetails)}
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex flex-col items-center gap-4 pt-2">
+                <div className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto max-w-full pb-1">
+                  <button
+                    type="button"
+                    onClick={() => goToPageAndScroll(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="shrink-0 px-4 py-2 text-[10px] font-bold uppercase tracking-widest border border-[#ddd2b7] text-gray-700 bg-white rounded-sm disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#c5a059] hover:text-[#8f6d2f] transition-colors"
+                  >
+                    Previous
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                    <button
+                      key={pageNumber}
+                      type="button"
+                      onClick={() => goToPage(pageNumber)}
+                      className={`shrink-0 min-w-10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border rounded-sm transition-colors ${
+                        pageNumber === currentPage
+                          ? 'bg-[#c5a059] border-[#c5a059] text-white'
+                          : 'bg-white border-[#ddd2b7] text-gray-700 hover:border-[#c5a059] hover:text-[#8f6d2f]'
                       }`}
+                      aria-current={pageNumber === currentPage ? 'page' : undefined}
                     >
-                      {t(siteCopy.statuses[upashray.status] || upashray.status)}
-                    </span>
-                  </div>
+                      {pageNumber}
+                    </button>
+                  ))}
 
-                  <p className="mt-2 text-sm text-gray-600">{upashray.village}</p>
-                  <p className="mt-3 text-sm text-gray-600 leading-relaxed">{upashray.description}</p>
-
-                  <div className="mt-5">
-                    <Link
-                      to={`/upashray-jirnodhar/${upashray.slug}`}
-                      className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-colors"
-                    >
-                      {t(siteCopy.common.viewDetails)}
-                    </Link>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => goToPageAndScroll(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="shrink-0 px-4 py-2 text-[10px] font-bold uppercase tracking-widest border border-[#ddd2b7] text-gray-700 bg-white rounded-sm disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#c5a059] hover:text-[#8f6d2f] transition-colors"
+                  >
+                    Next
+                  </button>
                 </div>
-              </article>
-            ))}
+
+                <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#8f6d2f] font-bold opacity-70">
+                  Showing {visibleUpashrays.length} of {upashrays.length} records
+                </p>
+              </div>
+            )}
           </section>
         )}
       </section>
