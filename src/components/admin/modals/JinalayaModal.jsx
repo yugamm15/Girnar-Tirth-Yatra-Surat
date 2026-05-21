@@ -59,12 +59,13 @@ const JinalayaModal = ({
             </div>
 
             <div>
-              <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Google Map Link</label>
+              <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Google Map Link or Coordinates</label>
               <input
-                type="url"
+                type="text"
                 value={jinalayaFormData.location}
                 onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, location: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
+                placeholder="Paste link or Lat, Long"
                 required
               />
             </div>
@@ -88,9 +89,9 @@ const JinalayaModal = ({
                 onChange={(e) => setJinalayaFormData({ ...jinalayaFormData, status: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors appearance-none"
               >
-                <option value="Plan">Plan</option>
-                <option value="Process">Process</option>
-                <option value="Done">Done</option>
+                <option value="plan">Plan</option>
+                <option value="process">Process</option>
+                <option value="done">Done</option>
               </select>
             </div>
 

@@ -657,7 +657,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         description: formData.description,
         trusty: formData.trusty, mobile: formData.mobile, location: formData.location,
         slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
-        status: formData.status
+        status: formData.status.toLowerCase()
       };
 
       let upashrayId = editingId;
@@ -704,7 +704,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         route: u.route || '',
         description: u.description || '',
         trusty: u.trusty || '', mobile: u.mobile || '',
-        location: u.location || '', slug: u.slug || '', status: u.status || 'Plan',
+        location: u.location || '', slug: u.slug || '', status: u.status || 'plan',
         beforeFiles: [], processFiles: [], afterFiles: [],
         existingBeforeMedia: media.filter(m => m.category === 'Before'),
         existingProcessMedia: media.filter(m => m.category === 'Process'),
@@ -738,7 +738,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setEditingId(null);
     setFormData({
       name: '', village: '', route: '', trusty: '', mobile: '', location: '', description: '', slug: '',
-      beforeFiles: [], processFiles: [], afterFiles: [], status: 'Plan'
+      beforeFiles: [], processFiles: [], afterFiles: [], status: 'plan'
     });
     setIsModalOpen(false);
   };
@@ -838,8 +838,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         mulnayak: jinalayaFormData.mulnayak,
         description: jinalayaFormData.description,
         location: jinalayaFormData.location, 
-        status: jinalayaFormData.status, before_img: jinalayaFormData.beforeImg,
-        process_img: jinalayaFormData.processImg, after_img: jinalayaFormData.afterImg
+        status: jinalayaFormData.status.toLowerCase(), 
+        before_img: jinalayaFormData.beforeImg || null,
+        process_img: jinalayaFormData.processImg || null, 
+        after_img: jinalayaFormData.afterImg || null
       };
       let savedJinalaya;
       if (editingJinalayaId) {
@@ -862,7 +864,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       route: j.route || '',
       mulnayak: j.mulnayak || '',
       description: j.description || '',
-      location: j.location || '', status: j.status || 'Plan', 
+      location: j.location || '', status: j.status || 'plan', 
       beforeImg: j.beforeImg || '', processImg: j.processImg || '', afterImg: j.afterImg || ''
     });
     setIsJinalayaModalOpen(true);
@@ -892,7 +894,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setEditingJinalayaId(null);
     setJinalayaFormData({
       name: '', village: '', route: '', mulnayak: '', location: '', description: '',
-      beforeImg: '', processImg: '', afterImg: '', status: 'Plan'
+      beforeImg: '', processImg: '', afterImg: '', status: 'plan'
     });
     setIsJinalayaModalOpen(false);
   };
