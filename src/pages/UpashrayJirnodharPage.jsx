@@ -1,10 +1,64 @@
 import { Link } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { LightPageShell } from '../components/LightPageShell.jsx';
 import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { dbCache, upashraysDB, upashrayMediaDB } from '../lib/database.js';
+
+const parseLocation = (locStr) => {
+  if (!locStr) return null;
+  const match = locStr.match(/(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)/);
+  if (match) {
+    return [parseFloat(match[1]), parseFloat(match[3])];
+  }
+  const urlMatch = locStr.match(/@(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)/);
+  if (urlMatch) {
+    return [parseFloat(urlMatch[1]), parseFloat(urlMatch[3])];
+  }
+  return null;
+};
+
+const createCustomIcon = (delay, idx = 0) => {
+  // 4 main directions: Top, Right, Bottom, Left
+  const directions = [
+    { x: 0, y: -80 },   // Top
+    { x: 80, y: 0 },    // Right
+    { x: 0, y: 80 },    // Bottom
+    { x: -80, y: 0 }    // Left
+  ];
+  const dir = directions[idx % 4];
+  const startX = dir.x;
+  const startY = dir.y;
+
+  return L.divIcon({
+    className: 'custom-pin-icon',
+    html: `<div class="animate-pin-drop" style="animation-delay: ${delay}ms; --start-x: ${startX}px; --start-y: ${startY}px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="20" height="30" style="filter: drop-shadow(0px 6px 3px rgba(0,0,0,0.4));">
+              <path fill="#e32636" d="M384 192c0 87.4-117 243-168.3 307.2c-12.3 15.3-35.1 15.3-47.4 0C117 435 0 279.4 0 192C0 86 86 0 192 0S384 86 384 192z"/>
+              <circle fill="#ffffff" cx="192" cy="192" r="64"/>
+            </svg>
+          </div>`,
+    iconSize: [20, 30],
+    iconAnchor: [10, 30],
+    popupAnchor: [0, -30],
+  });
+};
+
+const MapBounds = ({ locations }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (!locations || locations.length === 0) return;
+    const bounds = L.latLngBounds(locations);
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    }
+  }, [locations, map]);
+  return null;
+};
 
 const statusClassNames = {
   completed: 'bg-green-100 text-green-700 border-green-200',
@@ -66,7 +120,7 @@ const UpashrayJirnodharPage = () => {
         }
 
         const [data, media] = await Promise.all([
-          upashraysDB.getAll('id, name, village, route, slug, status, description, created_at'),
+          upashraysDB.getAll('id, name, village, route, slug, status, description, location, created_at'),
           upashrayMediaDB.getAll('id, upashray_id, media_type, file_url, sort_order, created_at')
         ]);
 
@@ -126,6 +180,8 @@ const UpashrayJirnodharPage = () => {
     window.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
   }, [currentPage]);
 
+  const delayPerPin = Math.min(150, 4000 / Math.max(1, upashrays.length));
+
   return (
     <LightPageShell>
       <section className="max-w-7xl mx-auto space-y-8 md:space-y-10">
@@ -148,17 +204,49 @@ const UpashrayJirnodharPage = () => {
                 <span className="text-[#c5a059] font-headline text-xs tracking-widest animate-bounce">Loading Sacred Map...</span>
               </div>
               
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15551375.021006575!2d72.31689139260177!3d17.476483169828236!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30635ff06b925117%3A0x2c5a77b887417244!2sIndia!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin&q=Jain+Tirth+India"
-                width="100%"
-                height="100%"
-                style={{ border: 0, filter: 'sepia(0.3) hue-rotate(-10deg) saturate(1.2) contrast(0.9)' }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                onLoad={(e) => e.currentTarget.parentElement.classList.add('loaded')}
-                title="India Map"
-              ></iframe>
+              <MapContainer 
+                center={[21.1702, 72.8311]} 
+                zoom={6} 
+                className="w-full h-full z-10 relative"
+                style={{ background: '#f9f7f2' }}
+                whenReady={(e) => {
+                  if (e.target && e.target.getContainer()) {
+                    e.target.getContainer().parentElement.classList.add('loaded');
+                  }
+                }}
+              >
+                <TileLayer
+                  url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <MapBounds locations={upashrays.map(u => parseLocation(u.location)).filter(Boolean)} />
+                {upashrays.map((upashray, idx) => {
+                  const coords = parseLocation(upashray.location);
+                  if (!coords) return null;
+                  return (
+                    <Marker 
+                      key={upashray.id} 
+                      position={coords} 
+                      icon={createCustomIcon(idx * delayPerPin, idx)}
+                    >
+                      <Popup className="custom-popup">
+                        <div className="text-center p-1 flex flex-col items-center">
+                          <h3 className="font-headline font-bold text-[#7a5f2d] text-sm mb-1">{upashray.name}</h3>
+                          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-3">{upashray.village}</p>
+                          <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="bg-[#c5a059] !text-white px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider hover:bg-[#b08d4a] transition-colors w-full shadow-sm mt-1 inline-flex items-center justify-center"
+                          >
+                            Direction
+                          </a>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+              </MapContainer>
             </div>
             
             <div className="mt-8 flex flex-wrap justify-center gap-6">
