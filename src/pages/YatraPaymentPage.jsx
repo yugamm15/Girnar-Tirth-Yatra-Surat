@@ -150,10 +150,16 @@ const YatraPaymentPage = () => {
                 <section className="p-6 bg-gray-50 border border-gray-100 rounded-sm">
                   <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-4">Summary</h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Yatricks ({bookingInfo.yatricks.length})</span>
-                      <span className="font-bold text-gray-900">₹{bookingInfo.totalAmount}</span>
-                    </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Yatricks ({bookingInfo.yatricks.length})</span>
+                        <span className="font-bold text-gray-900">₹{bookingInfo.totalAmount - (bookingInfo.selectedSponsorship?.amount || 0)}</span>
+                      </div>
+                      {bookingInfo.selectedSponsorship && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-500">Sponsorship — {bookingInfo.selectedSponsorship.title}</span>
+                          <span className="font-bold text-gray-900">₹{bookingInfo.selectedSponsorship.amount}</span>
+                        </div>
+                      )}
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Convenience Fee</span>
                       <span className="font-bold text-green-600">FREE</span>

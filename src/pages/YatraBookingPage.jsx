@@ -11,8 +11,6 @@ import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { dbCache, yatraDatesDB } from '../lib/database.js';
 
-const YATRA_PRICE_PER_PERSON = 900;
-
 const YatraBookingPage = () => {
   const { yatraId } = useParams();
   const navigate = useNavigate();
@@ -32,6 +30,7 @@ const YatraBookingPage = () => {
     remarks: '',
   });
   const [toasts, setToasts] = useState([]);
+  const [selectedSponsorshipId, setSelectedSponsorshipId] = useState(null);
   const [confirmState, setConfirmState] = useState({
     open: false,
     title: '',
@@ -116,7 +115,12 @@ const YatraBookingPage = () => {
   };
 
   const totalYatrikCount = yatricks.length + (validateYatrik(currentYatrik) ? 1 : 0);
-  const totalAmount = totalYatrikCount * YATRA_PRICE_PER_PERSON;
+  const pricePerPerson = yatra?.price_per_person || 900;
+  const sponsorshipTiers = yatra?.sponsorship_tiers || [];
+  const selectedSponsorship = sponsorshipTiers.find(s => String(s.id) === String(selectedSponsorshipId));
+  const sponsorshipAmount = selectedSponsorship ? Number(selectedSponsorship.amount || 0) : 0;
+
+  const totalAmount = (totalYatrikCount * pricePerPerson) + sponsorshipAmount;
 
   const handleProceedToPayment = () => {
     let finalToSubmit = [...yatricks];
@@ -140,7 +144,8 @@ const YatraBookingPage = () => {
     sessionStorage.setItem('pending_booking', JSON.stringify({
       yatraId,
       yatricks: finalToSubmit,
-      totalAmount: finalToSubmit.length * YATRA_PRICE_PER_PERSON
+      totalAmount: finalToSubmit.length * pricePerPerson + sponsorshipAmount,
+      selectedSponsorship: selectedSponsorship || null
     }));
     
     navigate('/monthly-bus-yatra/payment');
@@ -199,7 +204,7 @@ const YatraBookingPage = () => {
             <div className="hidden md:block">
               <div className="bg-[#fcf9f2] border border-[#c5a059]/20 px-6 py-4 rounded-sm">
                 <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#9f7c3d] mb-1">Fare Per Person</p>
-                <p className="text-2xl font-headline text-gray-900">₹{YATRA_PRICE_PER_PERSON}</p>
+                <p className="text-2xl font-headline text-gray-900">₹{pricePerPerson}</p>
               </div>
             </div>
           </div>
@@ -312,8 +317,22 @@ const YatraBookingPage = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Price per person</span>
-                  <span className="font-bold text-gray-900">₹{YATRA_PRICE_PER_PERSON}</span>
+                  <span className="font-bold text-gray-900">₹{pricePerPerson}</span>
                 </div>
+                {sponsorshipTiers.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="text-sm text-gray-500">Sponsorship Options</div>
+                    {sponsorshipTiers.map((s) => (
+                      <label key={s.id} className="flex justify-between items-center text-sm">
+                        <div className="flex items-center gap-3">
+                          <input type="radio" name="sponsorship" checked={String(selectedSponsorshipId) === String(s.id)} onChange={() => setSelectedSponsorshipId(s.id)} />
+                          <span>{s.title}</span>
+                        </div>
+                        <span className="font-bold">₹{s.amount}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="pt-6 border-t-2 border-dashed border-gray-100 mb-8">

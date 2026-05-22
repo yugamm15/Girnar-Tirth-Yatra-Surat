@@ -259,6 +259,14 @@ export const yatraDatesDB = {
         description: yatraDate.description,
         image: yatraDate.image,
         registration_open: yatraDate.registration_open,
+        price_per_person: yatraDate.price_per_person || 900,
+        sponsorship_tiers: yatraDate.sponsorship_tiers || [
+          { id: 1, title: 'Full Yatra Sponsor', amount: 31000 },
+          { id: 2, title: 'Main Pillar Sponsor', amount: 21000 },
+          { id: 3, title: 'Pillar Sponsor', amount: 11000 },
+          { id: 4, title: 'Assistant Sponsor', amount: 4000 }
+        ],
+        sponsorship_online_only: yatraDate.sponsorship_online_only === undefined ? true : yatraDate.sponsorship_online_only,
         created_at: new Date().toISOString() 
       }])
       .select();
@@ -558,6 +566,16 @@ export const checkingReportsDB = {
       .from('checking_reports')
       .select('*')
       .eq('upashray_id', upashrayId)
+      .order('report_date', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getByJinalayaId(jinalayaId) {
+    const { data, error } = await supabase
+      .from('checking_reports')
+      .select('*')
+      .eq('jinalaya_id', jinalayaId)
       .order('report_date', { ascending: false });
     if (error) throw error;
     return data || [];

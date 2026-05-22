@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import UpashrayReportsTab from './tabs/UpashrayReportsTab';
+import JinalayaReportsTab from './tabs/JinalayaReportsTab';
 import MyReportsTab from './tabs/MyReportsTab';
 import CheckingReportModal from './modals/CheckingReportModal';
 import ReportDetailModal from '../admin/modals/ReportDetailModal';
@@ -14,8 +15,11 @@ const MemberPanel = ({
   setIsMobileMenuOpen, 
   handleLogout,
   upashrays,
+  jinalayas,
   setCheckingUpashrayId,
   checkingUpashrayId,
+  setCheckingJinalayaId,
+  checkingJinalayaId,
   handleSaveCheckingReport,
   checkingReport,
   setCheckingReport,
@@ -65,6 +69,12 @@ const MemberPanel = ({
               Upashray Reports
             </button>
             <button
+              onClick={() => setMemberActiveTab('jinalaya-reports')}
+              className={`px-4 h-full text-[10px] uppercase tracking-widest font-bold transition-all border-b-2 flex items-center ${memberActiveTab === 'jinalaya-reports' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+            >
+              Jinalaya Reports
+            </button>
+            <button
               onClick={() => setMemberActiveTab('my-reports')}
               className={`px-4 h-full text-[10px] uppercase tracking-widest font-bold transition-all border-b-2 flex items-center ${memberActiveTab === 'my-reports' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
             >
@@ -100,6 +110,12 @@ const MemberPanel = ({
               >
                 Upashray Reports
               </button>
+                <button
+                  onClick={() => { setMemberActiveTab('jinalaya-reports'); setIsMobileMenuOpen(false); }}
+                  className={`w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-l-4 mb-2 ${memberActiveTab === 'jinalaya-reports' ? 'border-[#c5a059] bg-[#c5a059]/5 text-[#c5a059]' : 'border-transparent text-gray-500'}`}
+                >
+                  Jinalaya Reports
+                </button>
               <button
                 onClick={() => { setMemberActiveTab('my-reports'); setIsMobileMenuOpen(false); }}
                 className={`w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-l-4 mb-2 ${memberActiveTab === 'my-reports' ? 'border-[#c5a059] bg-[#c5a059]/5 text-[#c5a059]' : 'border-transparent text-gray-500'}`}
@@ -118,6 +134,11 @@ const MemberPanel = ({
               upashrays={upashrays}
               setCheckingUpashrayId={setCheckingUpashrayId}
             />
+          ) : memberActiveTab === 'jinalaya-reports' ? (
+            <JinalayaReportsTab
+              jinalayas={jinalayas}
+              setCheckingJinalayaId={setCheckingJinalayaId}
+            />
           ) : (
             <MyReportsTab 
               allReports={allReports}
@@ -132,7 +153,10 @@ const MemberPanel = ({
       <CheckingReportModal 
         checkingUpashrayId={checkingUpashrayId}
         setCheckingUpashrayId={setCheckingUpashrayId}
+        checkingJinalayaId={checkingJinalayaId}
+        setCheckingJinalayaId={setCheckingJinalayaId}
         upashrays={upashrays}
+        jinalayas={jinalayas}
         handleSaveCheckingReport={handleSaveCheckingReport}
         checkingReport={checkingReport}
         setCheckingReport={setCheckingReport}

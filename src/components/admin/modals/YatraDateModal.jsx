@@ -14,7 +14,7 @@ const YatraDateModal = ({
   return (
     <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/80" onClick={() => setIsYatraDateModalOpen(false)}></div>
-      <div className="relative bg-white w-full max-w-lg shadow-2xl rounded-sm overflow-hidden animate-fade-in">
+      <div className="relative bg-white w-full max-w-lg shadow-2xl rounded-sm overflow-auto max-h-[90vh] animate-fade-in">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
           <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900">
             {editingYatraDateId ? 'Edit Yatra Date' : 'Add New Yatra Date'}
@@ -90,6 +90,63 @@ const YatraDateModal = ({
             >
               <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${yatraDateFormData.registration_open ? 'translate-x-6' : 'translate-x-1'}`} />
             </button>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Price Per Person (₹)</label>
+              <input
+                type="number"
+                min="0"
+                value={yatraDateFormData.price_per_person || 0}
+                onChange={(e) => setYatraDateFormData({ ...yatraDateFormData, price_per_person: Number(e.target.value) })}
+                className="w-full bg-gray-50 border border-gray-200 text-sm py-3 px-4 outline-none focus:border-[#c5a059] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Sponsorship Tiers</label>
+              <div className="space-y-3">
+                {(yatraDateFormData.sponsorship_tiers || []).map((tier, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={tier.title}
+                      onChange={(e) => {
+                        const updated = [...(yatraDateFormData.sponsorship_tiers || [])];
+                        updated[idx] = { ...updated[idx], title: e.target.value };
+                        setYatraDateFormData({ ...yatraDateFormData, sponsorship_tiers: updated });
+                      }}
+                      className="flex-1 bg-gray-50 border border-gray-200 text-sm py-3 px-3 outline-none"
+                    />
+                    <input
+                      type="number"
+                      min="0"
+                      value={tier.amount || 0}
+                      onChange={(e) => {
+                        const updated = [...(yatraDateFormData.sponsorship_tiers || [])];
+                        updated[idx] = { ...updated[idx], amount: Number(e.target.value) };
+                        setYatraDateFormData({ ...yatraDateFormData, sponsorship_tiers: updated });
+                      }}
+                      className="w-32 bg-gray-50 border border-gray-200 text-sm py-3 px-3 outline-none"
+                    />
+                    <button type="button" onClick={() => {
+                      const updated = [...(yatraDateFormData.sponsorship_tiers || [])];
+                      updated.splice(idx, 1);
+                      setYatraDateFormData({ ...yatraDateFormData, sponsorship_tiers: updated });
+                    }} className="px-3 py-2 bg-red-50 text-red-600 rounded-sm">Remove</button>
+                  </div>
+                ))}
+                <div>
+                  <button type="button" onClick={() => {
+                    const updated = [...(yatraDateFormData.sponsorship_tiers || [])];
+                    const nextId = updated.reduce((max, t) => Math.max(max, t.id || 0), 0) + 1;
+                    updated.push({ id: nextId, title: 'New Tier', amount: 0 });
+                    setYatraDateFormData({ ...yatraDateFormData, sponsorship_tiers: updated });
+                  }} className="px-4 py-2 bg-[#c5a059] text-white rounded-sm">Add Tier</button>
+                </div>
+                <div className="text-[10px] text-gray-500">Sponsorships apply per bus only.</div>
+              </div>
+            </div>
           </div>
           <div className="pt-4">
             <button
