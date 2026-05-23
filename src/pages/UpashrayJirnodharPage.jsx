@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -182,6 +182,39 @@ const UpashrayJirnodharPage = () => {
 
   const delayPerPin = Math.min(150, 4000 / Math.max(1, upashrays.length));
 
+  const mapLocations = useMemo(() => {
+    return upashrays.map(u => parseLocation(u.location)).filter(Boolean);
+  }, [upashrays]);
+
+  const mapMarkers = useMemo(() => {
+    return upashrays.map((upashray, idx) => {
+      const coords = parseLocation(upashray.location);
+      if (!coords) return null;
+      return (
+        <Marker 
+          key={upashray.id} 
+          position={coords} 
+          icon={createCustomIcon(idx * delayPerPin, idx)}
+        >
+          <Popup className="custom-popup">
+            <div className="text-center p-1 flex flex-col items-center">
+              <h3 className="font-headline font-bold text-[#7a5f2d] text-sm mb-1">{upashray.name}</h3>
+              <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-3">{upashray.village}</p>
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`}
+                target="_blank"
+                rel="noreferrer"
+                className="bg-[#c5a059] !text-white px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider hover:bg-[#b08d4a] transition-colors w-full shadow-sm mt-1 inline-flex items-center justify-center"
+              >
+                Direction
+              </a>
+            </div>
+          </Popup>
+        </Marker>
+      );
+    });
+  }, [upashrays, delayPerPin]);
+
   return (
     <LightPageShell>
       <section className="max-w-7xl mx-auto space-y-8 md:space-y-10">
@@ -219,33 +252,8 @@ const UpashrayJirnodharPage = () => {
                   url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-                <MapBounds locations={upashrays.map(u => parseLocation(u.location)).filter(Boolean)} />
-                {upashrays.map((upashray, idx) => {
-                  const coords = parseLocation(upashray.location);
-                  if (!coords) return null;
-                  return (
-                    <Marker 
-                      key={upashray.id} 
-                      position={coords} 
-                      icon={createCustomIcon(idx * delayPerPin, idx)}
-                    >
-                      <Popup className="custom-popup">
-                        <div className="text-center p-1 flex flex-col items-center">
-                          <h3 className="font-headline font-bold text-[#7a5f2d] text-sm mb-1">{upashray.name}</h3>
-                          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-3">{upashray.village}</p>
-                          <a
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="bg-[#c5a059] !text-white px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider hover:bg-[#b08d4a] transition-colors w-full shadow-sm mt-1 inline-flex items-center justify-center"
-                          >
-                            Direction
-                          </a>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  );
-                })}
+                <MapBounds locations={mapLocations} />
+                {mapMarkers}
               </MapContainer>
             </div>
             

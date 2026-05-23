@@ -9,7 +9,7 @@ import MemberPanel from './member/MemberPanel';
 import ConfirmModal from './ConfirmModal.jsx';
 import TopLineLoader from './TopLineLoader.jsx';
 import ToastViewport from './ToastViewport.jsx';
-
+import { generateMemberCode } from '../utils/memberUtils.js';
 const ADMIN_CREDENTIALS = {
   email: 'GirnarTirthYatraGroup@gmail.com',
   password: 'Girnar@22'
@@ -752,7 +752,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       const data = {
         name: memberFormData.name, email: memberFormData.email.toLowerCase(), phone: memberFormData.phone,
         password: memberFormData.password, has_access: memberFormData.hasAccess,
-        code: memberFormData.code || (memberFormData.name.substring(0, 2).toUpperCase() + 'GYG022')
+        code: memberFormData.code || generateMemberCode(memberFormData.name, members)
       };
       let savedMember;
       if (editingMemberId) {

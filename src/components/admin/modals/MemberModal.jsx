@@ -7,7 +7,8 @@ const MemberModal = ({
   editingMemberId, 
   memberFormData, 
   setMemberFormData, 
-  handleSaveMember 
+  handleSaveMember,
+  members
 }) => {
   if (!isMemberModalOpen) return null;
 
@@ -40,7 +41,7 @@ const MemberModal = ({
             <div>
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Auto-Generated Code</label>
               <div className="w-full bg-gray-100 border border-gray-200 p-4 text-gray-500 text-sm font-mono font-bold select-none cursor-not-allowed">
-                {generateMemberCode(memberFormData.name) || '---'}
+                {memberFormData.code || generateMemberCode(memberFormData.name, members) || '---'}
               </div>
               <p className="text-[9px] text-gray-400 mt-1 uppercase tracking-wider">Format: Name(First 2) + GYG022</p>
             </div>

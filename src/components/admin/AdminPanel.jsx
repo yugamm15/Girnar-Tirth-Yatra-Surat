@@ -246,6 +246,7 @@ const AdminPanel = ({
         memberFormData={memberFormData}
         setMemberFormData={setMemberFormData}
         handleSaveMember={handleSaveMember}
+        members={members}
       />
 
       <JinalayaModal 
