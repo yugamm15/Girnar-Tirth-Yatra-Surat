@@ -80,6 +80,11 @@ export const SiteNavbar = ({ variant = 'light' }) => {
   const location = useLocation();
   const { t, language } = useLanguage();
 
+  // Reset mobile menu on location change to prevent double-open glitches
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
   useEffect(() => {
     const updateViewport = () => {
       setIsMobileViewport(window.innerWidth < 768);

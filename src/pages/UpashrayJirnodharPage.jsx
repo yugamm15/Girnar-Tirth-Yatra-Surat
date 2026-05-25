@@ -163,7 +163,7 @@ const UpashrayJirnodharPage = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setCurrentPage(1);
