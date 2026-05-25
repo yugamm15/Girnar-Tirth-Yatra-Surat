@@ -102,8 +102,8 @@ export const SiteNavbar = ({ variant = 'light' }) => {
 
   const isDark = variant === 'dark';
   const navWrapperClass = isMobileViewport
-    ? 'fixed top-3 inset-x-0 px-3 z-[120] flex items-center justify-between gap-2 pointer-events-none'
-    : 'fixed top-2 lg:top-3 inset-x-0 px-4 lg:px-8 xl:px-10 z-[120] flex justify-between items-center gap-3 pointer-events-none';
+    ? 'fixed top-3 inset-x-0 px-3 z-[1200] flex items-center justify-between gap-2 pointer-events-none'
+    : 'fixed top-2 lg:top-3 inset-x-0 px-4 lg:px-8 xl:px-10 z-[1200] flex justify-between items-center gap-3 pointer-events-none';
 
   const brandClass = 'pointer-events-auto flex items-center justify-center';
 
@@ -182,7 +182,11 @@ export const SiteNavbar = ({ variant = 'light' }) => {
         <button
           type="button"
           className={menuButtonClass}
-          onClick={() => setIsMobileMenuOpen(true)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsMobileMenuOpen(true);
+          }}
           aria-label={t(siteCopy.common.openNavigationMenu)}
         >
           <div className="relative w-5 h-4">
@@ -194,7 +198,7 @@ export const SiteNavbar = ({ variant = 'light' }) => {
       </nav>
 
       <div
-        className={`fixed inset-0 z-[140] transition-opacity duration-500 xl:hidden ${
+        className={`fixed inset-0 z-[1400] transition-opacity duration-500 xl:hidden ${
           isDark ? 'bg-black/60' : 'bg-black/40'
         } ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setIsMobileMenuOpen(false)}

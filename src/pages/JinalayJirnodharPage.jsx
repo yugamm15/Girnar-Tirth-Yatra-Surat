@@ -193,6 +193,7 @@ const JinalayJirnodharPage = () => {
                 target="_blank"
                 rel="noreferrer"
                 className="bg-[#c5a059] !text-white px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider hover:bg-[#b08d4a] transition-colors w-full shadow-sm mt-1 inline-flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
               >
                 Direction
               </a>
