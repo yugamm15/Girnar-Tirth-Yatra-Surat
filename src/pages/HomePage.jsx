@@ -696,9 +696,21 @@ const HomePage = () => {
                 {t(siteCopy.home.monthlyBus.title)}
               </h2>
               <p className="home-reveal text-sm md:text-xl text-on-surface-variant font-light leading-relaxed">{t(siteCopy.home.monthlyBus.paragraph)}</p>
+              
+              <div className="home-reveal mt-8 grid grid-cols-2 gap-4 md:gap-8 border-t border-white/10 pt-6 md:pt-8">
+                <div>
+                  <span className="block text-primary uppercase tracking-widest text-[8px] md:text-[10px] mb-1 font-bold opacity-80">{t(siteCopy.home.monthlyBus.frequencyLabel)}</span>
+                  <span className="text-white text-xs md:text-lg font-medium">{t(siteCopy.home.monthlyBus.frequencyValue)}</span>
+                </div>
+                <div>
+                  <span className="block text-primary uppercase tracking-widest text-[8px] md:text-[10px] mb-1 font-bold opacity-80">{t(siteCopy.home.monthlyBus.experienceLabel)}</span>
+                  <span className="text-white text-xs md:text-lg font-medium">{t(siteCopy.home.monthlyBus.experienceValue)}</span>
+                </div>
+              </div>
+
               <Link
                 to="/monthly-bus-yatra"
-                className="home-reveal inline-block mt-6 px-6 py-3 bg-primary text-on-primary font-bold tracking-[0.2em] uppercase text-[10px]"
+                className="home-reveal inline-block mt-8 px-6 py-3 bg-primary text-on-primary font-bold tracking-[0.2em] uppercase text-[10px]"
               >
                 {t(siteCopy.common.readMore)}
               </Link>

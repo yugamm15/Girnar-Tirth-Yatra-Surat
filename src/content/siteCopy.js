@@ -74,9 +74,9 @@ export const siteCopy = {
       lineOne: tr('Welcome to', 'સ્વાગત છે', 'स्वागत है'),
       lineTwo: tr('Girnar Tirth Yatra Group - Surat', 'ગિરનાર તીર્થ યાત્રા ગ્રુપ - સુરત', 'गिरनार तीर्थ यात्रा समूह - सूरत'),
       subtitle: tr(
-        'A cinematic journey from the heart of Surat to the sacred peaks of Girnar mountain.',
-        'સુરતના હૃદયમાંથી ગિરનારના પવિત્ર શિખરો સુધીની એક ભાવસભર યાત્રા.',
-        'सूरत के हृदय से गिरनार की पवित्र चोटियों तक की एक भावपूर्ण यात्रा।',
+        'With the spirit of "Divinity in every soul" and the essential mission of friendship with all living beings, join the Girnar Group as we walk together on the path of universal compassion.',
+        '"દરેક જીવમાં ઈશ્વર" ની ભાવના સાથે,અને દરેક કાર્ય કરતા પૂર્વે દરેક જીવ સાથે મૈત્રી એ સૌથી જરૂરી છે એવા જીવમૈત્રીના ઉદેશ્ય સાથે આગળ વધી રહેલ ગિરનાર ગ્રુપ સાથે ચાલો જીવમૈત્રીના પથ પર સાથે ચાલીએ..',
+        '"हर जीव में ईश्वर" की भावना और हर जीव के साथ मैत्री के पावन उद्देश्य के साथ, आइए गिरनार ग्रुप के साथ जीव-मैत्री के पथ पर साथ चलें।',
       ),
       scrollHint: tr('Scroll to explore', 'અન્વેષણ માટે સ્ક્રોલ કરો', 'देखने के लिए स्क्रॉल करें'),
     },
@@ -124,9 +124,9 @@ export const siteCopy = {
       badge: tr('Sacred Transit · 01', 'પવિત્ર પ્રવાસ · ૦૧', 'पवित्र यात्रा · 01'),
       title: tr('Monthly Bus Yatra', 'માસિક બસ યાત્રા', 'मासिक बस यात्रा'),
       paragraph: tr(
-        'Every month, dedicated buses depart from Surat to Girnar and Ambika Mata Mandir, keeping the pilgrimage accessible for all devotees.',
-        'દર મહિને સુરતથી ગિરનાર અને અંબિકા માતા મંદિર સુધી ભક્તિભરી બસ યાત્રા યોજાય છે જેથી દરેક ભાવિક માટે યાત્રા સરળ બને.',
-        'हर महीने सूरत से गिरनार और अम्बिका माता मंदिर तक भक्ति-पूर्ण बस यात्रा आयोजित होती है, जिससे यात्रा सभी श्रद्धालुओं के लिए सुलभ रहे।',
+        'Serving over 10,000 pilgrims for the last 8 years, this service of pilgrimage from Surat to Girnar continues uninterrupted.',
+        'છેલ્લા ૮ વર્ષથી ૧૦,૦૦૦થી વધુ યાત્રિકોને સેવા અર્પી, સુરતથી ગિરનારની તીર્થયાત્રાનો આ સેવાયજ્ઞ અવિરત ચાલુ છે.',
+        'पिछले 8 वर्षों से 10,000 से अधिक यात्रियों को सेवा प्रदान करते हुए, सूरत से गिरनार की यह तीर्थयात्रा सेवा निरंतर जारी है।',
       ),
       frequencyLabel: tr('Frequency', 'આવર્તન', 'आवृत्ति'),
       frequencyValue: tr('2 Buses per Month', 'દર મહિને 2 બસ', 'प्रति माह 2 बसें'),
@@ -139,11 +139,11 @@ export const siteCopy = {
     },
     upashray: {
       badge: tr('Architecture · 02', 'જીર્ણોદ્ધાર · ૦૨', 'जीर्णोद्धार · 02'),
-        title: tr('Upashray Jirnodhar', 'ઉપાશ્રય જીર્ણોદ્ધાર', 'उपाश्रय जीर्णोद्धार'),
+      title: tr('Upashray Jirnodhar', 'ઉપાશ્રય જીર્ણોદ્ધાર', 'उपाश्रय जीर्णोद्धार'),
       paragraph: tr(
-        'On the routes of Girnar and Palitana, Upashray spaces are renewed into clean, practical, and spiritually supportive halting points.',
-        'ગિરનાર અને પાલિતાણા માર્ગ પર ઉપાશ્રયોને સ્વચ્છ, સુવિધાસભર અને સાધનાસહાયક વિરામસ્થળ તરીકે નવનિર્મિત કરવામાં આવે છે.',
-        'गिरनार और पालीताना मार्ग पर उपाश्रयों को स्वच्छ, सुविधाजनक और साधना-सहायक विश्राम स्थलों के रूप में विकसित किया जा रहा है।',
+        'Through the renovation of sacred Upashrays for the last 4 years, we are making a humble effort to maintain the grandeur and sanctity of religious places.',
+        'છેલ્લા ૪ વર્ષથી પવિત્ર ઉપાશ્રયોના જીર્ણોદ્ધાર દ્વારા અમે ધર્મસ્થાનોની ભવ્યતા અને પવિત્રતા જાળવવાનો નમ્ર પ્રયાસ કરી રહ્યા છીએ.',
+        'पिछले 4 वर्षों से पवित्र उपाश्रयों के जीर्णोद्धार के माध्यम से, हम धार्मिक स्थलों की भव्यता और पवित्रता बनाए रखने का एक विनम्र प्रयास कर रहे हैं।',
       ),
       countLabel: tr('Total Upashrays Renovated till date', 'હાલ સુધી સુધારાયેલા ઉપાશ્રયો', 'अब तक नवीनीकृत उपाश्रय'),
       countValue: tr('80+', '80+', '80+'),
@@ -162,14 +162,14 @@ export const siteCopy = {
       badge: tr('Divine Rituals · 04', 'દિવ્ય વિધિઓ · ૦૪', 'दिव्य अनुष्ठान · 04'),
       title: tr('Maha Aarti & Abhishek', 'મહા આરતી અને અભિષેક', 'महा आरती और अभिषेक'),
       paragraph: tr(
-        'The devotional atmosphere of Girnar is shared in local Jinalayas through disciplined Maha Aarti and Abhishek seva.',
-        'ગિરનારની દિવ્ય ભાવના સ્થાનિક જિનાલયોમાં શિસ્તબદ્ધ મહા આરતી અને અભિષેક સેવા દ્વારા પ્રસરાય છે.',
-        'गिरनार की दिव्य भावना स्थानीय जिनालयों में अनुशासित महा आरती और अभिषेक सेवा के माध्यम से पहुंचाई जाती है।',
+        'By realizing the divine experience of Abhishek and Aarti performed on the holy peaks of Girnar in various Jinalayas, we make a humble effort to bring those sacred waves of devotion to you.',
+        'ગિરનારના પાવન શિખરો પર થતા અભિષેક અને આરતીની દિવ્ય અનુભૂતિને વિવિધ જિનાલયોમાં સાકાર કરી, અમે ભક્તિના એ પવિત્ર તરંગોને આપની સમક્ષ લાવવાનો એક નમ્ર પ્રયાસ કરીએ છીએ.',
+        'गिरनार के पवित्र शिखरों पर होने वाले अभिषेक और आरती के दिव्य अनुभव को विभिन्न जिनालयों में साकार करते हुए, हम भक्ति की उन पवित्र तरंगों को आपके समक्ष लाने का एक विनम्र प्रयास कर रहे हैं।',
       ),
       contacts: tr('Contact: Milanbhai 99798 58710 / Sandipbhai 98241 55255', 'સંપર્ક: મિલનભાઈ 99798 58710 / સંદિપભાઈ 98241 55255', 'संपर्क: मिलनभाई 99798 58710 / संदीपभाई 98241 55255')
     },
     join: {
-      title: tr('Join Our Sacred Journey', 'અમારી પવિત્ર યાત્રામાં જોડાઓ', 'हमारी पवित्र यात्रा से जुड़ें'),
+      title: tr('Be A Part Of Our Journey', 'અમારી પવિત્ર યાત્રામાં સહભાગી બનો', 'हमारी इस यात्रा का हिस्सा बनें'),
       joinButton: tr('Join the Yatra', 'યાત્રામાં જોડાઓ', 'यात्रा में जुड़ें'),
       supportButton: tr('Support Our Work', 'અમારી સેવા સહાય કરો', 'हमारे कार्य का सहयोग करें'),
     },
@@ -186,7 +186,11 @@ export const siteCopy = {
       {
         id: 'aadinath-jinalay',
         title: tr('1. Shri Aadinath Jinalay', '૧. શ્રી આદિનાથ જિનાલય', '1. श्री आदिनाथ जिनालय'),
-        description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जल्द आ रहा है...'),
+        description: tr(
+          'Salutations at the feet of Lord Aadinath, the King of Kings. The auspicious beginning of the Girnar pilgrimage starts with the darshan of Lord Aadinath\'s temple. This is the sacred place where the first Tirthankara, Lord Aadinath, showers his grace upon the pilgrims. Beholding the smile and peaceful countenance of the Lord brings wonderful peace to the heart. Let us pray to Him, "O Lord! By Your blessings, may this Girnar pilgrimage become the best and most soul-purifying journey of my life."',
+          '"રાજ રાજેશ્વર એવા આદિનાથ દાદાના ચરણોમાં વંદન" ગિરનારની યાત્રાનો મંગલારંભ આદિનાથ દાદાના દેરાસરના દર્શનથી થાય છે. આ એ પાવન સ્થાન છે જ્યાં પ્રથમ તીર્થંકર પ્રભુ આદિનાથની કૃપા દ્રષ્ટિ યાત્રાળુઓ પર પડે છે. દાદાના સ્મિત અને શાંત મુદ્રાના દર્શન કરતા જ હૃદયમાં એક અદભુત શાંતિ પ્રસરે છે. દાદાને વિનંતી કરીએ કે, "હે પ્રભુ! આપના આશીર્વાદથી આ ગિરનારની યાત્રા મારા જીવનની શ્રેષ્ઠ અને આત્મકલ્યાણકારી યાત્રા બની રહે."',
+          '"राज राजेश्वर आदिनाथ दादा के चरणों में वंदन।" गिरनार की यात्रा का मंगलारंभ आदिनाथ दादा के मंदिर के दर्शन से होता है। यह वह पावन स्थान है जहाँ प्रथम तीर्थंकर प्रभु आदिनाथ की कृपा दृष्टि यात्रियों पर पड़ती है। दादा की मुस्कान और शांत मुद्रा के दर्शन करते ही हृदय में एक अद्भुत शांति छा जाती है। दादा से प्रार्थना करें कि, "हे प्रभु! आपके आशीर्वाद से यह गिरनार की यात्रा मेरे जीवन की श्रेष्ठ और आत्मकल्याणकारी यात्रा बनी रहे।"'
+        ),
         image: '/images/about-girnar/shri aadinath jinalay.JPG'
       },
       {
@@ -223,9 +227,9 @@ export const siteCopy = {
         id: 'neminath-2750',
         title: tr('5. Neminath Bhagvan at 2750 Step', '૫. ૨૭૫૦ પગથિયે નેમિનાથ ભગવાન', '5. 2750 सीढ़ी पर नेमिनाथ भगवान'),
         description: tr(
-          'When 3700 steps are completed while climbing, the premises of the main temples of Girnar begin. As soon as you come here, the mind becomes very calm and you feel close to the Lord.',
-          'ચડતાં ચડતાં જ્યારે ૩૭૦૦ પગથિયાં પૂરાં થાય, ત્યારે ગિરનારના મુખ્ય દેરાસરોનો પરિસર શરૂ થાય છે. અહીં આવતા જ મન એકદમ શાંત થઈ જાય છે અને પ્રભુની નિકટ હોવાનો અહેસાસ થાય છે.',
-          'चढ़ते समय जब 3700 सीढ़ियाँ पूरी हो जाती हैं, तब गिरनार के मुख्य मंदिरों का परिसर शुरू होता है। यहाँ आते ही मन एकदम शांत हो जाता है और प्रभु के निकट होने का एहसास होता है।'
+          'Located right next to the path at the 2750th step, this small shrine often remains unnoticed by many devotees. Due to lack of knowledge, many pilgrims move ahead without stopping here, but in reality, this place is a wonderful center for experiencing the proximity of the Lord. Beholding the sacred footprints of Lord Neminath here is a direct experience of detachment. These footprints remind us that this is the very path through which the Tirthankara Lord embarked on the journey to salvation. Therefore, pay special attention while climbing Girnar and definitely stop at this small shrine. Let us bow our heads and pray at the Lord\'s feet, "O Lord! I have been blessed with the fortune of walking on the path where Your holy feet have trodden. May my emotional journey be completed without any obstacles until Your feet, and may my soul attain supreme peace."',
+          '૨૭૫૦ પગથિયાં ચડતા માર્ગની બરાબર બાજુમાં આવેલી આ નાનકડી દેરી ઘણા ભક્તોની નજરથી અજાણી રહી જાય છે. અજ્ઞાનતાને કારણે ઘણા યાત્રાળુઓ અહીં રોકાયા વિના આગળ વધી જાય છે, પરંતુ ખરેખર તો આ સ્થાન પ્રભુની નિકટતા અનુભવવાનું એક અદભુત કેન્દ્ર છે. અહીં બિરાજમાન પ્રભુ નેમિનાથના પાવન પગલાંના દર્શન એટલે સાક્ષાત્ વૈરાગ્યનો અનુભવ. આ પગલાં આપણને યાદ અપાવે છે કે આ એ જ માર્ગ છે જેના પરથી તીર્થંકર પરમાત્માએ મોક્ષના પંથે પ્રયાણ કર્યું હતું. તેથી, ગિરનાર ચડતી વખતે ખાસ ધ્યાન રાખજો અને આ નાનકડી દેરી પાસે અચૂક થોભજો. મસ્તક નમાવીને પ્રભુના ચરણોમાં એટલી જ પ્રાર્થના કરીએ કે, "હે પ્રભુ! આપના આ ચરણો જ્યાં જ્યાં પડ્યા છે, તે માર્ગ પર ચાલવાનું સૌભાગ્ય મને મળ્યું છે. મારી આ ભાવયાત્રા આપના ચરણો સુધી નિર્વિઘ્ને પૂર્ણ થાય અને મારા આત્માને પરમ શાંતિ પ્રાપ્ત થાય."',
+          '२७५० सीढ़ियां चढ़ते समय मार्ग के ठीक बगल में स्थित यह छोटी सी देरी कई भक्तों की नजर से ओझल रह जाती है। अज्ञानता के कारण कई यात्री यहाँ रुके बिना आगे बढ़ जाते हैं, लेकिन वास्तव में यह स्थान प्रभु की निकटता अनुभव करने का एक अद्भुत केंद्र है। यहाँ विराजमान प्रभु नेमिनाथ के पावन चरणों (पगलों) के दर्शन यानी साक्षात् वैरागी का अनुभव। ये पगले हमें याद दिलाते हैं कि यह वही मार्ग है जिससे तीर्थंकर परमात्मा ने मोक्ष के पथ पर प्रस्थान किया था। इसलिए, गिरनार चढ़ते समय विशेष ध्यान रखें और इस छोटी सी देरी पर अवश्य रुकें। मस्तक झुकाकर प्रभु के चरणों में बस इतनी ही प्रार्थना करें कि, "हे प्रभु! आपके ये चरण जहाँ-जहाँ पड़े हैं, उस मार्ग पर चलने का सौभाग्य मुझे मिला है। मेरी यह भाव यात्रा आपके चरणों तक निर्विघ्न पूर्ण हो और मेरी आत्मा को परम शांति प्राप्त हो।"'
         ),
         image: '/images/about-girnar/girnar-2750.jpeg'
       },
@@ -233,34 +237,50 @@ export const siteCopy = {
         id: 'main-gate',
         title: tr('6. Girnar Tonk Main Gate', '૬. ગિરનાર ટૂંક મુખ્ય દરવાજો', '6. गिरनार टोंक मुख्य द्वार'),
         description: tr(
-          'This is the main entrance to move towards the holy aura of Lord Neminath. Entering this gate, it feels as if we are leaving all the attachments and aversions of the world and entering the supreme abode of the Lord.',
-          'ભગવાન નેમિનાથની પવિત્ર ઓરા તરફ આગળ વધવાનું આ મુખ્ય પ્રવેશદ્વાર છે. આ દ્વારમાં પ્રવેશતા જ એવું લાગે છે કે આપણે સંસારના તમામ રાગ-દ્વેષ છોડીને પ્રભુના પરમ ધામમાં પ્રવેશી રહ્યા છીએ.',
-          'भगवान नेमिनाथ के पवित्र ओरा की ओर बढ़ने का यह मुख्य प्रवेश द्वार है। इस द्वार में प्रवेश करते ही ऐसा लगता है जैसे हम संसार के सभी राग-द्वेष को छोड़कर प्रभु के परम धाम में प्रवेश कर रहे हैं।'
+          'This is the holy gate, the anticipation of which makes the journey of thousands of steps successful. When we stand in front of this gate, there is no fatigue in the mind, only a wonderful ocean of peace and devotion overflowing. Crossing this gate means leaving behind all the attachments and aversions of the world and entering the light of the Lord\'s detachment. Touching this entrance, one feels that I am not just entering a stone gate, but opening the doors of my inner soul. Waves of joy should overflow while entering the sacred aura of this entrance to the 14 Jinalayas. May the fatigue of this journey shed away here as the burden of my karmas, and may I enter Your presence with only the pure feeling of Your devotion. Let us enter this gate with the feeling: "O Lord! Now I am Yours, and You are mine." Come, let us bow our heads to this gate of devotion and immerse ourselves in the infinite compassion of the Lord.',
+          'આ એ પવિત્ર દ્વાર છે, જેની રાહ જોતા હજારો પગથિયાંની યાત્રા સફળ થઈ જાય છે. જ્યારે આ દ્વારની સામે આવીને ઉભો રહીએ, ત્યારે મનમાં કોઈ થાક નથી હોતો, માત્ર એક અદભુત શાંતિ અને ભક્તિનો સાગર છલકાતો હોય છે. આ દ્વાર પાર કરવું એટલે સંસારના તમામ રાગ-દ્વેષને બહાર મૂકીને પ્રભુના વૈરાગ્યના તેજમાં પ્રવેશવું. આ પ્રવેશદ્વારને સ્પર્શતા જ અનુભવાય છે કે હું માત્ર એક પથ્થરના દ્વારમાં નથી જઈ રહ્યો, પણ મારા અંદરના આત્માના દ્વાર ખોલી રહ્યો છું. ૧૪ જિનાલયોના આ પ્રવેશ દ્વારના પાવન ઓરામાં પ્રવેશતા આનંદ ની લહેરો છલકાવી જોઈએ. આ યાત્રાનો જે થાક છે તે મારા કર્મોનો ભાર બનીને અહીં જ ખરી જાય અને હું માત્ર તમારી ભક્તિનો નિર્મળ ભાવ લઈને આપના સાનિધ્યમાં પ્રવેશું. એવા ભાવ સાથે આ દ્વારમાં પ્રવેશીએ, અહીંયા એક જ ભાવ રમતો હોય: "હે પ્રભુ! હવે હું તમારો, અને તમે મારા." ચાલો, આ ભક્તિના દ્વારને મસ્તક નમાવીએ અને પ્રભુની અનંત કરુણામાં લીન થઈ જઈએ.',
+          'यह वह पवित्र द्वार है, जिसकी प्रतीक्षा में हजारों सीढ़ियों की यात्रा सफल हो जाती है। जब हम इस द्वार के सामने खड़े होते हैं, तब मन में कोई थकान नहीं होती, केवल अद्भुत शांति और भक्ति का सागर उमड़ रहा होता है। इस द्वार को पार करने का अर्थ है संसार के सभी राग-द्वेष को बाहर छोड़कर प्रभु के वैराग्य के तेज में प्रवेश करना। इस प्रवेश द्वार को छूते ही अनुभव होता है कि मैं केवल एक पत्थर के द्वार में नहीं जा रहा हूँ, बल्कि अपने भीतर की आत्मा के द्वार खोल रहा हूँ। १४ जिनालयों के इस प्रवेश द्वार के पावन ओरा में प्रवेश करते समय आनंद की लहरें उमड़नी चाहिए। इस यात्रा की जो थकान है, वह मेरे कर्मों का भार बनकर यहीं झड़ जाए और मैं केवल आपकी भक्ति का निर्मल भाव लेकर आपके सान्निध्य में प्रवेश करूँ। ऐसे भाव के साथ इस द्वार में प्रवेश करें, जहाँ केवल एक ही भाव हो: "हे प्रभु! अब मैं आपका, और आप मेरे।" आइए, भक्ति के इस द्वार पर मस्तक झुकाएं और प्रभु की अनंत करुणा में लीन हो जाएं।'
         ),
         image: '/images/about-girnar/tonk-main-gate.jpg'
       },
       {
         id: 'tonk',
-        title: tr('7. Girnar Tonk', '૭. ગિરનાર ટૂંક', '7. गिरनार टोंक'),
-        description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जल्द आ रहा है...'),
+        title: tr('7. Girnar Tonk-gate', '૭. ગિરનાર ટૂંક દરવાજો', '7. गिरनार टोंक द्वार'),
+        description: tr(
+          '"Silence your speech while entering this holy gate. Keep the feeling that, "O Lord! I came with ego, worries, and the burden of the world, but now I am entering Your court as a pure soul, leaving everything outside." If tears of joy come to the eyes while entering, understand that our feeling has reached the Lord. Pray with gratitude in your heart: "O Lord! My soul, wandering for many births, has finally reached Your presence today. Infinite thanks to You for giving me this good fortune." Moving towards the sanctum sanctorum, surrender at the Lord\'s feet with an open heart: "O Lord! I have returned from the path of the world and finally come to Your feet. As I enter this gate, may all the doors of my ignorance close and Your light of infinite knowledge kindle in my heart. O Lord, dye me in the color of Your devotion."',
+          '"આ પવિત્ર દ્વારે પ્રવેશતી વખતે તમારી વાણીને મૌન કરી દો. અહીં એવો ભાવ રાખો કે, "હે પ્રભુ! હું અહંકાર, ચિંતાઓ અને સંસારના ભાર સાથે આવ્યો હતો, પણ હવે તમારા દરબારમાં આ બધું જ બહાર છોડીને, એક શુદ્ધ આત્મા તરીકે પ્રવેશ કરી રહ્યો છું." પ્રવેશતી વખતે જો આંખમાં હર્ષના આંસુ આવે, તો સમજવું કે આપણો આ ભાવ પ્રભુ સુધી પહોંચી ગયો છે. મનમાં કૃતજ્ઞતા સાથે પ્રાર્થના કરો: "હે પ્રભુ! અનેક જન્મોથી ભટકતી મારી આત્મા આજે તમારા સાનિધ્યમાં આવીને ટકરાઈ છે, આ સૌભાગ્ય મને આપવા બદલ આપનો અનંત આભાર." ગર્ભગૃહ તરફ આગળ વધતા, નિખાલસ ભાવે પ્રભુના ચરણોમાં સમર્પિત થાઓ: "હે પ્રભુ! હું સંસારના માર્ગેથી ફરીને અંતે આપના ચરણોમાં આવ્યો છું. આ દ્વારમાં પ્રવેશતાની સાથે જ મારા અજ્ઞાનનાં તમામ દ્વાર બંધ થઈ જાય અને આપની અનંત જ્ઞાનરૂપી જ્યોત મારા હૃદયમાં પ્રગટે. હે પ્રભુ, મને આપની ભક્તિના રંગમાં રંગી લો."',
+          '"इस पवित्र द्वार पर प्रवेश करते समय अपनी वाणी को मौन कर दें। यहाँ ऐसा भाव रखें कि, "हे प्रभु! मैं अहंकार, चिंताओं और संसार के भार के साथ आया था, लेकिन अब आपके दरबार में यह सब बाहर छोड़कर, एक शुद्ध आत्मा के रूप में प्रवेश कर रहा हूँ।" प्रवेश करते समय यदि आँखों में हर्ष के आँसू आ जाएँ, तो समझें कि हमारा यह भाव प्रभु तक पहुँच गया है। मन में कृतज्ञता के साथ प्रार्थना करें: "हे प्रभु! अनेक जन्मों से भटकती मेरी आत्मा आज आपके सान्निध्य में आकर थमी है, यह सौभाग्य मुझे देने के लिए आपका अनंत आभार।" गर्भगृह की ओर बढ़ते हुए, निश्छल भाव से प्रभु के चरणों में समर्पित हों: "हे प्रभु! मैं संसार के मार्ग से लौटकर अंततः आपके चरणों में आया हूँ। इस द्वार में प्रवेश करने के साथ ही मेरे अज्ञान के सभी द्वार बंद हो जाएँ और आपकी अनंत ज्ञानरूपी ज्योति मेरे हृदय में प्रज्वलित हो। हे प्रभु, मुझे अपनी भक्ति के रंग में रंग लें।"'
+        ),
         image: '/images/about-girnar/girnar-tonk.jpeg'
       },
       {
         id: 'derashar',
-        title: tr('8. Girnar Derashar', '૮. ગિરનાર દેરાસર', '8. गिरनार देरासर'),
-        description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जલ્દ આ રહા હૈ...'),
+        title: tr('8. Karnavihar Prasad jinalaya', '૮. કર્ણવિહાર પ્રાસાદ જિનાલય', '8. कर्णविहार प्रासाद जिनालय'),
+        description: tr(
+          'When one beholds the "Karnavihar Prasad" on the sky-touching peaks of Girnar, it feels as if one is entering another world from this one. Containing thousands of years of history and the detachment of countless souls, this palace is a living symbol of the realization of Lord Neminath. Reaching here is not just a physical journey, but the pinnacle of an "emotional journey". The peace we set out to find will be felt today in every stone of this Karnavihar Prasad.',
+          'ગિરનારના ગગનચુંબી શિખરો પર જ્યારે આ "કર્ણવિહાર પ્રાસાદ" ના દર્શન થાય, ત્યારે એવું લાગે કે જાણે આ લોકમાંથી પરલોકમાં પ્રવેશ કરી રહ્યા છીએ. હજારો વર્ષોના ઈતિહાસ અને અસંખ્ય આત્માઓના વૈરાગ્યને પોતાની અંદર સમાવી લેનાર આ પ્રાસાદ એટલે પ્રભુ નેમિનાથના સાક્ષાત્કારનું જીવંત પ્રતિક. અહીં પહોંચવું એ માત્ર શારીરિક યાત્રા નથી, પણ એક "ભાવયાત્રા" ની ચરમસીમા છે. જે શાંતિની શોધમાં નીકળ્યા છીએ, તે શાંતિ આજે આ કર્ણવિહાર પ્રાસાદની પ્રત્યેક શીલામાં અનુભવાશે.',
+          'गिरनार के गगनचुंबी शिखरों पर जब इस "कर्णविहार प्रासाद" के दर्शन होते हैं, तब ऐसा लगता है मानो इस लोक से परलोक में प्रवेश कर रहे हों। हजारों वर्षों के इतिहास और असंख्य आत्माओं के वैराग्य को अपने भीतर समाहित करने वाला यह प्रासाद यानी प्रभु नेमिनाथ के साक्षात्कार का जीवंत प्रतीक। यहाँ पहुँचना केवल एक शारीरिक यात्रा नहीं है, बल्कि एक "भाव यात्रा" की चरम सीमा है। जिस शांति की खोज में हम निकले हैं, वह शांति आज इस कर्णविहार प्रासाद के प्रत्येक पत्थर में अनुभव होगी।'
+        ),
         image: '/images/about-girnar/girnar-derashar.jpg'
       },
       {
         id: 'neminath-bhagvan',
         title: tr('9. Neminath Bhagvan', '૯. નેમિનાથ ભગવાન', '9. नेमिनाथ भगवान'),
-        description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जल्द आ रहा है...'),
+        description: tr(
+          '"When one beholds the calm, gentle, and compassionate countenance of Lord Neminath seated in the sanctum sanctorum of Karnavihar Prasad, it feels as if time has stood still and one\'s gaze cannot be removed from the Lord. At this moment, only one feeling arises: "O Lord, I have not come here on my own, but You Yourself have called me."',
+          '"જ્યારે કર્ણ વિહાર પ્રસાદના ગર્ભગૃહમાં બિરાજમાન પ્રભુ નેમિનાથની શાંત, સૌમ્ય અને કરુણાપૂર્ણ મુદ્રાના દર્શન થાય, ત્યારે એવું લાગે કે સમય થંભી ગયો છે અને બસ એ દાદા પરથી નજર જ ના હટે. આ ક્ષણે માત્ર એક જ ભાવ આવે કે હે પ્રભુ, હું અહીં આવ્યો નથી, પણ પ્રભુ આપે જ મને બોલાવ્યો છે."',
+          '"जब कर्ण विहार प्रासाद के गर्भगृह में विराजमान प्रभु नेमिनाथ की शांत, सौम्य और करुणापूर्ण मुद्रा के दर्शन होते हैं, तब ऐसा लगता है कि समय थम गया है और बस उन दादा से नजर ही नहीं हटती। इस क्षण केवल एक ही भाव आता है कि "हे प्रभु, मैं यहाँ आया नहीं हूँ, बल्कि प्रभु आपने ही मुझे बुलाया है।"'
+        ),
         image: '/images/about-girnar/neminath-bhagvan.jpg'
       },
       {
         id: 'sahesavan',
         title: tr('10. Sahesavan', '૧૦. સહેસાવન', '10. सहेसावन'),
-        description: tr('Coming Soon...', 'ટૂંક સમયમાં...', 'जल्द आ रहा है...'),
+        description: tr(
+          'Sahesavan, the heart of Girnar, is not just a place, but the sacred land of the spiritual elevation of Lord Neminath. This is the very place where two precious and divine Kalyanaks of Lord Neminath\'s life were completed. 1. Diksha Kalyanak: On this land of Sahesavan, Lord Neminath renounced all worldly attachments and material pleasures and embraced Diksha (initiation). In the holy place where the Lord renounced the world and adopted the path of "Aparigraha" (non-possessiveness), waves of detachment are still felt today. Standing here, let us pray, "O Lord! Give me also some vision and strength to walk on this path of Your detachment." 2. Kevalgyan Kalyanak (Attainment of Omniscience): In this very Sahesavan, Lord Neminath destroyed his Ghati karmas and attained infinite knowledge—Kevalgyan. The infinite power to know and see the entire universe was attained by the Lord here. Stepping onto this place, one feels as if the darkness of our ignorance is being removed and the light of knowledge is dawning.',
+          'ગિરનારના હૃદય સમાન સહસાવન એ માત્ર એક સ્થાન નથી, પરંતુ તે પ્રભુ નેમિનાથના આત્મિક ઉત્કર્ષની પાવન ભૂમિ છે. આ જ એ સ્થાન છે જ્યાં પ્રભુ નેમિનાથના જીવનના બે અમૂલ્ય અને દિવ્ય કલ્યાણકો સંપન્ન થયા હતા. ૧.દીક્ષા કલ્યાણક : સહસાવનની આ ભૂમિ પર પ્રભુ નેમિનાથે સંસારના તમામ રાગ-દ્વેષ અને ભૌતિક સુખ-વૈભવનો ત્યાગ કરી દીક્ષા અંગીકાર કરી હતી. જે પવિત્ર સ્થાને પ્રભુએ સંસારનો ત્યાગ કરી "અપરિગ્રહ" નો માર્ગ અપનાવ્યો, ત્યાં આજે પણ વૈરાગ્યની લહેરો અનુભવાય છે. અહીં ઊભા રહીને આપણે પ્રાર્થના કરીએ કે, "હે પ્રભુ! આપના આ વૈરાગ્યના પંથે ચાલવાની મને પણ થોડી દ્રષ્ટિ અને શક્તિ આપજો." ૨.કેવળજ્ઞાન કલ્યાણક (સર્વજ્ઞતાની પ્રાપ્તિ): આ જ સહસાવનમાં પ્રભુ નેમિનાથે ઘાતી કર્મોનો ક્ષય કરી અનંત જ્ઞાન—કેવળજ્ઞાન પ્રાપ્ત કર્યું હતું. લોકાલોકને જાણવાની અને જોવાની અસીમ શક્તિ પ્રભુને અહીં પ્રાપ્ત થઈ હતી. આ સ્થાન પર પગ મૂકતા જ એવી અનુભૂતિ થાય છે કે જાણે આપણા અજ્ઞાનનો અંધકાર દૂર થઈ રહ્યો હોય અને જ્ઞાનનું તેજ પ્રગટી રહ્યું હોય.',
+          'गिरनार के हृदय के समान सहसावन केवल एक स्थान नहीं है, बल्कि यह प्रभु नेमिनाथ के आत्मिक उत्थान की पावन भूमि है। यह वही स्थान है जहाँ प्रभु नेमिनाथ के जीवन के दो बहुमूल्य और दिव्य कल्याणक संपन्न हुए थे। १. दीक्षा कल्याणक: सहसावन की इस भूमि पर प्रभु नेमिनाथ ने संसार के सभी राग-द्वेष और भौतिक सुख-वैभव का त्याग कर दीक्षा अंगीकार की थी। जिस पवित्र स्थान पर प्रभु ने संसार का त्याग कर "अपरिग्रह" का मार्ग अपनाया, वहाँ आज भी वैराग्य की लहरें अनुभव की जाती हैं। यहाँ खड़े होकर हम प्रार्थना करें कि, "हे प्रभु! आपके इस वैराग्य के पथ पर चलने की मुझे भी थोड़ी दृष्टि और शक्ति प्रदान करें।" २. केवलज्ञान कल्याणक (सर्वज्ञता की प्राप्ति): इसी सहसावन में प्रभु नेमिनाथ ने घाती कर्मों का क्षय कर अनंत ज्ञान—केवलज्ञान प्राप्त किया था। लोकालोक को जानने और देखने की असीम शक्ति प्रभु को यहाँ प्राप्त हुई थी। इस स्थान पर पैर रखते ही ऐसी अनुभूति होती है जैसे हमारे अज्ञान का अंधकार दूर हो रहा हो और ज्ञान का तेज प्रकट हो रहा हो।'
+        ),
         image: '/images/about-girnar/sahesavan.jpg'
       }
     ],

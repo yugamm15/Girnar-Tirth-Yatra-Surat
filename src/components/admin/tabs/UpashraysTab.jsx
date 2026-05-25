@@ -37,58 +37,60 @@ const UpashraysTab = ({ upashrays, upashraySearch, setUpashraySearch, setIsModal
 
       {/* Upashray List Table */}
       <section className="max-w-5xl mx-auto">
-        <div className="bg-white overflow-x-auto shadow-md rounded-sm border border-gray-100">
-          <table className="w-full min-w-[800px] text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Name</th>
-                <th className="px-6 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Village</th>
-                <th className="px-6 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Route</th>
-                <th className="px-6 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Trusty / Mobile</th>
-                <th className="px-6 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status</th>
-                <th className="px-6 py-4 text-right text-[10px] uppercase tracking-widest text-gray-400 font-bold">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {upashrays
-                .filter(u => (u.name || '').toLowerCase().includes((upashraySearch || '').toLowerCase()))
-                .map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{u.name || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{u.village || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{u.route || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {u.trusty || '-'}<br />
-                      <span className="text-[10px] text-gray-400">{u.mobile || '-'}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${u.status === 'Done' ? 'bg-green-50 text-green-600' :
-                        u.status === 'Process' ? 'bg-blue-50 text-blue-600' :
-                          'bg-amber-50 text-amber-600'
-                        }`}>
-                        {u.status}
-                      </span>
-                    </td>
-                    <td className="p-6 text-right">
-                      <div className="flex justify-end gap-3">
-                        <button
-                          onClick={() => startEdit(u)}
-                          className="p-2 text-[#c5a059] hover:bg-[#c5a059]/10 rounded-full transition-all title-case text-[10px] font-bold tracking-widest uppercase"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => deleteUpashray(u.id)}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-all text-[10px] font-bold tracking-widest uppercase"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+        <div className="bg-white overflow-hidden shadow-md rounded-sm border border-gray-100">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse table-auto">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-4 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Name</th>
+                  <th className="px-4 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Village</th>
+                  <th className="px-4 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Route</th>
+                  <th className="px-4 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Trusty / Mobile</th>
+                  <th className="px-4 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold w-24">Status</th>
+                  <th className="px-4 py-4 text-right text-[10px] uppercase tracking-widest text-gray-400 font-bold w-32">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {upashrays
+                  .filter(u => (u.name || '').toLowerCase().includes((upashraySearch || '').toLowerCase()))
+                  .map((u) => (
+                    <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-4 py-4 text-sm font-bold text-gray-900 leading-tight min-w-[120px]">{u.name || '-'}</td>
+                      <td className="px-4 py-4 text-xs text-gray-600">{u.village || '-'}</td>
+                      <td className="px-4 py-4 text-xs text-gray-600">{u.route || '-'}</td>
+                      <td className="px-4 py-4 text-xs text-gray-600">
+                        <span className="font-bold">{u.trusty || '-'}</span><br />
+                        <span className="text-[10px] text-gray-400">{u.mobile || '-'}</span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-full whitespace-nowrap ${u.status === 'done' ? 'bg-green-50 text-green-600 border border-green-100' :
+                          u.status === 'process' ? 'bg-blue-50 text-blue-600 border border-blue-100' :
+                            'bg-amber-50 text-amber-600 border border-amber-100'
+                          }`}>
+                          {u.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => startEdit(u)}
+                            className="text-[#c5a059] hover:text-[#b08d4a] transition-all text-[10px] font-bold tracking-widest uppercase"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => deleteUpashray(u.id)}
+                            className="text-red-500 hover:text-red-700 transition-all text-[10px] font-bold tracking-widest uppercase"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
     </>
