@@ -22,7 +22,7 @@ const parseLocation = (locStr) => {
   return null;
 };
 
-const createCustomIcon = (delay, idx = 0) => {
+const createCustomIcon = (delay, idx = 0, isMobile = false) => {
   // 4 main directions: Top, Right, Bottom, Left
   const directions = [
     { x: 0, y: -80 },   // Top
@@ -34,9 +34,13 @@ const createCustomIcon = (delay, idx = 0) => {
   const startX = dir.x;
   const startY = dir.y;
 
+  const animationStyle = isMobile 
+    ? '' 
+    : `animation: pin-drop 0.9s cubic-bezier(0.21, 0.82, 0.44, 1) forwards; animation-delay: ${delay}ms; --start-x: ${startX}px; --start-y: ${startY}px;`;
+
   return L.divIcon({
     className: 'custom-pin-icon',
-    html: `<div class="animate-pin-drop" style="animation-delay: ${delay}ms; --start-x: ${startX}px; --start-y: ${startY}px;">
+    html: `<div class="${isMobile ? '' : 'animate-pin-drop'}" style="${animationStyle}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="20" height="30" style="filter: drop-shadow(0px 6px 3px rgba(0,0,0,0.4));">
               <path fill="#e32636" d="M384 192c0 87.4-117 243-168.3 307.2c-12.3 15.3-35.1 15.3-47.4 0C117 435 0 279.4 0 192C0 86 86 0 192 0S384 86 384 192z"/>
               <circle fill="#ffffff" cx="192" cy="192" r="64"/>
@@ -78,6 +82,15 @@ const UpashrayJirnodharPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const listingsRef = useRef(null);
   const shouldScrollRef = useRef(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setIsMobileViewport(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', updateViewport);
+    return () => window.removeEventListener('resize', updateViewport);
+  }, []);
 
   const itemsPerPage = 6;
 
@@ -194,7 +207,7 @@ const UpashrayJirnodharPage = () => {
         <Marker 
           key={upashray.id} 
           position={coords} 
-          icon={createCustomIcon(idx * delayPerPin, idx)}
+          icon={createCustomIcon(idx * delayPerPin, idx, isMobileViewport)}
         >
           <Popup className="custom-popup">
             <div className="text-center p-1 flex flex-col items-center">
@@ -240,6 +253,10 @@ const UpashrayJirnodharPage = () => {
               <MapContainer 
                 center={[21.1702, 72.8311]} 
                 zoom={6} 
+                scrollWheelZoom={false}
+                dragging={!isMobileViewport || true} // Allow dragging on mobile
+                touchZoom={true}
+                tap={false} // Prevents double tap issues on some mobile devices
                 className="w-full h-full z-10 relative"
                 style={{ background: '#f9f7f2' }}
                 whenReady={(e) => {

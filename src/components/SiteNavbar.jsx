@@ -190,7 +190,7 @@ export const SiteNavbar = ({ variant = 'light' }) => {
 
       <div
         className={`fixed inset-0 z-[140] transition-opacity duration-500 xl:hidden ${
-          isDark ? 'bg-black/60 backdrop-blur-sm' : 'bg-black/40 backdrop-blur-sm'
+          isDark ? 'bg-black/60' : 'bg-black/40'
         } ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setIsMobileMenuOpen(false)}
       >
