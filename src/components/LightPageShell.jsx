@@ -25,7 +25,7 @@ export const LightPageShell = ({ children }) => {
 
       <div className="relative z-10 flex min-h-full flex-col">
         <SiteNavbar variant="light" />
-        <main className="flex-1 pt-20 md:pt-32 pb-16 md:pb-24 px-4 md:px-6">{children}</main>
+        <main className="flex-1 pt-24 md:pt-32 pb-16 md:pb-24 px-4 md:px-6">{children}</main>
         <SiteFooter variant="light" />
       </div>
     </div>

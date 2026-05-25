@@ -33,16 +33,17 @@ const createCustomIcon = (delay, idx = 0, isMobile = false) => {
   const startX = dir.x;
   const startY = dir.y;
 
-  const animationStyle = isMobile 
-    ? '' 
-    : `animation: pin-drop 0.9s cubic-bezier(0.21, 0.82, 0.44, 1) forwards; animation-delay: ${delay}ms; --start-x: ${startX}px; --start-y: ${startY}px;`;
+  const animationStyle = `animation: pin-drop 0.9s cubic-bezier(0.21, 0.82, 0.44, 1) forwards; animation-delay: ${delay}ms; --start-x: ${startX}px; --start-y: ${startY}px; will-change: transform, opacity;`;
 
-  const shadowStyle = isMobile ? '' : 'filter: drop-shadow(0px 6px 3px rgba(0,0,0,0.4));';
+  // Use a simple box-shadow or no filter on mobile to prevent horizontal line glitches
+  const svgStyle = isMobile 
+    ? '' 
+    : 'filter: drop-shadow(0px 6px 3px rgba(0,0,0,0.4));';
 
   return L.divIcon({
     className: 'custom-pin-icon',
-    html: `<div class="${isMobile ? '' : 'animate-pin-drop'}" style="${animationStyle}">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="20" height="30" style="${shadowStyle}">
+    html: `<div class="animate-pin-drop" style="${animationStyle}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="20" height="30" style="${svgStyle}">
               <path fill="#e32636" d="M384 192c0 87.4-117 243-168.3 307.2c-12.3 15.3-35.1 15.3-47.4 0C117 435 0 279.4 0 192C0 86 86 0 192 0S384 86 384 192z"/>
               <circle fill="#ffffff" cx="192" cy="192" r="64"/>
             </svg>

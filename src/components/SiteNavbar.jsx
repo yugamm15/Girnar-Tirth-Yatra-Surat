@@ -97,10 +97,10 @@ export const SiteNavbar = ({ variant = 'light' }) => {
 
   const isDark = variant === 'dark';
   const navWrapperClass = isMobileViewport
-    ? 'fixed top-0 inset-x-0 px-3 py-3 z-[120] flex items-center justify-between gap-2 pointer-events-auto bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm'
+    ? 'fixed top-3 inset-x-0 px-3 z-[120] flex items-center justify-between gap-2 pointer-events-none'
     : 'fixed top-2 lg:top-3 inset-x-0 px-4 lg:px-8 xl:px-10 z-[120] flex justify-between items-center gap-3 pointer-events-none';
 
-  const brandClass = 'flex items-center justify-center';
+  const brandClass = 'pointer-events-auto flex items-center justify-center';
 
   const desktopNavClass = isDark
     ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white/5 backdrop-blur-xl rounded-full border border-primary/20 shadow-lg shadow-black/5 pointer-events-auto'
@@ -111,8 +111,8 @@ export const SiteNavbar = ({ variant = 'light' }) => {
 
   const menuButtonClass = isMobileViewport
     ? isDark
-      ? 'flex-shrink-0 xl:hidden flex items-center justify-center w-10 h-10 bg-white/5 rounded-full border border-primary/20 pointer-events-auto'
-      : 'flex-shrink-0 xl:hidden flex items-center justify-center w-10 h-10 bg-white rounded-full border border-gray-200 pointer-events-auto shadow-sm'
+      ? 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-white/5 backdrop-blur-xl rounded-full border border-primary/20 pointer-events-auto'
+      : 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto'
     : isDark
       ? 'xl:hidden flex items-center justify-center w-12 h-12 bg-white/5 backdrop-blur-xl rounded-full border border-primary/20 pointer-events-auto'
       : 'xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto';
@@ -133,7 +133,7 @@ export const SiteNavbar = ({ variant = 'light' }) => {
     <>
       <nav className={navWrapperClass} aria-label="Primary">
         <Link to="/" className={brandClass} aria-label={t(siteCopy.brandName)}>
-          <img src={isMobileViewport ? '/images/mobile/logo2.webp' : '/images/logo2.png'} alt="Logo" className={`w-auto object-contain ${isMobileViewport ? 'h-10' : 'h-20 md:h-32 drop-shadow-2xl'}`} />
+          <img src={isMobileViewport ? '/images/mobile/logo2.webp' : '/images/logo2.png'} alt="Logo" className="h-20 w-auto object-contain md:h-32 drop-shadow-2xl" />
         </Link>
 
         <div className={desktopNavClass}>
