@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ReportsTab = ({ 
   allReports, 
@@ -13,11 +13,14 @@ const ReportsTab = ({
   deleteReport,
   openReportAndPrint 
 }) => {
+  const [selectedEntityType, setSelectedEntityType] = useState('upashray'); // 'upashray' | 'jinalaya' | 'all'
+
   const filteredReports = allReports.filter(report => {
-    const matchesUpashray = reportUpashrayFilter === 'all' || report.upashrayName === reportUpashrayFilter;
+    const matchesType = selectedEntityType === 'all' ? true : report.entityType === selectedEntityType;
+    const matchesEntity = reportUpashrayFilter === 'all' || report.entityName === reportUpashrayFilter;
     const matchesMember = reportMemberFilter === 'all' || report.memberName === reportMemberFilter;
     const matchesDate = !reportDateFilter || report.report_date === reportDateFilter;
-    return matchesUpashray && matchesMember && matchesDate;
+    return matchesType && matchesEntity && matchesMember && matchesDate;
   });
 
   return (
@@ -25,21 +28,26 @@ const ReportsTab = ({
       <div className="max-w-5xl mx-auto mb-12">
         <div className="text-center md:text-left mb-8">
           <h2 className="text-4xl font-headline text-gray-900 mb-2">Member Submissions</h2>
-          <p className="text-gray-500 text-sm font-light">Filter and view checking reports by category, member, or date.</p>
+          <p className="text-gray-500 text-sm font-light">Filter and view checking reports by entity, member, or date.</p>
+        </div>
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => setSelectedEntityType('upashray')} className={`px-4 py-2 text-sm font-bold rounded-sm ${selectedEntityType==='upashray' ? 'bg-[#c5a059] text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>Upashray</button>
+          <button onClick={() => setSelectedEntityType('jinalaya')} className={`px-4 py-2 text-sm font-bold rounded-sm ${selectedEntityType==='jinalaya' ? 'bg-[#c5a059] text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>Jinalaya</button>
+          <button onClick={() => setSelectedEntityType('all')} className={`px-4 py-2 text-sm font-bold rounded-sm ${selectedEntityType==='all' ? 'bg-[#c5a059] text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>All</button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white p-6 rounded-sm border border-gray-100 shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-1 h-full bg-[#c5a059]"></div>
           <div>
-            <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-3">Upashray Wise</label>
+            <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-3">Entity</label>
             <div className="relative">
               <select 
                 value={reportUpashrayFilter}
                 onChange={(e) => setReportUpashrayFilter(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 text-xs py-3 px-4 outline-none focus:border-[#c5a059] transition-colors appearance-none cursor-pointer font-bold text-gray-700"
               >
-                <option value="all">All Upashrays</option>
-                {[...new Set(allReports.map(r => r.upashrayName))].sort().map(name => (
+                <option value="all">All Entities</option>
+                {[...new Set(allReports.filter(r => selectedEntityType === 'all' ? true : r.entityType === selectedEntityType).map(r => r.entityName))].sort().map(name => (
                   <option key={name} value={name}>{name}</option>
                 ))}
               </select>
@@ -89,7 +97,7 @@ const ReportsTab = ({
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-6 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Date</th>
                 <th className="px-6 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Reporter</th>
-                <th className="px-6 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Upashray</th>
+                <th className="px-6 py-4 text-left text-[10px] uppercase tracking-widest text-gray-400 font-bold">Entity</th>
                 <th className="px-6 py-4 text-right text-[10px] uppercase tracking-widest text-gray-400 font-bold">Actions</th>
               </tr>
             </thead>
@@ -99,7 +107,7 @@ const ReportsTab = ({
                   <tr key={report.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{report.date}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{report.memberName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{report.upashrayName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{report.entityName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="flex justify-end gap-3">
                         <button

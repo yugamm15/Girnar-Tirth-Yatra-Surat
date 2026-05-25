@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const BusYatraTab = ({ 
   yatraSearch, 
@@ -14,6 +14,8 @@ const BusYatraTab = ({
   setRegistrationYatraFilter, 
   exportRegistrationsToCSV 
 }) => {
+  const [remarksModalOpen, setRemarksModalOpen] = useState(false);
+  const [remarksText, setRemarksText] = useState('');
   return (
     <>
       <div className="max-w-5xl mx-auto mb-12">
@@ -38,7 +40,20 @@ const BusYatraTab = ({
             <button
               onClick={() => {
                 setEditingYatraDateId(null);
-                setYatraDateFormData({ date_text: '', description: '', image: '', registration_open: true });
+                setYatraDateFormData({
+                  date_text: '',
+                  description: '',
+                  image: '',
+                  registration_open: true,
+                  price_per_person: 900,
+                  sponsorship_tiers: [
+                    { id: 1, title: 'Full Yatra Sponsor', amount: 31000 },
+                    { id: 2, title: 'Main Pillar Sponsor', amount: 21000 },
+                    { id: 3, title: 'Pillar Sponsor', amount: 11000 },
+                    { id: 4, title: 'Assistant Sponsor', amount: 4000 }
+                  ],
+                  sponsorship_online_only: true
+                });
                 setIsYatraDateModalOpen(true);
               }}
               className="w-full md:w-auto px-8 py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#c5a059]/20 hover:bg-[#b08d4a] transition-all flex items-center justify-center gap-3 h-[52px]"
@@ -90,7 +105,18 @@ const BusYatraTab = ({
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600 max-w-[200px] truncate">{date.description || '-'}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600 max-w-[300px]">
+                          <div className="mb-2 truncate">{date.description || '-'}</div>
+                          {date.sponsorship_tiers && date.sponsorship_tiers.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {date.sponsorship_tiers.map((s) => (
+                                <div key={s.id} className="px-2 py-1 bg-gray-100 text-[10px] text-gray-800 rounded-full font-bold">
+                                  {s.title} — ₹{s.amount}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
                         <td className="px-6 py-4">
                           <span className="px-3 py-1 bg-gray-100 text-[#c5a059] text-[10px] font-bold rounded-full">
                             {registrationCount} Registered
@@ -118,7 +144,15 @@ const BusYatraTab = ({
                                 date_text: date.date_text,
                                 description: date.description || '',
                                 image: date.image || '',
-                                registration_open: date.registration_open
+                                registration_open: date.registration_open,
+                                price_per_person: date.price_per_person || 900,
+                                sponsorship_tiers: date.sponsorship_tiers || [
+                                  { id: 1, title: 'Full Yatra Sponsor', amount: 31000 },
+                                  { id: 2, title: 'Main Pillar Sponsor', amount: 21000 },
+                                  { id: 3, title: 'Pillar Sponsor', amount: 11000 },
+                                  { id: 4, title: 'Assistant Sponsor', amount: 4000 }
+                                ],
+                                sponsorship_online_only: date.sponsorship_online_only === undefined ? true : date.sponsorship_online_only,
                               });
                               setIsYatraDateModalOpen(true);
                             }}
@@ -218,7 +252,13 @@ const BusYatraTab = ({
                           {reg.alt_phone && <div className="text-[10px] text-gray-400">Alt: {reg.alt_phone}</div>}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{reg.gender}</td>
-                        <td className="px-6 py-4 text-sm text-gray-500 italic max-w-[200px] truncate">{reg.remarks || '-'}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 italic max-w-[200px]">
+                          {reg.remarks ? (
+                            <button onClick={() => { setRemarksModalOpen(true); setRemarksText(reg.remarks); }} className="text-left w-full text-sm text-gray-700 hover:underline">
+                              {reg.remarks.length > 60 ? reg.remarks.slice(0,60) + '…' : reg.remarks}
+                            </button>
+                          ) : '-'}
+                        </td>
                         <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => deleteRegistration(reg.id)}
@@ -241,6 +281,18 @@ const BusYatraTab = ({
           </table>
         </div>
       </section>
+      {remarksModalOpen && (
+        <div className="fixed inset-0 z-[500] overflow-y-auto p-4 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/60" onClick={() => setRemarksModalOpen(false)}></div>
+          <div className="relative bg-white w-full max-w-lg shadow-2xl rounded-sm overflow-auto max-h-[80vh] p-6">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-lg font-bold">Remarks</h3>
+              <button onClick={() => setRemarksModalOpen(false)} className="text-gray-400 hover:text-gray-600">Close</button>
+            </div>
+            <div className="text-sm text-gray-700 whitespace-pre-line">{remarksText}</div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

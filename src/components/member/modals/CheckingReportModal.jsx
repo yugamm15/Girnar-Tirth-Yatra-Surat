@@ -3,7 +3,10 @@ import React from 'react';
 const CheckingReportModal = ({ 
   checkingUpashrayId, 
   setCheckingUpashrayId, 
+  checkingJinalayaId,
+  setCheckingJinalayaId,
   upashrays, 
+  jinalayas,
   handleSaveCheckingReport, 
   checkingReport, 
   setCheckingReport, 
@@ -12,9 +15,10 @@ const CheckingReportModal = ({
   generalNotes, 
   setGeneralNotes 
 }) => {
-  if (!checkingUpashrayId) return null;
+  if (!checkingUpashrayId && !checkingJinalayaId) return null;
 
-  const currentUpashray = upashrays.find(u => u.id === checkingUpashrayId);
+  const isUpashray = !!checkingUpashrayId;
+  const currentEntity = isUpashray ? upashrays.find(u => u.id === checkingUpashrayId) : jinalayas.find(j => j.id === checkingJinalayaId);
 
   return (
     <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
@@ -22,16 +26,19 @@ const CheckingReportModal = ({
       <div className="relative bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl rounded-sm p-8 md:p-12 animate-fade-in border-t-4 border-[#c5a059]">
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h3 className="text-3xl font-headline text-gray-900 mb-2">Upashray Yearly Checking Report</h3>
+            <h3 className="text-3xl font-headline text-gray-900 mb-2">{isUpashray ? 'Upashray' : 'Jinalay'} Yearly Checking Report</h3>
             <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-sm border border-gray-100">
-              <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Upashray</strong> {currentUpashray?.name}</span>
-              <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Village</strong> {currentUpashray?.village}</span>
-              <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Route</strong> {currentUpashray?.route}</span>
-              <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Trusty</strong> {currentUpashray?.trusty || '-'}</span>
+              <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">{isUpashray ? 'Upashray' : 'Jinalay'}</strong> {currentEntity?.name}</span>
+              <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Village</strong> {currentEntity?.village}</span>
+              <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Route</strong> {currentEntity?.route}</span>
+              <span><strong className="uppercase text-[10px] tracking-widest text-gray-400 block mb-1">Trusty</strong> {currentEntity?.trusty || currentEntity?.mulnayak || '-'}</span>
             </div>
           </div>
           <button
-            onClick={() => setCheckingUpashrayId(null)}
+            onClick={() => {
+              if (isUpashray) setCheckingUpashrayId(null);
+              else setCheckingJinalayaId(null);
+            }}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">

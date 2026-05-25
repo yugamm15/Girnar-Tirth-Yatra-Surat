@@ -791,6 +791,9 @@ const HomePage = () => {
                 {t(siteCopy.home.rituals.title)}
               </h2>
               <p className="home-reveal text-sm md:text-xl text-on-surface-variant font-light leading-relaxed">{t(siteCopy.home.rituals.paragraph)}</p>
+              {siteCopy.home.rituals.contacts && (
+                <p className="home-reveal mt-4 text-sm md:text-xl text-on-surface-variant font-bold leading-relaxed">{t(siteCopy.home.rituals.contacts)}</p>
+              )}
               <Link
                 to="/events"
                 className="home-reveal inline-block mt-6 px-6 py-3 border border-primary/60 text-primary font-bold tracking-[0.2em] uppercase text-[10px] hover:bg-primary hover:text-black transition-colors"

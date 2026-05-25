@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 
-const UpashrayReportsTab = ({ upashrays, setCheckingUpashrayId }) => {
+const JinalayaReportsTab = ({ jinalayas, setCheckingJinalayaId }) => {
   const [query, setQuery] = useState('');
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return upashrays;
-    return upashrays.filter(u => (u.name || '').toLowerCase().includes(q) || (u.village || '').toLowerCase().includes(q));
-  }, [upashrays, query]);
+    if (!q) return jinalayas;
+    return jinalayas.filter(j => (j.name || '').toLowerCase().includes(q) || (j.village || '').toLowerCase().includes(q));
+  }, [jinalayas, query]);
 
   return (
     <div className="bg-white overflow-hidden shadow-md rounded-sm border border-gray-100">
@@ -15,11 +15,11 @@ const UpashrayReportsTab = ({ upashrays, setCheckingUpashrayId }) => {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search Upashray or village..."
+          placeholder="Search Jinalay or village..."
           className="w-full md:w-1/2 bg-gray-50 border border-gray-200 px-4 py-2 text-sm rounded-sm outline-none"
         />
         <button
-          onClick={() => {}}
+          onClick={() => { /* noop: filtering is live */ }}
           className="px-4 py-2 bg-[#c5a059] text-white text-xs font-bold uppercase tracking-widest rounded-sm"
         >
           Search
@@ -30,32 +30,28 @@ const UpashrayReportsTab = ({ upashrays, setCheckingUpashrayId }) => {
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold w-32">Image</th>
-              <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Upashray Details</th>
+              <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Jinalay Details</th>
               <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold">Latest Reports</th>
               <th className="p-6 text-gray-400 text-[10px] uppercase tracking-widest font-bold text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filtered.map((u) => (
-              <tr key={u.id} className="hover:bg-gray-50 transition-colors group">
+            {filtered.map((j) => (
+              <tr key={j.id} className="hover:bg-gray-50 transition-colors group">
                 <td className="p-6">
                   <div className="w-20 h-20 rounded-sm overflow-hidden bg-gray-100 border border-gray-200">
-                    <img src={u.afterImg} alt={u.name} className="w-full h-full object-cover" />
+                    <img src={j.afterImg} alt={j.name} className="w-full h-full object-cover" />
                   </div>
                 </td>
                 <td className="p-6">
-                  <div className="text-gray-900 text-sm font-bold tracking-wider mb-1 uppercase">{u.name}</div>
-                  <div className={`text-[9px] inline-block px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${u.status === 'Done' ? 'bg-green-100 text-green-600' :
-                    u.status === 'Process' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'
-                    }`}>
-                    {u.status || 'Plan'}
-                  </div>
+                  <div className="text-gray-900 text-sm font-bold tracking-wider mb-1 uppercase">{j.name}</div>
+                  <div className="text-[9px] text-gray-600">{j.village}</div>
                 </td>
                 <td className="p-6">
-                  {u.reports && u.reports.length > 0 ? (
+                  {j.reports && j.reports.length > 0 ? (
                     <div className="text-[10px] border-l-2 border-[#c5a059] pl-2 py-0.5">
-                      <span className="font-bold text-gray-700 block">{u.reports[0].title}</span>
-                      <span className="text-gray-400">{u.reports[0].date}</span>
+                      <span className="font-bold text-gray-700 block">{j.reports[0].title}</span>
+                      <span className="text-gray-400">{j.reports[0].date}</span>
                     </div>
                   ) : (
                     <span className="text-gray-300 text-[10px] uppercase tracking-widest">No reports yet</span>
@@ -63,7 +59,7 @@ const UpashrayReportsTab = ({ upashrays, setCheckingUpashrayId }) => {
                 </td>
                 <td className="p-6 text-right">
                   <button
-                    onClick={() => setCheckingUpashrayId(u.id)}
+                    onClick={() => setCheckingJinalayaId(j.id)}
                     className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-all rounded-sm shadow-md"
                   >
                     Add Report
@@ -78,4 +74,4 @@ const UpashrayReportsTab = ({ upashrays, setCheckingUpashrayId }) => {
   );
 };
 
-export default UpashrayReportsTab;
+export default JinalayaReportsTab;

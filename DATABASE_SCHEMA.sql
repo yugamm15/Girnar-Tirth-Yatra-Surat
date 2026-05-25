@@ -55,7 +55,12 @@ CREATE TABLE yatra_dates (
   date_text VARCHAR(255) NOT NULL,
   description TEXT,
   image VARCHAR(500),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  registration_open BOOLEAN DEFAULT FALSE,
+  price_per_person NUMERIC DEFAULT 900,
+  sponsorship_tiers JSONB DEFAULT '[]'::jsonb,
+  sponsorship_online_only BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============== YATRIK REGISTRATIONS TABLE ==============

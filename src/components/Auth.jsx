@@ -153,6 +153,24 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     "આખા ઉપાશ્રય નું કલર કામ ચેક કરવું પોપડા ખરચ્યા છે કે બરાબર તે ચેક કરવું."
   ];
 
+  const JINALAYA_CHECKING_POINTS = [
+    'જિનાલયનું મુખ્ય દ્વાર અને બનાવટ સ્થિતિ ચેક કરો',
+    'મૂળનાયકની મૂર્તિ અને અભિષેક જગ્યા સફાઈ અને નમાજગી ચેક કરો',
+    'પ્રકાશ (લાઇટિંગ) અને વાયરિંગનું સલામત કનેક્શન ચેક કરો',
+    'ફ્લોરિંગ અને સિડીની ક્ષતિઓ તપાસો',
+    'પ્રદર્શિત ફોટા અને બોર્ડ યોગ્ય રીતે ફિટ છે કે નહીં ચેક કરો',
+    'પ્રસાદ અને સેવાઓ માટે વ્યવસ્થા અને ગુણવત્તા તપાસો',
+    'પાણીની સ્રોત અને ટોયલેટ સુવિધાઓ કાર્યરત છે કે નહી તપાસો',
+    'આસપાસની સફાઈ અને કચરો વ્યવસ્થા ચેક કરો',
+    'સુરક્ષા કૅમેરા અને ચોરાવચોર વ્યવસ્થા ઉપલબ્ધ છે તો ચેક કરો',
+    'દાન માટે નોટ બુક અને પારદર્શિતા ચેક કરો',
+    'મૂર્તિની આસપાસની દ્રષ્ટિ અને ગંધ-માલિન્ય તપાસો',
+    'બાગબગીચાની દેખभાળ અને જાળવણી ચેક કરો',
+    'મંદિરની દીવાલો, રંગ અને મૂર્તિ સંરક્ષણ તપાસો',
+    'સંકુચિત પ્રવેશ અને આક્સેસ માર્ગ ચલાવવા યોગ્ય છે કે નહીં તપાસો',
+    'ફરીથી જોખમ સૂચવવા માટે કોઈ તાત્કાલિક મરામત સૂચવો'
+  ];
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Form State for Adding/Editing Upashray
@@ -184,6 +202,18 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     id: index, point, description: '', isChecked: false, images: []
   })));
   const [generalNotes, setGeneralNotes] = useState('');
+  const [checkingJinalayaId, setCheckingJinalayaId] = useState(null);
+
+  // Populate correct checklist when opening a check modal for Upashray or Jinalaya
+  useEffect(() => {
+    if (checkingUpashrayId) {
+      setCheckingReport(CHECKING_POINTS.map((point, index) => ({ id: index, point, description: '', isChecked: false, images: [] })));
+      setGeneralNotes('');
+    } else if (checkingJinalayaId) {
+      setCheckingReport(JINALAYA_CHECKING_POINTS.map((point, index) => ({ id: index, point, description: '', isChecked: false, images: [] })));
+      setGeneralNotes('');
+    }
+  }, [checkingUpashrayId, checkingJinalayaId]);
 
   // Cache Utilities
   const readPortalCache = () => {
@@ -279,21 +309,42 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   const loadReports = async () => {
     try {
       // Fetch reports, upashrays, and members in parallel for speed
-      const [reportsData, upashraysData, membersData] = await Promise.all([
+      const [reportsData, upashraysData, membersData, jinalayasData] = await Promise.all([
         checkingReportsDB.getAll(),
         upashraysDB.getAll(),
-        membersDB.getAll()
+        membersDB.getAll(),
+        jinalayasDB.getAll()
       ]);
       
       const processed = reportsData.map(r => {
-        const upashray = upashraysData.find(u => String(u.id) === String(r.upashray_id));
         const member = membersData.find(m => String(m.id) === String(r.member_id));
-        
+        if (r.upashray_id) {
+          const upashray = upashraysData.find(u => String(u.id) === String(r.upashray_id));
+          return {
+            ...r,
+            entityType: 'upashray',
+            entityName: upashray ? upashray.name : 'Unknown Upashray',
+            village: upashray ? upashray.village : 'Unknown Location',
+            route: upashray ? upashray.route : '',
+            memberName: member ? member.name : 'Unknown Member',
+            date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
+          };
+        } else if (r.jinalaya_id) {
+          const jinalaya = jinalayasData.find(j => String(j.id) === String(r.jinalaya_id));
+          return {
+            ...r,
+            entityType: 'jinalaya',
+            entityName: jinalaya ? jinalaya.name : 'Unknown Jinalaya',
+            village: jinalaya ? jinalaya.village : 'Unknown Location',
+            route: jinalaya ? jinalaya.route : '',
+            memberName: member ? member.name : 'Unknown Member',
+            date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
+          };
+        }
         return {
           ...r,
-          upashrayName: upashray ? upashray.name : 'Unknown Upashray',
-          village: upashray ? upashray.village : 'Unknown Location',
-          route: upashray ? upashray.route : '',
+          entityType: 'unknown',
+          entityName: 'Unknown',
           memberName: member ? member.name : 'Unknown Member',
           date: r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A'
         };
@@ -362,20 +413,22 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   };
 
   const processUpashrayReports = (reports) => {
-    const reportsByUpashray = {};
+    const reportsByEntity = {};
     reports.forEach(r => {
-      if (r && r.upashray_id) {
-        if (!reportsByUpashray[r.upashray_id]) reportsByUpashray[r.upashray_id] = [];
-        reportsByUpashray[r.upashray_id].push({
-          ...r, title: 'Checking Report',
-          date: r.date || (r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A')
-        });
-      }
+      const key = r.entityType && r.entityType === 'jinalaya' ? `j_${r.jinalaya_id}` : `u_${r.upashray_id}`;
+      if (!reportsByEntity[key]) reportsByEntity[key] = [];
+      reportsByEntity[key].push({ ...r, title: 'Checking Report', date: r.date || (r.report_date ? new Date(r.report_date).toLocaleDateString() : 'N/A') });
     });
 
     setUpashrays(prev => {
-      const updated = prev.map(u => ({ ...u, reports: reportsByUpashray[u.id] || [] }));
+      const updated = prev.map(u => ({ ...u, reports: reportsByEntity[`u_${u.id}`] || [] }));
       updateCache({ upashrays: updated });
+      return updated;
+    });
+
+    setJinalayas(prev => {
+      const updated = prev.map(j => ({ ...j, reports: reportsByEntity[`j_${j.id}`] || [] }));
+      updateCache({ jinalayas: updated });
       return updated;
     });
   };
@@ -914,8 +967,18 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setProcessingMessage(editingYatraDateId ? 'Updating Yatra Date...' : 'Saving Yatra Date...');
     try {
       const data = {
-        date_text: yatraDateFormData.date_text, description: yatraDateFormData.description,
-        image: yatraDateFormData.image, registration_open: yatraDateFormData.registration_open
+        date_text: yatraDateFormData.date_text,
+        description: yatraDateFormData.description,
+        image: yatraDateFormData.image,
+        registration_open: yatraDateFormData.registration_open,
+        price_per_person: yatraDateFormData.price_per_person || 900,
+        sponsorship_tiers: yatraDateFormData.sponsorship_tiers || [
+          { id: 1, title: 'Full Yatra Sponsor', amount: 31000 },
+          { id: 2, title: 'Main Pillar Sponsor', amount: 21000 },
+          { id: 3, title: 'Pillar Sponsor', amount: 11000 },
+          { id: 4, title: 'Assistant Sponsor', amount: 4000 }
+        ],
+        sponsorship_online_only: yatraDateFormData.sponsorship_online_only === undefined ? true : yatraDateFormData.sponsorship_online_only,
       };
       if (editingYatraDateId) await yatraDatesDB.update(editingYatraDateId, data);
       else await yatraDatesDB.create(data);
@@ -1022,14 +1085,22 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
   const handleSaveCheckingReport = async (e) => {
     e.preventDefault();
-    if (!checkingUpashrayId || !currentMemberId) return;
+    if ((!checkingUpashrayId && !checkingJinalayaId) || !currentMemberId) return;
     setIsProcessing(true);
     setProcessingMessage('Saving Report...');
     try {
-      const reportData = { upashray_id: checkingUpashrayId, member_id: currentMemberId, report_date: new Date().toISOString(), points: checkingReport, general_notes: generalNotes };
+      const reportData = {
+        member_id: currentMemberId,
+        report_date: new Date().toISOString(),
+        points: checkingReport,
+        general_notes: generalNotes
+      };
+      if (checkingUpashrayId) reportData.upashray_id = checkingUpashrayId;
+      if (checkingJinalayaId) reportData.jinalaya_id = checkingJinalayaId;
       await checkingReportsDB.create(reportData);
       await loadReports();
       setCheckingUpashrayId(null);
+      setCheckingJinalayaId(null);
       setCheckingReport(CHECKING_POINTS.map((point, index) => ({ id: index, point, description: '', isChecked: false, images: [] })));
       setGeneralNotes('');
       pushToast('Report saved successfully!', 'success');
@@ -1102,7 +1173,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         <GlobalUX />
         <MemberPanel 
           memberActiveTab={memberActiveTab} setMemberActiveTab={(tab) => navigate(`/member/${tab}`)} loadedData={loadedData} loadReports={loadReports} loadUpashrayReports={loadUpashrayReports} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} handleLogout={handleLogout}
-          upashrays={upashrays} setCheckingUpashrayId={setCheckingUpashrayId} checkingUpashrayId={checkingUpashrayId} handleSaveCheckingReport={handleSaveCheckingReport} checkingReport={checkingReport} setCheckingReport={setCheckingReport} removePointImage={removePointImage} handlePointImageUpload={handlePointImageUpload} generalNotes={generalNotes} setGeneralNotes={setGeneralNotes}
+          upashrays={upashrays} jinalayas={jinalayas} setCheckingUpashrayId={setCheckingUpashrayId} checkingUpashrayId={checkingUpashrayId} setCheckingJinalayaId={setCheckingJinalayaId} checkingJinalayaId={checkingJinalayaId} handleSaveCheckingReport={handleSaveCheckingReport} checkingReport={checkingReport} setCheckingReport={setCheckingReport} removePointImage={removePointImage} handlePointImageUpload={handlePointImageUpload} generalNotes={generalNotes} setGeneralNotes={setGeneralNotes}
           allReports={allReports} currentMemberId={currentMemberId} setSelectedReport={setSelectedReport} setIsReportModalOpen={setIsReportModalOpen} isReportModalOpen={isReportModalOpen} selectedReport={selectedReport}
         />
       </>

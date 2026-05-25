@@ -58,6 +58,9 @@ const EventsPage = () => {
                   </li>
                 ))}
               </ul>
+              {pageCopy.sections[1].contacts && (
+                <p className="mt-4 text-sm text-gray-700 font-bold">{t(pageCopy.sections[1].contacts)}</p>
+              )}
             </div>
           </article>
         </div>
