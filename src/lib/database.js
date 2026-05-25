@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { formatDateToISO } from '../utils/dateUtils.js';
 
 const DATABASE_CACHE_PREFIX = 'girnar_db_cache_v1';
 
@@ -22,6 +23,18 @@ const writeCache = (key, data) => {
   } catch {
     // Ignore cache failures in private mode or on quota limits.
   }
+};
+
+const normalizeTripDate = (value) => {
+  if (!value) return null;
+  if (value instanceof Date) return formatDateToISO(value);
+
+  const raw = String(value).trim();
+  if (!raw) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+
+  const parsed = new Date(raw.replace(/(\d+)(st|nd|rd|th)/gi, '$1'));
+  return Number.isNaN(parsed.getTime()) ? null : formatDateToISO(parsed);
 };
 
 export const dbCache = {
@@ -255,18 +268,11 @@ export const yatraDatesDB = {
     const { data, error } = await supabase
       .from('yatra_dates')
       .insert([{ 
-        date_text: yatraDate.date_text,
+        trip_date: normalizeTripDate(yatraDate.trip_date || yatraDate.date_text),
         description: yatraDate.description,
         image: yatraDate.image,
         registration_open: yatraDate.registration_open,
         price_per_person: yatraDate.price_per_person || 900,
-        sponsorship_tiers: yatraDate.sponsorship_tiers || [
-          { id: 1, title: 'Full Yatra Sponsor', amount: 31000 },
-          { id: 2, title: 'Main Pillar Sponsor', amount: 21000 },
-          { id: 3, title: 'Pillar Sponsor', amount: 11000 },
-          { id: 4, title: 'Assistant Sponsor', amount: 4000 }
-        ],
-        sponsorship_online_only: yatraDate.sponsorship_online_only === undefined ? true : yatraDate.sponsorship_online_only,
         created_at: new Date().toISOString() 
       }])
       .select();
@@ -275,9 +281,15 @@ export const yatraDatesDB = {
   },
 
   async update(id, updates) {
+    const normalizedUpdates = { ...updates };
+    if (normalizedUpdates.date_text && !normalizedUpdates.trip_date) {
+      normalizedUpdates.trip_date = normalizeTripDate(normalizedUpdates.date_text);
+    }
+    delete normalizedUpdates.date_text;
+
     const { data, error } = await supabase
       .from('yatra_dates')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update({ ...normalizedUpdates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select();
     if (error) throw error;
@@ -287,6 +299,140 @@ export const yatraDatesDB = {
   async delete(id) {
     const { error } = await supabase
       .from('yatra_dates')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  }
+};
+
+// ============== SPONSORSHIP SCHEMES ==============
+
+export const sponsorshipSchemesDB = {
+  async getAll() {
+    const { data, error } = await supabase
+      .from('sponsorship_schemes')
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getById(id) {
+    const { data, error } = await supabase
+      .from('sponsorship_schemes')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async create(scheme) {
+    const payload = {
+      title: scheme.title,
+      description: scheme.description || '',
+      amount: Number(scheme.amount || 0),
+      sort_order: Number(scheme.sort_order || 0),
+      is_active: scheme.is_active === undefined ? true : Boolean(scheme.is_active),
+      created_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from('sponsorship_schemes')
+      .insert([payload])
+      .select();
+    if (error) throw error;
+    return data?.[0];
+  },
+
+  async update(id, scheme) {
+    const payload = {
+      title: scheme.title,
+      description: scheme.description || '',
+      amount: Number(scheme.amount || 0),
+      sort_order: Number(scheme.sort_order || 0),
+      is_active: scheme.is_active === undefined ? true : Boolean(scheme.is_active),
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from('sponsorship_schemes')
+      .update(payload)
+      .eq('id', id);
+
+    if (error) throw error;
+    return data?.[0];
+  },
+
+  async delete(id) {
+    const { error } = await supabase
+      .from('sponsorship_schemes')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  }
+};
+
+// ============== PAYMENT INTENTS ==============
+
+export const paymentIntentsDB = {
+  async getAll() {
+    const { data, error } = await supabase
+      .from('payment_intents')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async create(intent) {
+    const payload = {
+      module_key: intent.module_key,
+      reference_type: intent.reference_type || null,
+      reference_id: intent.reference_id === undefined || intent.reference_id === null ? null : String(intent.reference_id),
+      payer_name: intent.payer_name || '',
+      phone: intent.phone || '',
+      email: intent.email || '',
+      city: intent.city || '',
+      amount: Number(intent.amount || 0),
+      currency: intent.currency || 'INR',
+      status: intent.status || 'pending',
+      gateway_order_id: intent.gateway_order_id || null,
+      gateway_payment_id: intent.gateway_payment_id || null,
+      refund_status: intent.refund_status || 'not_requested',
+      refund_transaction_id: intent.refund_transaction_id || null,
+      refund_contact: intent.refund_contact || null,
+      refund_notes: intent.refund_notes || null,
+      refund_requested_at: intent.refund_requested_at || null,
+      refund_processed_at: intent.refund_processed_at || null,
+      admin_notes: intent.admin_notes || null,
+      items: intent.items || [],
+      metadata: intent.metadata || {},
+      created_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from('payment_intents')
+      .insert([payload])
+      .select();
+    if (error) throw error;
+    return data?.[0];
+  },
+
+  async update(id, updates) {
+    const { data, error } = await supabase
+      .from('payment_intents')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select();
+    if (error) throw error;
+    return data?.[0];
+  },
+
+  async delete(id) {
+    const { error } = await supabase
+      .from('payment_intents')
       .delete()
       .eq('id', id);
     if (error) throw error;

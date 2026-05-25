@@ -55,20 +55,36 @@ WHERE NOT EXISTS (
 --   WHERE yd.date_text = v.date_text
 -- );
 
-INSERT INTO yatra_dates (date_text, description)
-SELECT v.date_text, v.description
+INSERT INTO yatra_dates (trip_date, description)
+SELECT v.trip_date, v.description
 FROM (
   VALUES
-    ('1 June 2026', 'Monthly Yatra - June 2026'),
-    ('1 July 2026', 'Monthly Yatra - July 2026')
-) AS v(date_text, description)
+    (DATE '2026-06-01', 'Monthly Yatra - June 2026'),
+    (DATE '2026-07-01', 'Monthly Yatra - July 2026')
+) AS v(trip_date, description)
 WHERE NOT EXISTS (
   SELECT 1
   FROM yatra_dates yd
-  WHERE yd.date_text = v.date_text
+  WHERE yd.trip_date = v.trip_date
+);
+
+INSERT INTO sponsorship_schemes (title, description, amount, sort_order, is_active)
+SELECT v.title, v.description, v.amount, v.sort_order, v.is_active
+FROM (
+  VALUES
+    ('Full Yatra Sponsor', 'Support the full monthly journey and receive top-level recognition.', 31000, 1, TRUE),
+    ('Main Pillar Sponsor', 'Sponsor one major pillar of the monthly trip experience.', 21000, 2, TRUE),
+    ('Pillar Sponsor', 'Sponsor an important service pillar for selected trips.', 11000, 3, TRUE),
+    ('Assistant Sponsor', 'Smaller contribution option for families and groups.', 4000, 4, TRUE)
+) AS v(title, description, amount, sort_order, is_active)
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM sponsorship_schemes ss
+  WHERE ss.title = v.title
 );
 
 SELECT 'upashrays' AS table_name, count(*) AS row_count FROM upashrays;
 SELECT 'members' AS table_name, count(*) AS row_count FROM members;
 SELECT 'jinalayas' AS table_name, count(*) AS row_count FROM jinalayas;
 SELECT 'yatra_dates' AS table_name, count(*) AS row_count FROM yatra_dates;
+SELECT 'sponsorship_schemes' AS table_name, count(*) AS row_count FROM sponsorship_schemes;

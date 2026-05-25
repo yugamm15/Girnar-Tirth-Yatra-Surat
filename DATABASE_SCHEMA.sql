@@ -52,13 +52,52 @@ CREATE TABLE jinalayas (
 -- ============== YATRA DATES TABLE ==============
 CREATE TABLE yatra_dates (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  date_text VARCHAR(255) NOT NULL,
+  trip_date DATE NOT NULL,
   description TEXT,
   image VARCHAR(500),
   registration_open BOOLEAN DEFAULT FALSE,
   price_per_person NUMERIC DEFAULT 900,
-  sponsorship_tiers JSONB DEFAULT '[]'::jsonb,
-  sponsorship_online_only BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============== SPONSORSHIP SCHEMES TABLE ==============
+-- Admin-managed sponsor/labharthi options that apply universally across trips.
+CREATE TABLE sponsorship_schemes (
+  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  amount NUMERIC NOT NULL DEFAULT 0,
+  sort_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Generic payment intent table that can be used by sponsorship and future payment modules.
+CREATE TABLE payment_intents (
+  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  module_key VARCHAR(100) NOT NULL,
+  reference_type VARCHAR(100),
+  reference_id VARCHAR(100),
+  payer_name VARCHAR(255) NOT NULL,
+  phone VARCHAR(20),
+  email VARCHAR(255),
+  city VARCHAR(255),
+  amount NUMERIC NOT NULL DEFAULT 0,
+  currency VARCHAR(10) DEFAULT 'INR',
+  status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'failed', 'cancelled')),
+  gateway_order_id VARCHAR(255),
+  gateway_payment_id VARCHAR(255),
+  refund_status VARCHAR(50) DEFAULT 'not_requested' CHECK (refund_status IN ('not_requested', 'requested', 'processed', 'failed')),
+  refund_transaction_id VARCHAR(255),
+  refund_contact VARCHAR(20),
+  refund_notes TEXT,
+  refund_requested_at TIMESTAMP,
+  refund_processed_at TIMESTAMP,
+  admin_notes TEXT,
+  items JSONB NOT NULL DEFAULT '[]'::jsonb,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -146,6 +185,12 @@ CREATE INDEX idx_members_email ON members(email);
 CREATE INDEX idx_members_has_access ON members(has_access);
 CREATE INDEX idx_yatrik_yatra_id ON yatrik_registrations(yatra_id);
 CREATE INDEX idx_yatrik_created_at ON yatrik_registrations(created_at);
+CREATE INDEX idx_yatra_dates_trip_date ON yatra_dates(trip_date);
+CREATE INDEX idx_sponsorship_schemes_active ON sponsorship_schemes(is_active);
+CREATE INDEX idx_sponsorship_schemes_sort_order ON sponsorship_schemes(sort_order);
+CREATE INDEX idx_payment_intents_module_key ON payment_intents(module_key);
+CREATE INDEX idx_payment_intents_status ON payment_intents(status);
+CREATE INDEX idx_payment_intents_reference ON payment_intents(reference_type, reference_id);
 CREATE INDEX idx_checking_reports_upashray_id ON checking_reports(upashray_id);
 CREATE INDEX idx_contact_created_at ON contact_messages(created_at);
 CREATE INDEX idx_upashray_media_upashray_id ON upashray_media(upashray_id);
@@ -154,6 +199,35 @@ CREATE INDEX idx_admin_profiles_role ON admin_profiles(role);
 CREATE INDEX idx_audit_logs_entity_type ON audit_logs(entity_type);
 CREATE INDEX idx_audit_logs_actor_user_id ON audit_logs(actor_user_id);
 CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
+
+-- ============== MIGRATION CLEANUP FOR THE OLD BUS-SPONSORSHIP FIELDS ==============
+-- Run these after the new tables exist and the old data has been moved or replaced.
+ALTER TABLE yatra_dates ADD COLUMN IF NOT EXISTS trip_date DATE;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = 'yatra_dates'
+      AND column_name = 'date_text'
+  ) THEN
+    EXECUTE $cmd$
+      UPDATE yatra_dates
+      SET trip_date = CASE
+        WHEN trip_date IS NOT NULL THEN trip_date
+        ELSE to_date(
+          regexp_replace(date_text, '(\d+)(st|nd|rd|th)', '\1', 'gi'),
+          'DD FMMonth YYYY'
+        )
+      END;
+    $cmd$;
+    ALTER TABLE yatra_dates ALTER COLUMN trip_date SET NOT NULL;
+    ALTER TABLE yatra_dates DROP COLUMN IF EXISTS date_text;
+  END IF;
+END $$;
+ALTER TABLE yatra_dates DROP COLUMN IF EXISTS sponsorship_tiers;
+ALTER TABLE yatra_dates DROP COLUMN IF EXISTS sponsorship_online_only;
+DROP TABLE IF EXISTS sponsorship_scheme_trips CASCADE;
 
 -- ============== ROW SECURITY POLICIES (Optional - Enable as needed) ==============
 -- ALTER TABLE upashrays ENABLE ROW LEVEL SECURITY;

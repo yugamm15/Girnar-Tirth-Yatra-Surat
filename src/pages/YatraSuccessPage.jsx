@@ -1,10 +1,15 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { LightPageShell } from '../components/LightPageShell.jsx';
-import { useLanguage } from '../context/LanguageContext.jsx';
 
 const YatraSuccessPage = () => {
-  const { t } = useLanguage();
+  const location = useLocation();
+  const successKind = location.state?.kind || 'booking';
+  const title = successKind === 'sponsorship' ? 'Sponsorship Successful!' : 'Booking Successful!';
+  const description = successKind === 'sponsorship'
+    ? 'Thank you for supporting the monthly bus yatra. Your labharthi selection has been recorded and the team will share confirmation details.'
+    : 'Thank you for choosing Girnar Seva Group. Your pilgrimage journey is confirmed. A confirmation receipt has been sent to your registered mobile number.';
+  const primaryLink = successKind === 'sponsorship' ? '/monthly-bus-yatra/sponsorship' : '/monthly-bus-yatra';
+  const primaryLabel = successKind === 'sponsorship' ? 'Back to Sponsorship' : 'Back to Yatra List';
 
   return (
     <LightPageShell>
@@ -15,18 +20,15 @@ const YatraSuccessPage = () => {
           </svg>
         </div>
         
-        <h1 className="text-4xl font-headline text-gray-900 mb-6">Booking Successful!</h1>
-        <p className="text-gray-500 text-lg leading-relaxed mb-12">
-          Thank you for choosing Girnar Seva Group. Your pilgrimage journey is confirmed. 
-          A confirmation receipt has been sent to your registered mobile number.
-        </p>
+        <h1 className="text-4xl font-headline text-gray-900 mb-6">{title}</h1>
+        <p className="text-gray-500 text-lg leading-relaxed mb-12">{description}</p>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Link 
-            to="/monthly-bus-yatra"
+            to={primaryLink}
             className="px-8 py-5 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs hover:bg-[#b08d4a] transition-all"
           >
-            Back to Yatra List
+            {primaryLabel}
           </Link>
           <Link 
             to="/"

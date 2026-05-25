@@ -7,14 +7,17 @@ import ToastViewport from '../components/ToastViewport.jsx';
 import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { dbCache, yatraDatesDB } from '../lib/database.js';
+import { dbCache, sponsorshipSchemesDB, yatraDatesDB } from '../lib/database.js';
+import { formatDateForDisplay } from '../utils/dateUtils.js';
 
 const MonthlyBusYatraPage = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const pageCopy = siteCopy.monthlyBusPage;
   const [yatraDates, setYatraDates] = useState(pageCopy.yatraDates);
+  const [sponsorshipSchemes, setSponsorshipSchemes] = useState([]);
   const [isLoadingDates, setIsLoadingDates] = useState(false);
+  const [isLoadingSchemes, setIsLoadingSchemes] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [selectedYatraName, setSelectedYatraName] = useState('');
@@ -79,11 +82,11 @@ const MonthlyBusYatraPage = () => {
 
         const nextDates = records.map((record) => ({
           id: record.id,
-          date: { en: record.date_text, gu: record.date_text, hi: record.date_text },
+          date: { en: formatDateForDisplay(record.trip_date || record.date_text), gu: formatDateForDisplay(record.trip_date || record.date_text), hi: formatDateForDisplay(record.trip_date || record.date_text) },
           description: { en: record.description, gu: record.description, hi: record.description },
           image: record.image,
           registration_open: record.registration_open,
-          date_raw: record.date_text // for parsing if needed
+          date_raw: record.trip_date || record.date_text
         }));
 
         if (!cancelled) {
@@ -106,6 +109,31 @@ const MonthlyBusYatraPage = () => {
     };
   }, [pageCopy.yatraDates]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSponsorshipSchemes = async () => {
+      setIsLoadingSchemes(true);
+      try {
+        const records = await sponsorshipSchemesDB.getAll();
+        if (!cancelled) {
+          setSponsorshipSchemes(records.filter((scheme) => scheme.is_active !== false));
+        }
+      } catch (error) {
+        console.log('Sponsorship error:', error.message);
+      } finally {
+        if (!cancelled) {
+          setIsLoadingSchemes(false);
+        }
+      }
+    };
+
+    loadSponsorshipSchemes();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const scrollToYatras = () => {
     yatraListRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -119,6 +147,11 @@ const MonthlyBusYatraPage = () => {
       setSelectedYatraName(t(yatra.date));
       setShowComingSoon(true);
     }
+  };
+
+  const handleSponsorshipSelect = (scheme) => {
+    sessionStorage.setItem('pending_sponsorship_scheme', JSON.stringify({ schemeId: scheme.id }));
+    navigate('/monthly-bus-yatra/sponsorship');
   };
 
   return (
@@ -214,6 +247,52 @@ const MonthlyBusYatraPage = () => {
               <p className="mt-3 text-sm text-gray-600 leading-relaxed">{t(card.body)}</p>
             </article>
           ))}
+        </section>
+
+        {/* Sponsorship Module */}
+        <section className="space-y-8">
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-headline text-gray-900">Labharthi & Sponsorship</h2>
+            <div className="mt-2 w-20 h-1 bg-[#c5a059] mx-auto opacity-40 rounded-full" />
+            <p className="mt-4 text-sm md:text-base text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Choose a sponsorship scheme and continue to payment after selecting the trips you want to support.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+            {isLoadingSchemes ? (
+              <div className="md:col-span-2 xl:col-span-4 p-6 bg-white border border-gray-100 shadow-sm text-sm text-gray-500">Loading sponsorship schemes...</div>
+            ) : sponsorshipSchemes.length > 0 ? (
+              sponsorshipSchemes.map((scheme) => {
+                return (
+                  <article key={scheme.id} className="light-panel-soft p-6 bg-white border border-gray-100 shadow-sm flex flex-col gap-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-xl font-headline text-gray-900">{scheme.title}</h3>
+                        <p className="mt-2 text-sm text-gray-600 leading-relaxed line-clamp-3">{scheme.description || 'Support a monthly trip with this sponsorship option.'}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-gray-400">Per Trip</p>
+                        <p className="mt-1 text-2xl font-headline text-[#c5a059]">₹{Number(scheme.amount || 0)}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSponsorshipSelect(scheme)}
+                      className="mt-auto px-5 py-3 bg-[#c5a059] text-white font-bold uppercase tracking-[0.16em] text-[10px] hover:bg-[#b08d4a] transition-colors"
+                    >
+                      Sponsor This Trip
+                    </button>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="md:col-span-2 xl:col-span-4 p-6 bg-white border border-gray-100 shadow-sm text-sm text-gray-500">
+                Sponsorship schemes will appear here once they are created in the admin panel.
+              </div>
+            )}
+          </div>
         </section>
 
         {/* Yatra Dates Section */}

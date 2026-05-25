@@ -46,13 +46,6 @@ const BusYatraTab = ({
                   image: '',
                   registration_open: true,
                   price_per_person: 900,
-                  sponsorship_tiers: [
-                    { id: 1, title: 'Full Yatra Sponsor', amount: 31000 },
-                    { id: 2, title: 'Main Pillar Sponsor', amount: 21000 },
-                    { id: 3, title: 'Pillar Sponsor', amount: 11000 },
-                    { id: 4, title: 'Assistant Sponsor', amount: 4000 }
-                  ],
-                  sponsorship_online_only: true
                 });
                 setIsYatraDateModalOpen(true);
               }}
@@ -107,15 +100,6 @@ const BusYatraTab = ({
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600 max-w-[300px]">
                           <div className="mb-2 truncate">{date.description || '-'}</div>
-                          {date.sponsorship_tiers && date.sponsorship_tiers.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                              {date.sponsorship_tiers.map((s) => (
-                                <div key={s.id} className="px-2 py-1 bg-gray-100 text-[10px] text-gray-800 rounded-full font-bold">
-                                  {s.title} — ₹{s.amount}
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </td>
                         <td className="px-6 py-4">
                           <span className="px-3 py-1 bg-gray-100 text-[#c5a059] text-[10px] font-bold rounded-full">
@@ -146,13 +130,6 @@ const BusYatraTab = ({
                                 image: date.image || '',
                                 registration_open: date.registration_open,
                                 price_per_person: date.price_per_person || 900,
-                                sponsorship_tiers: date.sponsorship_tiers || [
-                                  { id: 1, title: 'Full Yatra Sponsor', amount: 31000 },
-                                  { id: 2, title: 'Main Pillar Sponsor', amount: 21000 },
-                                  { id: 3, title: 'Pillar Sponsor', amount: 11000 },
-                                  { id: 4, title: 'Assistant Sponsor', amount: 4000 }
-                                ],
-                                sponsorship_online_only: date.sponsorship_online_only === undefined ? true : date.sponsorship_online_only,
                               });
                               setIsYatraDateModalOpen(true);
                             }}

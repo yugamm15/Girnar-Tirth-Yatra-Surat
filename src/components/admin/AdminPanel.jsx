@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import UpashraysTab from './tabs/UpashraysTab';
 import BusYatraTab from './tabs/BusYatraTab';
+import SponsorPaymentsTab from './tabs/SponsorPaymentsTab';
 import MembersTab from './tabs/MembersTab';
 import JinalayasTab from './tabs/JinalayasTab';
 import ReportsTab from './tabs/ReportsTab';
@@ -18,6 +19,7 @@ const AdminPanel = ({
   loadJinalayas,
   loadReports,
   loadBusYatra,
+  loadPaymentIntents,
   isMobileMenuOpen, 
   setIsMobileMenuOpen, 
   handleLogout,
@@ -27,6 +29,7 @@ const AdminPanel = ({
   // Bus Yatra props
   yatraSearch, setYatraSearch, setEditingYatraDateId, setYatraDateFormData, setIsYatraDateModalOpen, yatraDates, busRegistrations, toggleRegistrationStatus, deleteYatraDate, registrationYatraFilter, setRegistrationYatraFilter, exportRegistrationsToCSV, deleteRegistration,
   isYatraDateModalOpen, editingYatraDateId, yatraDateFormData, handleYatraFileChange, handleYatraDateSubmit,
+  paymentIntents,
   // Member props
   members, memberSearch, setMemberSearch, setIsMemberModalOpen, toggleMemberAccess, startEditMember, deleteMember,
   isMemberModalOpen, resetMemberForm, editingMemberId, memberFormData, setMemberFormData, handleSaveMember,
@@ -45,6 +48,7 @@ const AdminPanel = ({
     if (activeTab === 'jinalayas' && !loadedData.jinalayas) loadJinalayas();
     if (activeTab === 'reports' && !loadedData.reports) loadReports();
     if (activeTab === 'bus-yatra' && !loadedData.busYatra) loadBusYatra();
+    if (activeTab === 'sponsor-payments' && !loadedData.sponsorships) loadPaymentIntents?.();
   }, [activeTab, loadedData]);
 
   return (
@@ -112,6 +116,12 @@ const AdminPanel = ({
             >
               Bus Yatra
             </button>
+            <button
+              onClick={() => setActiveTab('sponsor-payments')}
+              className={`px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 whitespace-nowrap h-20 flex items-center ${activeTab === 'sponsor-payments' ? 'border-[#c5a059] text-[#c5a059]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+            >
+              Sponsor Payments
+            </button>
           </nav>
         </div>
 
@@ -156,6 +166,12 @@ const AdminPanel = ({
               >
                 Bus Yatra
               </button>
+              <button
+                onClick={() => { setActiveTab('sponsor-payments'); setIsMobileMenuOpen(false); }}
+                className={`w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-l-4 mb-2 ${activeTab === 'sponsor-payments' ? 'border-[#c5a059] bg-[#c5a059]/5 text-[#c5a059]' : 'border-transparent text-gray-500'}`}
+              >
+                Sponsor Payments
+              </button>
             </nav>
           </div>
         )}
@@ -188,6 +204,9 @@ const AdminPanel = ({
             exportRegistrationsToCSV={exportRegistrationsToCSV}
             deleteRegistration={deleteRegistration}
           />
+        )}
+        {(activeTab === 'sponsorships' || activeTab === 'sponsor-payments') && (
+          <SponsorPaymentsTab paymentIntents={paymentIntents} />
         )}
         {activeTab === 'members' && (
           <MembersTab 

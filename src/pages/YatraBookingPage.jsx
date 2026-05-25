@@ -10,6 +10,7 @@ import { FormInput } from '../components/FormInput.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { dbCache, yatraDatesDB } from '../lib/database.js';
+import { formatDateForDisplay } from '../utils/dateUtils.js';
 
 const YatraBookingPage = () => {
   const { yatraId } = useParams();
@@ -30,7 +31,6 @@ const YatraBookingPage = () => {
     remarks: '',
   });
   const [toasts, setToasts] = useState([]);
-  const [selectedSponsorshipId, setSelectedSponsorshipId] = useState(null);
   const [confirmState, setConfirmState] = useState({
     open: false,
     title: '',
@@ -56,7 +56,7 @@ const YatraBookingPage = () => {
           if (found) {
             setYatra({
               ...found,
-              date_text: typeof found.date === 'object' ? found.date.en : found.date,
+              date_text: found.trip_date ? formatDateForDisplay(found.trip_date) : (typeof found.date === 'object' ? found.date.en : found.date),
               description: typeof found.description === 'object' ? found.description.en : found.description
             });
             setLoading(false);
@@ -70,7 +70,10 @@ const YatraBookingPage = () => {
           return;
         }
         
-        setYatra(found);
+        setYatra({
+          ...found,
+          date_text: found.trip_date ? formatDateForDisplay(found.trip_date) : found.date_text || '',
+        });
       } catch (err) {
         console.error('Error loading yatra:', err);
         if (!yatra) {
@@ -116,11 +119,7 @@ const YatraBookingPage = () => {
 
   const totalYatrikCount = yatricks.length + (validateYatrik(currentYatrik) ? 1 : 0);
   const pricePerPerson = yatra?.price_per_person || 900;
-  const sponsorshipTiers = yatra?.sponsorship_tiers || [];
-  const selectedSponsorship = sponsorshipTiers.find(s => String(s.id) === String(selectedSponsorshipId));
-  const sponsorshipAmount = selectedSponsorship ? Number(selectedSponsorship.amount || 0) : 0;
-
-  const totalAmount = (totalYatrikCount * pricePerPerson) + sponsorshipAmount;
+  const totalAmount = totalYatrikCount * pricePerPerson;
 
   const handleProceedToPayment = () => {
     let finalToSubmit = [...yatricks];
@@ -144,8 +143,7 @@ const YatraBookingPage = () => {
     sessionStorage.setItem('pending_booking', JSON.stringify({
       yatraId,
       yatricks: finalToSubmit,
-      totalAmount: finalToSubmit.length * pricePerPerson + sponsorshipAmount,
-      selectedSponsorship: selectedSponsorship || null
+      totalAmount: finalToSubmit.length * pricePerPerson,
     }));
     
     navigate('/monthly-bus-yatra/payment');
@@ -319,20 +317,6 @@ const YatraBookingPage = () => {
                   <span className="text-gray-500">Price per person</span>
                   <span className="font-bold text-gray-900">₹{pricePerPerson}</span>
                 </div>
-                {sponsorshipTiers.length > 0 && (
-                  <div className="space-y-3">
-                    <div className="text-sm text-gray-500">Sponsorship Options</div>
-                    {sponsorshipTiers.map((s) => (
-                      <label key={s.id} className="flex justify-between items-center text-sm">
-                        <div className="flex items-center gap-3">
-                          <input type="radio" name="sponsorship" checked={String(selectedSponsorshipId) === String(s.id)} onChange={() => setSelectedSponsorshipId(s.id)} />
-                          <span>{s.title}</span>
-                        </div>
-                        <span className="font-bold">₹{s.amount}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <div className="pt-6 border-t-2 border-dashed border-gray-100 mb-8">

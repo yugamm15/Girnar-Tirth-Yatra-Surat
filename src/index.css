@@ -394,6 +394,17 @@ body.light-route-active {
   background: transparent; /* Ensure background doesn't cover images */
 }
 
+/* Keep admin/member typography aligned with the main portal font system. */
+.admin-portal-view,
+.member-portal-view {
+  font-family: var(--font-body);
+}
+
+.admin-portal-view .font-headline,
+.member-portal-view .font-headline {
+  font-family: var(--font-headline);
+}
+
 
 .parallax-bg {
   width: 100%;

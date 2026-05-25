@@ -36,3 +36,35 @@ export const getDateFromDaysAgo = (days) => {
   date.setDate(date.getDate() - days);
   return formatDateToISO(date);
 };
+
+/**
+ * Parse a trip date from the stored yatra record.
+ * Falls back to date_text if trip_date is not available yet.
+ * @param {object} yatra - Yatra record
+ * @returns {Date|null}
+ */
+export const parseYatraTripDate = (yatra) => {
+  if (!yatra) return null;
+
+  const rawValue = yatra.trip_date || yatra.date_raw || yatra.date_text || (typeof yatra.date === 'string' ? yatra.date : '');
+  if (!rawValue) return null;
+
+  const normalized = String(rawValue).replace(/(\d+)(st|nd|rd|th)/gi, '$1');
+  const parsed = new Date(normalized);
+
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+/**
+ * Check whether a trip is in the future relative to today.
+ * @param {object} yatra - Yatra record
+ * @returns {boolean}
+ */
+export const isFutureYatraTrip = (yatra) => {
+  const tripDate = parseYatraTripDate(yatra);
+  if (!tripDate) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return tripDate.getTime() >= today.getTime();
+};

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient.js';
-import { upashraysDB, membersDB, jinalayasDB, checkingReportsDB, adminProfilesDB, yatrikRegistrationsDB, yatraDatesDB, upashrayMediaDB } from '../lib/database.js';
+import { upashraysDB, membersDB, jinalayasDB, checkingReportsDB, adminProfilesDB, yatrikRegistrationsDB, yatraDatesDB, upashrayMediaDB, paymentIntentsDB } from '../lib/database.js';
 import LoginForm from './auth/LoginForm';
 import LoadingOverlay from './auth/LoadingOverlay';
 import AdminPanel from './admin/AdminPanel';
@@ -10,12 +10,30 @@ import ConfirmModal from './ConfirmModal.jsx';
 import TopLineLoader from './TopLineLoader.jsx';
 import ToastViewport from './ToastViewport.jsx';
 import { generateMemberCode } from '../utils/memberUtils.js';
+import { formatDateForDisplay } from '../utils/dateUtils.js';
 const ADMIN_CREDENTIALS = {
   email: 'GirnarTirthYatraGroup@gmail.com',
   password: 'Girnar@22'
 };
 
 const PORTAL_CACHE_KEY = 'girnar_portal_state_v1';
+
+const ADMIN_TABS = new Set([
+  'upashrays',
+  'jinalayas',
+  'members',
+  'reports',
+  'bus-yatra',
+  'sponsorships',
+  'sponsor-payments',
+]);
+
+const resolveAdminTabFromPath = (pathname) => {
+  const pathParts = pathname.split('/').filter(Boolean);
+  const candidateTab = pathParts[0] === 'admin' ? pathParts[1] : null;
+  if (candidateTab === 'sponsorships') return 'sponsor-payments';
+  return candidateTab && ADMIN_TABS.has(candidateTab) ? candidateTab : 'upashrays';
+};
 
 export const AuthView = ({ onBack, initialView = 'login' }) => {
   const navigate = useNavigate();
@@ -45,10 +63,11 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     return localStorage.getItem('auth_member_id') || null;
   });
   const [isLoadingData, setIsLoadingData] = useState(false);
-  const [activeTab, setActiveTab] = useState('upashrays'); // 'upashrays', 'members', 'jinalayas', 'reports', 'bus-yatra'
+  const [activeTab, setActiveTab] = useState(() => resolveAdminTabFromPath(window.location.pathname)); // 'upashrays', 'members', 'jinalayas', 'reports', 'bus-yatra', 'sponsorships', 'sponsor-payments'
   const [allReports, setAllReports] = useState([]);
   const [busRegistrations, setBusRegistrations] = useState([]);
   const [yatraDates, setYatraDates] = useState([]);
+  const [paymentIntents, setPaymentIntents] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -66,10 +85,11 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     const tab = pathParts[1];
 
     if (view === 'admin' && role === 'admin') {
+      const nextTab = resolveAdminTabFromPath(location.pathname);
       if (!tab) {
         navigate('/admin/upashrays', { replace: true });
-      } else if (tab !== activeTab) {
-        setActiveTab(tab);
+      } else if (nextTab !== activeTab) {
+        setActiveTab(nextTab);
       }
     } else if (view === 'member' && role === 'member') {
       if (!tab) {
@@ -243,7 +263,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
   // Modular Data Loading
   const [loadedData, setLoadedData] = useState({
-    upashrays: false, members: false, jinalayas: false, reports: false, busYatra: false
+    upashrays: false, members: false, jinalayas: false, reports: false, busYatra: false, sponsorships: false
   });
 
   const loadUpashrays = async () => {
@@ -365,13 +385,35 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       const [busData, datesData] = await Promise.all([
         yatrikRegistrationsDB.getAll(), yatraDatesDB.getAll()
       ]);
-      const processedDates = datesData.map(d => ({ ...d, registration_open: d.registration_open !== false }));
+      const processedDates = datesData.map(d => ({
+        ...d,
+        date_text: d.trip_date ? formatDateForDisplay(d.trip_date) : d.date_text || '',
+        registration_open: d.registration_open !== false,
+      }));
       setBusRegistrations(busData);
       setYatraDates(processedDates);
       setLoadedData(prev => ({ ...prev, busYatra: true }));
       updateCache({ busRegistrations: busData, yatraDates: processedDates });
       return { busData, processedDates };
     } catch (e) { console.error(e); return { busData: [], processedDates: [] }; }
+  };
+
+  const loadPaymentIntents = async () => {
+    try {
+      const intents = await paymentIntentsDB.getAll();
+      const processed = intents.map((intent) => ({
+        ...intent,
+        createdAtLabel: intent.created_at ? new Date(intent.created_at).toLocaleString() : 'N/A',
+        paymentLabel: intent.gateway_payment_id || intent.gateway_order_id || 'Pending',
+      }));
+      setPaymentIntents(processed);
+      setLoadedData(prev => ({ ...prev, sponsorships: true }));
+      updateCache({ paymentIntents: processed });
+      return processed;
+    } catch (e) {
+      console.error('Failed to load payment intents:', e);
+      return [];
+    }
   };
 
   const updateCache = (newState) => {
@@ -443,6 +485,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       await loadUpashrayReports();
       
       loadBusYatra();
+      loadPaymentIntents();
     } else {
       await loadUpashrayReports();
     }
@@ -972,13 +1015,6 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         image: yatraDateFormData.image,
         registration_open: yatraDateFormData.registration_open,
         price_per_person: yatraDateFormData.price_per_person || 900,
-        sponsorship_tiers: yatraDateFormData.sponsorship_tiers || [
-          { id: 1, title: 'Full Yatra Sponsor', amount: 31000 },
-          { id: 2, title: 'Main Pillar Sponsor', amount: 21000 },
-          { id: 3, title: 'Pillar Sponsor', amount: 11000 },
-          { id: 4, title: 'Assistant Sponsor', amount: 4000 }
-        ],
-        sponsorship_online_only: yatraDateFormData.sponsorship_online_only === undefined ? true : yatraDateFormData.sponsorship_online_only,
       };
       if (editingYatraDateId) await yatraDatesDB.update(editingYatraDateId, data);
       else await yatraDatesDB.create(data);
@@ -1156,7 +1192,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       <>
         <GlobalUX />
         <AdminPanel 
-          activeTab={activeTab} setActiveTab={(tab) => navigate(`/admin/${tab}`)} loadedData={loadedData} loadMembers={loadMembers} loadJinalayas={loadJinalayas} loadReports={loadReports} loadBusYatra={loadBusYatra} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} handleLogout={handleLogout}
+          activeTab={activeTab} setActiveTab={(tab) => navigate(`/admin/${tab}`)} loadedData={loadedData} loadMembers={loadMembers} loadJinalayas={loadJinalayas} loadReports={loadReports} loadBusYatra={loadBusYatra} loadPaymentIntents={loadPaymentIntents} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} handleLogout={handleLogout}
           upashrays={upashrays} upashraySearch={upashraySearch} setUpashraySearch={setUpashraySearch} setIsModalOpen={setIsModalOpen} startEdit={startEdit} deleteUpashray={deleteUpashray} isModalOpen={isModalOpen} resetForm={resetForm} editingId={editingId} formData={formData} setFormData={setFormData} handleSaveUpashray={handleSaveUpashray} handleMultipleFilesChange={handleMultipleFilesChange} removeMediaFile={removeMediaFile} deleteExistingMedia={deleteExistingMedia}
           yatraSearch={yatraSearch} setYatraSearch={setYatraSearch} setEditingYatraDateId={setEditingYatraDateId} setYatraDateFormData={setYatraDateFormData} setIsYatraDateModalOpen={setIsYatraDateModalOpen} yatraDates={yatraDates} busRegistrations={busRegistrations} toggleRegistrationStatus={toggleRegistrationStatus} deleteYatraDate={deleteYatraDate} registrationYatraFilter={registrationYatraFilter} setRegistrationYatraFilter={setRegistrationYatraFilter} exportRegistrationsToCSV={exportRegistrationsToCSV} deleteRegistration={deleteRegistration} isYatraDateModalOpen={isYatraDateModalOpen} editingYatraDateId={editingYatraDateId} yatraDateFormData={yatraDateFormData} handleYatraFileChange={handleYatraFileChange} handleYatraDateSubmit={handleYatraDateSubmit}
           members={members} memberSearch={memberSearch} setMemberSearch={setMemberSearch} setIsMemberModalOpen={setIsMemberModalOpen} toggleMemberAccess={toggleMemberAccess} startEditMember={startEditMember} deleteMember={deleteMember} isMemberModalOpen={isMemberModalOpen} resetMemberForm={resetMemberForm} editingMemberId={editingMemberId} memberFormData={memberFormData} setMemberFormData={setMemberFormData} handleSaveMember={handleSaveMember}
