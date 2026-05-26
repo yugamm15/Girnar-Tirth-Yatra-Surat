@@ -292,10 +292,12 @@ body.mobile-nav-open {
 /* Snap Scroll — scroll-behavior: auto keeps native wheel + snap snappy (no double-easing hang) */
 .snap-container {
   height: 100vh;
-  overflow-y: auto;
+  height: 100dvh;
+  overflow-y: scroll;
   overscroll-behavior-y: contain;
   scroll-snap-type: y mandatory;
-  scroll-behavior: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -307,8 +309,9 @@ body.mobile-nav-open {
 /* No user scroll until welcome is shown — stops snap from jumping to the next image */
 .snap-container-locked {
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
-  overflow: hidden;
+  overflow-y: hidden;
   scroll-snap-type: none;
   overscroll-behavior: none;
 }
@@ -390,6 +393,8 @@ body.mobile-nav-open {
   scroll-snap-align: start;
   scroll-snap-stop: always;
   height: 100vh;
+  height: 100dvh;
+  flex-shrink: 0;
   box-sizing: border-box;
   width: 100%;
   position: relative;

@@ -65,6 +65,7 @@ export const siteCopy = {
       { id: 'intro', label: tr('About Girnar', 'ગિરનાર વિષે', 'गिरनार परिचय') },
       { id: 'work1', label: tr('Bus Yatra', 'બસ યાત્રા', 'बस यात्रा') },
       { id: 'work2', label: tr('Upashray', 'ઉપાશ્રય', 'उपाश्रय') },
+      { id: 'workj', label: tr('Jinalay', 'જિનાલય', 'जिनालय') },
       { id: 'work3', label: tr('Pathsala', 'પાઠશાળા', 'पाठशाला') },
       { id: 'work4', label: tr('Aarti & Abhishek', 'આરતી અને અભિષેક', 'आरती और अभिषेक') },
       { id: 'join', label: tr('Join Us', 'જોડાઓ', 'जुड़ें') },
@@ -148,6 +149,17 @@ export const siteCopy = {
       countLabel: tr('Total Upashrays Renovated till date', 'હાલ સુધી સુધારાયેલા ઉપાશ્રયો', 'अब तक नवीनीकृत उपाश्रय'),
       countValue: tr('80+', '80+', '80+'),
       currentFocus: tr('Current Focus: Pavagadh Upashrays', 'હાલનું કેન્દ્ર: પાવાગઢ ઉપાશ્રયો', 'वर्तमान केंद्र: पावागढ़ उपाश्रय'),
+    },
+    jinalayHome: {
+      badge: tr('Architecture · 02.1', 'જીર્ણોદ્ધાર · ૦૨.૧', 'जीर्णोद्धार · 02.1'),
+      title: tr('Jinalay Jirnodhar', 'જિનાલય જીર્ણોદ્ધાર', 'जिनालय जीर्णोद्धार'),
+      paragraph: tr(
+        'Along with Upashrays, our group is dedicated to the restoration of sacred Jinalayas. Total 14 Jinalayas have been renovated to preserve our divine heritage.',
+        'ઉપાશ્રયોની સાથે, અમારું ગ્રુપ પવિત્ર જિનાલયોના જીર્ણોદ્ધાર માટે પણ સમર્પિત છે. અત્યાર સુધીમાં કુલ ૧૪ જિનાલયોનો જીર્ણોદ્ધાર કરવામાં આવ્યો છે.',
+        'उपाश्रयों के साथ-साथ, हमारा समूह पवित्र जिनालयों के जीर्णोद्धार के लिए भी समर्पित है। अब तक कुल 14 जिनालयों का जीर्णोद्धार किया जा चुका है।',
+      ),
+      countLabel: tr('Total Jinalayas Renovated', 'કુલ જીર્ણોદ્ધાર થયેલ જિનાલયો', 'कुल नवीनीकृत जिनालय'),
+      countValue: tr('14', '૧૪', '14'),
     },
     pathsala: {
       badge: tr('Education · 03', 'શૈક્ષણિક સેવા · ૦૩', 'शैक्षिक सेवा · 03'),

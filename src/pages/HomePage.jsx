@@ -19,6 +19,8 @@ const sceneImages = {
   busMobile: '/images/mobile/bus.webp',
   upashray: '/images/Upasray.png',
   upashrayMobile: '/images/mobile/upashray.webp',
+  jinalay: '/images/Jinalaya-jirnodhar.JPG',
+  jinalayMobile: '/images/Jinalaya-jirnodhar.JPG',
   pathsala: '/images/5-Pathsala Vitran.png',
   pathsalaMobile: '/images/5-Pathsala Vitran.png',
   rituals: '/image/6.JPG',
@@ -70,9 +72,10 @@ const HomePage = () => {
       { id: 'about', label: t(siteCopy.home.scenes[1].label) },
       { id: 'bus', label: t(siteCopy.home.scenes[2].label) },
       { id: 'upashray', label: t(siteCopy.home.scenes[3].label) },
-      { id: 'pathsala', label: t(siteCopy.home.scenes[4].label) },
-      { id: 'rituals', label: t(siteCopy.home.scenes[5].label) },
-      { id: 'join', label: t(siteCopy.home.scenes[6].label) },
+      { id: 'jinalay', label: t(siteCopy.home.scenes[4].label) },
+      { id: 'pathsala', label: t(siteCopy.home.scenes[5].label) },
+      { id: 'rituals', label: t(siteCopy.home.scenes[6].label) },
+      { id: 'join', label: t(siteCopy.home.scenes[7].label) },
     ],
     [t],
   );
@@ -524,7 +527,7 @@ const HomePage = () => {
     <div className="relative min-h-full flex flex-col overflow-x-hidden bg-surface selection:bg-primary selection:text-on-primary">
       <SiteNavbar variant="dark" />
 
-      <aside className="fixed right-4 md:right-12 top-1/2 -translate-y-1/2 z-[80] flex flex-col gap-4 md:gap-7 items-center">
+      <aside className="fixed right-4 md:right-12 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-4 md:gap-7 items-center">
         {scenes.map((scene) => {
           const isActive = activeSceneId === scene.id;
           return (
@@ -637,8 +640,8 @@ const HomePage = () => {
               onContextMenu={(e) => e.preventDefault()}
             />
           </div>
-          <div className="relative z-20 w-full px-4 md:px-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
-            <article className="frosted-premium rounded-sm border-t-2 border-primary p-5 md:p-10">
+          <div className="relative z-20 w-full px-4 md:px-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 items-center">
+            <article className="frosted-premium rounded-sm border-t-2 border-primary p-5 md:p-10 mx-auto w-full">
               <span className="text-primary font-headline text-[10px] tracking-[0.5em] uppercase opacity-60">{t(siteCopy.home.intro.acharyaBadge)}</span>
               <h2 className="home-reveal text-[1.1rem] md:text-4xl font-headline mt-3 text-white leading-tight">{t(siteCopy.home.intro.acharyaTitle)}</h2>
               <div className="mt-3 md:mt-6 space-y-3 text-on-surface-variant leading-5 md:leading-relaxed font-light text-[11px] md:text-sm">
@@ -650,7 +653,7 @@ const HomePage = () => {
                 <p className="home-reveal italic text-primary/80">{t(siteCopy.home.intro.quote)}</p>
               </div>
             </article>
-            <article className="frosted-premium rounded-sm border-t-2 border-primary p-5 md:p-10 flex flex-col">
+            <article className="frosted-premium rounded-sm border-t-2 border-primary p-5 md:p-10 flex flex-col mx-auto w-full">
               <span className="text-primary font-headline text-[10px] tracking-[0.5em] uppercase opacity-60">{t(siteCopy.aboutPage.portraitPanelTitle)}</span>
               <div className="mt-3 md:mt-6 rounded-sm overflow-hidden border border-primary/20 bg-black/35">
                 <img
@@ -760,6 +763,46 @@ const HomePage = () => {
 
         <section
           ref={(element) => {
+            sectionRefs.current.jinalay = element;
+          }}
+          data-scene-id="jinalay"
+          className="home-scene snap-section relative min-h-screen flex items-center py-20"
+        >
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            <img
+              src={isMobileViewport ? sceneImages.jinalayMobile : sceneImages.jinalay}
+              alt={t(siteCopy.home.scenes[4].label)}
+              className="home-bg h-full w-full object-cover brightness-[0.34] select-none"
+              loading="lazy"
+              decoding="async"
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </div>
+          <div className="relative z-20 w-full px-6 md:px-24 flex justify-center md:justify-start">
+            <article className="frosted-premium px-6 md:px-12 py-6 md:py-10 max-w-sm md:max-w-2xl border-l-[6px] border-secondary text-left">
+              <span className="text-primary font-bold tracking-[0.4em] uppercase text-[8px] md:text-[10px] opacity-70">{t(siteCopy.home.jinalayHome.badge)}</span>
+              <h2 className="home-reveal text-3xl md:text-7xl font-headline mt-4 mb-4 md:mb-6 leading-tight md:leading-none text-white">
+                {t(siteCopy.home.jinalayHome.title)}
+              </h2>
+              <p className="home-reveal text-sm md:text-lg text-on-surface-variant font-light leading-relaxed">{t(siteCopy.home.jinalayHome.paragraph)}</p>
+              <div className="home-reveal mt-4 bg-white/5 p-3 rounded-sm text-center inline-block">
+                <span className="block text-secondary text-xl md:text-3xl font-headline mb-0.5 font-bold">{t(siteCopy.home.jinalayHome.countValue)}</span>
+                <span className="text-white uppercase tracking-widest text-[8px] md:text-[10px]">{t(siteCopy.home.jinalayHome.countLabel)}</span>
+              </div>
+              <div>
+                <Link
+                  to="/jinalay-jirnodhar"
+                  className="home-reveal inline-block mt-6 px-6 py-3 border border-secondary/60 text-secondary font-bold tracking-[0.2em] uppercase text-[10px] hover:bg-secondary hover:text-black transition-colors"
+                >
+                  {t(siteCopy.common.viewDetails)}
+                </Link>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section
+          ref={(element) => {
             sectionRefs.current.pathsala = element;
           }}
           data-scene-id="pathsala"
@@ -768,15 +811,15 @@ const HomePage = () => {
           <div className="absolute inset-0 z-0 overflow-hidden">
             <img
               src={isMobileViewport ? sceneImages.pathsalaMobile : sceneImages.pathsala}
-              alt={t(siteCopy.home.scenes[4].label)}
+              alt={t(siteCopy.home.scenes[5].label)}
               className="home-bg h-full w-full object-cover brightness-[0.35] select-none"
               loading="lazy"
               decoding="async"
               onContextMenu={(e) => e.preventDefault()}
             />
           </div>
-          <div className="relative z-20 w-full px-6 md:px-24 flex justify-center md:justify-start">
-            <article className="frosted-premium p-8 md:p-14 max-w-sm md:max-w-2xl border-l-[6px] border-secondary">
+          <div className="relative z-20 w-full px-6 md:px-24 flex justify-center md:justify-end">
+            <article className="frosted-premium p-8 md:p-14 max-w-sm md:max-w-2xl border-r-[6px] border-secondary text-right">
               <span className="text-primary font-bold tracking-[0.4em] uppercase text-[8px] md:text-[10px] opacity-70">{t(siteCopy.home.pathsala.badge)}</span>
               <h2 className="home-reveal text-3xl md:text-7xl font-headline mt-4 md:mt-6 mb-5 md:mb-7 leading-tight md:leading-none text-white">
                 {t(siteCopy.home.pathsala.title)}
@@ -794,17 +837,23 @@ const HomePage = () => {
           className="home-scene snap-section relative min-h-screen flex items-center py-20"
         >
           <div className="absolute inset-0 z-0 overflow-hidden">
-            <img src={isMobileViewport ? sceneImages.ritualsMobile : sceneImages.rituals} alt={t(siteCopy.home.scenes[5].label)} className="home-bg h-full w-full object-cover brightness-[0.33]" loading="lazy" decoding="async" />
+            <img src={isMobileViewport ? sceneImages.ritualsMobile : sceneImages.rituals} alt={t(siteCopy.home.scenes[6].label)} className="home-bg h-full w-full object-cover brightness-[0.33]" loading="lazy" decoding="async" />
           </div>
-          <div className="relative z-20 w-full px-6 md:px-24 flex justify-center md:justify-end">
-            <article className="frosted-premium p-8 md:p-14 max-w-sm md:max-w-2xl border-r-[6px] border-secondary text-right">
+          <div className="relative z-20 w-full px-6 md:px-24 flex justify-center md:justify-start">
+            <article className="frosted-premium p-8 md:p-14 max-w-sm md:max-w-2xl border-l-[6px] border-secondary text-left">
               <span className="text-primary font-bold tracking-[0.4em] uppercase text-[8px] md:text-[10px] opacity-70">{t(siteCopy.home.rituals.badge)}</span>
               <h2 className="home-reveal text-3xl md:text-7xl font-headline mt-4 md:mt-6 mb-5 md:mb-7 leading-tight md:leading-none text-white">
                 {t(siteCopy.home.rituals.title)}
               </h2>
               <p className="home-reveal text-sm md:text-xl text-on-surface-variant font-light leading-relaxed">{t(siteCopy.home.rituals.paragraph)}</p>
               {siteCopy.home.rituals.contacts && (
-                <p className="home-reveal mt-4 text-sm md:text-xl text-on-surface-variant font-bold leading-relaxed">{t(siteCopy.home.rituals.contacts)}</p>
+                <div className="home-reveal mt-4 space-y-1">
+                  {t(siteCopy.home.rituals.contacts).split('/').map((contact, idx) => (
+                    <p key={idx} className="text-sm md:text-xl text-on-surface-variant font-bold leading-relaxed">
+                      {contact.trim()}
+                    </p>
+                  ))}
+                </div>
               )}
               <Link
                 to="/events"
