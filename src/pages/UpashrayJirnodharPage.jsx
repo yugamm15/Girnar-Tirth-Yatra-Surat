@@ -204,6 +204,19 @@ const UpashrayJirnodharPage = () => {
 
   const delayPerPin = Math.min(150, 4000 / Math.max(1, upashrays.length));
 
+  const getVisiblePageNumbers = () => {
+    const maxVisible = 4;
+    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let end = start + maxVisible - 1;
+
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  };
+
   const mapLocations = useMemo(() => {
     return upashrays.map(u => parseLocation(u.location)).filter(Boolean);
   }, [upashrays]);
@@ -361,7 +374,7 @@ const UpashrayJirnodharPage = () => {
                     Previous
                   </button>
 
-                  {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                  {getVisiblePageNumbers().map((pageNumber) => (
                     <button
                       key={pageNumber}
                       type="button"
