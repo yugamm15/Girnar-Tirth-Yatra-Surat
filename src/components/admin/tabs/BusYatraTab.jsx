@@ -12,7 +12,8 @@ const BusYatraTab = ({
   deleteYatraDate, 
   registrationYatraFilter, 
   setRegistrationYatraFilter, 
-  exportRegistrationsToCSV 
+  exportRegistrationsToCSV,
+  deleteRegistration
 }) => {
   const [remarksModalOpen, setRemarksModalOpen] = useState(false);
   const [remarksText, setRemarksText] = useState('');
