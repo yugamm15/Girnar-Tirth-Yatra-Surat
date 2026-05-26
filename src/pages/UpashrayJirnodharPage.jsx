@@ -8,6 +8,7 @@ import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { dbCache, upashraysDB, upashrayMediaDB } from '../lib/database.js';
+import { getSafeImageUrl } from '../utils/imageUtils.js';
 
 const parseLocation = (locStr) => {
   if (!locStr) return null;
@@ -99,6 +100,11 @@ const UpashrayJirnodharPage = () => {
 
   const cacheKey = 'upashray_jirnodhar_page';
 
+  const sanitizeUpashray = (item) => ({
+    ...item,
+    coverImage: getSafeImageUrl(item?.coverImage, '/images/Upasray.png'),
+  });
+
   const normalizeUpashrays = (data, media) => {
     const mediaByUpashrayId = media.reduce((acc, item) => {
       const upashrayId = String(item.upashray_id);
@@ -112,8 +118,8 @@ const UpashrayJirnodharPage = () => {
     return data.map((upashray) => {
       const upashrayMedia = mediaByUpashrayId[String(upashray.id)] || [];
       const coverImage =
-        upashrayMedia.find((item) => item.media_type === 'before')?.file_url ||
-        upashrayMedia[0]?.file_url ||
+        getSafeImageUrl(upashrayMedia.find((item) => item.media_type === 'before')?.file_url, '') ||
+        getSafeImageUrl(upashrayMedia[0]?.file_url, '') ||
         '/images/Upasray.png';
 
       return {
@@ -131,7 +137,7 @@ const UpashrayJirnodharPage = () => {
       try {
         const cachedUpashrays = dbCache.read(cacheKey);
         if (cachedUpashrays) {
-          setUpashrays(cachedUpashrays);
+          setUpashrays(cachedUpashrays.map(sanitizeUpashray));
           setLoading(false);
         }
 
@@ -143,9 +149,9 @@ const UpashrayJirnodharPage = () => {
         const nextUpashrays = normalizeUpashrays(data || [], media || []);
 
         if (!cancelled) {
-          setUpashrays(nextUpashrays);
+          setUpashrays(nextUpashrays.map(sanitizeUpashray));
           setError(null);
-          dbCache.write(cacheKey, nextUpashrays);
+          dbCache.write(cacheKey, nextUpashrays.map(sanitizeUpashray));
         }
       } catch (err) {
         console.error('Error loading upashrays:', err);

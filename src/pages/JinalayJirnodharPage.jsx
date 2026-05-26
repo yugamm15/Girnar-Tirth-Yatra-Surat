@@ -8,6 +8,7 @@ import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { dbCache, jinalayasDB } from '../lib/database.js';
+import { getSafeImageUrl } from '../utils/imageUtils.js';
 
 const parseLocation = (locStr) => {
   if (!locStr) return null;
@@ -97,6 +98,11 @@ const JinalayJirnodharPage = () => {
 
   const cacheKey = 'jinalay_jirnodhar_page';
 
+  const sanitizeJinalaya = (item) => ({
+    ...item,
+    coverImage: getSafeImageUrl(item?.coverImage, '/images/Upasray.png'),
+  });
+
   useEffect(() => {
     let cancelled = false;
 
@@ -104,20 +110,20 @@ const JinalayJirnodharPage = () => {
       try {
         const cachedJinalayas = dbCache.read(cacheKey);
         if (cachedJinalayas) {
-          setJinalayas(cachedJinalayas);
+          setJinalayas(cachedJinalayas.map(sanitizeJinalaya));
           setLoading(false);
         }
 
         const data = await jinalayasDB.getAll();
         const processed = data.map(j => ({
           ...j,
-          coverImage: j.after_img || j.process_img || j.before_img || '/images/Upasray.png'
+          coverImage: getSafeImageUrl(j.after_img || j.process_img || j.before_img, '/images/Upasray.png')
         }));
 
         if (!cancelled) {
-          setJinalayas(processed);
+          setJinalayas(processed.map(sanitizeJinalaya));
           setError(null);
-          dbCache.write(cacheKey, processed);
+          dbCache.write(cacheKey, processed.map(sanitizeJinalaya));
         }
       } catch (err) {
         console.error('Error loading jinalayas:', err);

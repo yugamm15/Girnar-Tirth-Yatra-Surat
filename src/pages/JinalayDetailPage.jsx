@@ -6,6 +6,7 @@ import GalleryModal from '../components/GalleryModal.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { dbCache, jinalayasDB } from '../lib/database.js';
+import { getSafeImageUrl } from '../utils/imageUtils.js';
 
 const statusClassNames = {
   completed: 'bg-green-100 text-green-700 border-green-200',
@@ -31,6 +32,17 @@ const JinalayDetailPage = () => {
 
   const cacheKey = `jinalay_detail_${id || 'unknown'}`;
 
+  const sanitizeJinalaya = (value) => {
+    if (!value) return value;
+
+    return {
+      ...value,
+      before_img: getSafeImageUrl(value.before_img, ''),
+      process_img: getSafeImageUrl(value.process_img, ''),
+      after_img: getSafeImageUrl(value.after_img, ''),
+    };
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -38,7 +50,7 @@ const JinalayDetailPage = () => {
       try {
         const cachedState = dbCache.read(cacheKey);
         if (cachedState) {
-          setJinalaya(cachedState);
+          setJinalaya(sanitizeJinalaya(cachedState));
           setLoading(false);
         } else {
           setLoading(true);
@@ -54,9 +66,9 @@ const JinalayDetailPage = () => {
         }
 
         if (!cancelled) {
-          setJinalaya(data);
+          setJinalaya(sanitizeJinalaya(data));
           setError(null);
-          dbCache.write(cacheKey, data);
+          dbCache.write(cacheKey, sanitizeJinalaya(data));
         }
       } catch (err) {
         console.error('Error loading jinalaya:', err);
@@ -124,7 +136,10 @@ const JinalayDetailPage = () => {
     planned: 'planned'
   }[jinalaya.status] || jinalaya.status;
 
-  const coverImage = jinalaya.after_img || jinalaya.process_img || jinalaya.before_img || '/images/Upasray.png';
+  const coverImage = getSafeImageUrl(jinalaya.after_img || jinalaya.process_img || jinalaya.before_img, '/images/Upasray.png');
+  const beforeImage = getSafeImageUrl(jinalaya.before_img, '');
+  const processImage = getSafeImageUrl(jinalaya.process_img, '');
+  const afterImage = getSafeImageUrl(jinalaya.after_img, '');
 
   return (
     <LightPageShell>
@@ -203,14 +218,14 @@ const JinalayDetailPage = () => {
           {/* Before Section */}
           <article className="light-panel-soft p-5">
             <h2 className="text-xl font-headline text-gray-900">Before</h2>
-            {jinalaya.before_img ? (
+            {beforeImage ? (
               <div className="mt-4">
                 <div
                   className="cursor-pointer group relative"
-                  onClick={() => openGallery(jinalaya.before_img, `${jinalaya.name} - Before`)}
+                  onClick={() => openGallery(beforeImage, `${jinalaya.name} - Before`)}
                 >
                   <SecureImage
-                    src={jinalaya.before_img}
+                    src={beforeImage}
                     alt={`${jinalaya.name} - Before`}
                     containerClassName="w-full h-44 rounded-sm border border-gray-100"
                     className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"
@@ -230,14 +245,14 @@ const JinalayDetailPage = () => {
           {/* Process Section */}
           <article className="light-panel-soft p-5">
             <h2 className="text-xl font-headline text-gray-900">In Process</h2>
-            {jinalaya.process_img ? (
+            {processImage ? (
               <div className="mt-4">
                 <div
                   className="cursor-pointer group relative"
-                  onClick={() => openGallery(jinalaya.process_img, `${jinalaya.name} - Process`)}
+                  onClick={() => openGallery(processImage, `${jinalaya.name} - Process`)}
                 >
                   <SecureImage
-                    src={jinalaya.process_img}
+                    src={processImage}
                     alt={`${jinalaya.name} - Process`}
                     containerClassName="w-full h-44 rounded-sm border border-gray-100"
                     className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"
@@ -257,14 +272,14 @@ const JinalayDetailPage = () => {
           {/* After Section */}
           <article className="light-panel-soft p-5">
             <h2 className="text-xl font-headline text-gray-900">After</h2>
-            {jinalaya.after_img ? (
+            {afterImage ? (
               <div className="mt-4">
                 <div
                   className="cursor-pointer group relative"
-                  onClick={() => openGallery(jinalaya.after_img, `${jinalaya.name} - After`)}
+                  onClick={() => openGallery(afterImage, `${jinalaya.name} - After`)}
                 >
                   <SecureImage
-                    src={jinalaya.after_img}
+                    src={afterImage}
                     alt={`${jinalaya.name} - After`}
                     containerClassName="w-full h-44 rounded-sm border border-gray-100"
                     className="w-full h-44 object-cover group-hover:opacity-90 transition-opacity"

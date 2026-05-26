@@ -113,6 +113,12 @@ body.light-route-active {
   overscroll-behavior-y: none;
 }
 
+html.mobile-nav-open,
+body.mobile-nav-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .light-shell-grid {
   position: fixed;
   inset: 0;

@@ -11,6 +11,7 @@ import TopLineLoader from './TopLineLoader.jsx';
 import ToastViewport from './ToastViewport.jsx';
 import { generateMemberCode } from '../utils/memberUtils.js';
 import { formatDateForDisplay } from '../utils/dateUtils.js';
+import { getPersistableImageUrl, getSafeImageUrl } from '../utils/imageUtils.js';
 const ADMIN_CREDENTIALS = {
   email: 'GirnarTirthYatraGroup@gmail.com',
   password: 'Girnar@22'
@@ -255,9 +256,23 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     if (!state) return;
     if (state.busRegistrations) setBusRegistrations(state.busRegistrations);
     if (state.yatraDates) setYatraDates(state.yatraDates);
-    if (state.upashrays) setUpashrays(state.upashrays);
+    if (state.upashrays) {
+      setUpashrays(state.upashrays.map((u) => ({
+        ...u,
+        beforeImg: getSafeImageUrl(u.beforeImg, '/images/Upasray.png'),
+        processImg: getSafeImageUrl(u.processImg, '/images/Upasray.png'),
+        afterImg: getSafeImageUrl(u.afterImg, '/images/Upasray.png'),
+      })));
+    }
     if (state.members) setMembers(state.members);
-    if (state.jinalayas) setJinalayas(state.jinalayas);
+    if (state.jinalayas) {
+      setJinalayas(state.jinalayas.map((j) => ({
+        ...j,
+        beforeImg: getSafeImageUrl(j.beforeImg, '/images/Upasray.png'),
+        processImg: getSafeImageUrl(j.processImg, '/images/Upasray.png'),
+        afterImg: getSafeImageUrl(j.afterImg, '/images/Upasray.png'),
+      })));
+    }
     if (state.allReports) setAllReports(state.allReports);
   };
 
@@ -272,9 +287,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       const processed = data.map(u => ({
         ...u,
         name: u.name || '', village: u.village || '', route: u.route || '',
-        beforeImg: u.before_img || '/images/Upasray.png',
-        processImg: u.process_img || '/images/Upasray.png',
-        afterImg: u.after_img || '/images/Upasray.png',
+        beforeImg: getSafeImageUrl(u.before_img, '/images/Upasray.png'),
+        processImg: getSafeImageUrl(u.process_img, '/images/Upasray.png'),
+        afterImg: getSafeImageUrl(u.after_img, '/images/Upasray.png'),
         reports: []
       }));
       
@@ -315,9 +330,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       const data = await jinalayasDB.getAll();
       const processed = data.map(j => ({
         ...j,
-        beforeImg: j.before_img || '/images/Upasray.png',
-        processImg: j.process_img || '/images/Upasray.png',
-        afterImg: j.after_img || '/images/Upasray.png'
+        beforeImg: getSafeImageUrl(j.before_img, '/images/Upasray.png'),
+        processImg: getSafeImageUrl(j.process_img, '/images/Upasray.png'),
+        afterImg: getSafeImageUrl(j.after_img, '/images/Upasray.png')
       }));
       setJinalayas(processed);
       setLoadedData(prev => ({ ...prev, jinalayas: true }));
@@ -935,9 +950,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         description: jinalayaFormData.description,
         location: jinalayaFormData.location, 
         status: jinalayaFormData.status.toLowerCase(), 
-        before_img: jinalayaFormData.beforeImg || null,
-        process_img: jinalayaFormData.processImg || null, 
-        after_img: jinalayaFormData.afterImg || null
+        before_img: getPersistableImageUrl(jinalayaFormData.beforeImg),
+        process_img: getPersistableImageUrl(jinalayaFormData.processImg), 
+        after_img: getPersistableImageUrl(jinalayaFormData.afterImg)
       };
       let savedJinalaya;
       if (editingJinalayaId) {

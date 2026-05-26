@@ -86,6 +86,20 @@ export const SiteNavbar = ({ variant = 'light' }) => {
   }, [location.pathname]);
 
   useEffect(() => {
+    if (typeof document === 'undefined') {
+      return undefined;
+    }
+
+    document.documentElement.classList.toggle('mobile-nav-open', isMobileMenuOpen);
+    document.body.classList.toggle('mobile-nav-open', isMobileMenuOpen);
+
+    return () => {
+      document.documentElement.classList.remove('mobile-nav-open');
+      document.body.classList.remove('mobile-nav-open');
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
     const updateViewport = () => {
       setIsMobileViewport(window.innerWidth < 768);
     };
@@ -204,7 +218,7 @@ export const SiteNavbar = ({ variant = 'light' }) => {
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <div
-          className={`absolute right-0 top-0 h-full w-[86%] max-w-[360px] transition-transform duration-500 transform ${
+          className={`absolute right-0 top-0 h-full w-[86%] max-w-[360px] overflow-y-auto overscroll-contain transition-transform duration-500 transform ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           } ${isDark ? 'bg-[#0a0a0a] border-l border-primary/10' : 'bg-white'} shadow-2xl flex flex-col`}
           onClick={(event) => event.stopPropagation()}
