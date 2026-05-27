@@ -115,7 +115,6 @@ body.light-route-active {
 
 html.mobile-nav-open,
 body.mobile-nav-open {
-  overflow: hidden;
   overscroll-behavior: none;
 }
 

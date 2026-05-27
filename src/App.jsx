@@ -52,7 +52,7 @@ const AppRoutes = () => {
   const location = useLocation();
 
   return (
-    <div key={location.key} className="route-transition-enter">
+    <div key={location.pathname} className="route-transition-enter">
       <Routes location={location}>
         <Route path="/" element={withLazyBoundary(<HomePage />)} />
         <Route path="/about-girnar" element={withLazyBoundary(<AboutGirnarPage />)} />
