@@ -28,6 +28,7 @@ const AdminPanel = ({
   isModalOpen, resetForm, editingId, formData, setFormData, handleSaveUpashray, handleMultipleFilesChange, removeMediaFile, deleteExistingMedia,
   // Bus Yatra props
   yatraSearch, setYatraSearch, setEditingYatraDateId, setYatraDateFormData, setIsYatraDateModalOpen, yatraDates, busRegistrations, toggleRegistrationStatus, deleteYatraDate, registrationYatraFilter, setRegistrationYatraFilter, exportRegistrationsToCSV, deleteRegistration,
+  addOfflineRegistration,
   isYatraDateModalOpen, editingYatraDateId, yatraDateFormData, handleYatraFileChange, handleYatraDateSubmit,
   paymentIntents,
   // Member props
@@ -203,6 +204,7 @@ const AdminPanel = ({
             setRegistrationYatraFilter={setRegistrationYatraFilter}
             exportRegistrationsToCSV={exportRegistrationsToCSV}
             deleteRegistration={deleteRegistration}
+            addOfflineRegistration={addOfflineRegistration}
           />
         )}
         {(activeTab === 'sponsorships' || activeTab === 'sponsor-payments') && (

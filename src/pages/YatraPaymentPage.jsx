@@ -4,7 +4,8 @@ import { LightPageShell } from '../components/LightPageShell.jsx';
 import SecureImage from '../components/SecureImage.jsx';
 import TopLineLoader from '../components/TopLineLoader.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { yatrikRegistrationsDB } from '../lib/database.js';
+import { siteCopy } from '../content/siteCopy.js';
+import { yatraDatesDB, yatrikRegistrationsDB } from '../lib/database.js';
 
 const YatraPaymentPage = () => {
   const navigate = useNavigate();
@@ -56,6 +57,17 @@ const YatraPaymentPage = () => {
         
         try {
           setIsProcessing(true);
+
+          const [latestYatra, latestRegistrations] = await Promise.all([
+            yatraDatesDB.getById(bookingInfo.yatraId),
+            yatrikRegistrationsDB.getByYatraId(bookingInfo.yatraId),
+          ]);
+          const latestMaxCapacity = latestYatra?.max_capacity == null || latestYatra?.max_capacity === '' ? null : Number(latestYatra.max_capacity);
+          if (Number.isFinite(latestMaxCapacity) && latestMaxCapacity > 0 && latestRegistrations.length + bookingInfo.yatricks.length > latestMaxCapacity) {
+            alert(`Sorry, max capacity reached. Please contact ${siteCopy.contactPage.info.phoneValue} for help.`);
+            setIsProcessing(false);
+            return;
+          }
           
           // Prepare registrations for database
           const registrations = bookingInfo.yatricks.map(y => ({
@@ -67,6 +79,7 @@ const YatraPaymentPage = () => {
             gender: y.gender,
             remarks: y.remarks ? `${y.remarks} (Payment ID: ${response.razorpay_payment_id})` : `Payment ID: ${response.razorpay_payment_id}`,
             yatra_id: parseInt(bookingInfo.yatraId),
+            registration_source: 'online',
           }));
 
           // Save to database

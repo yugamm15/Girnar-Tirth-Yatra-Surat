@@ -57,6 +57,7 @@ CREATE TABLE yatra_dates (
   image VARCHAR(500),
   registration_open BOOLEAN DEFAULT FALSE,
   price_per_person NUMERIC DEFAULT 900,
+  max_capacity INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -114,6 +115,7 @@ CREATE TABLE yatrik_registrations (
   gender VARCHAR(50),
   remarks TEXT,
   yatra_id BIGINT REFERENCES yatra_dates(id) ON DELETE CASCADE,
+  registration_source VARCHAR(20) DEFAULT 'online',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -185,6 +187,7 @@ CREATE INDEX idx_members_email ON members(email);
 CREATE INDEX idx_members_has_access ON members(has_access);
 CREATE INDEX idx_yatrik_yatra_id ON yatrik_registrations(yatra_id);
 CREATE INDEX idx_yatrik_created_at ON yatrik_registrations(created_at);
+CREATE INDEX idx_yatrik_registration_source ON yatrik_registrations(registration_source);
 CREATE INDEX idx_yatra_dates_trip_date ON yatra_dates(trip_date);
 CREATE INDEX idx_sponsorship_schemes_active ON sponsorship_schemes(is_active);
 CREATE INDEX idx_sponsorship_schemes_sort_order ON sponsorship_schemes(sort_order);
@@ -203,6 +206,8 @@ CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
 -- ============== MIGRATION CLEANUP FOR THE OLD BUS-SPONSORSHIP FIELDS ==============
 -- Run these after the new tables exist and the old data has been moved or replaced.
 ALTER TABLE yatra_dates ADD COLUMN IF NOT EXISTS trip_date DATE;
+ALTER TABLE yatra_dates ADD COLUMN IF NOT EXISTS max_capacity INTEGER;
+ALTER TABLE yatrik_registrations ADD COLUMN IF NOT EXISTS registration_source VARCHAR(20) DEFAULT 'online';
 DO $$
 BEGIN
   IF EXISTS (

@@ -213,7 +213,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
   // Form State for Yatra Dates
   const [yatraDateFormData, setYatraDateFormData] = useState({
-    date_text: '', description: '', image: '', registration_open: true
+    date_text: '', description: '', image: '', registration_open: true, max_capacity: ''
   });
   const [isYatraDateModalOpen, setIsYatraDateModalOpen] = useState(false);
   const [editingYatraDateId, setEditingYatraDateId] = useState(null);
@@ -404,6 +404,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         ...d,
         date_text: d.trip_date ? formatDateForDisplay(d.trip_date) : d.date_text || '',
         registration_open: d.registration_open !== false,
+        max_capacity: d.max_capacity ?? null,
       }));
       setBusRegistrations(busData);
       setYatraDates(processedDates);
@@ -1030,6 +1031,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         image: yatraDateFormData.image,
         registration_open: yatraDateFormData.registration_open,
         price_per_person: yatraDateFormData.price_per_person || 900,
+        max_capacity: yatraDateFormData.max_capacity === '' ? null : yatraDateFormData.max_capacity,
       };
       if (editingYatraDateId) await yatraDatesDB.update(editingYatraDateId, data);
       else await yatraDatesDB.create(data);
@@ -1100,13 +1102,61 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     }
   };
 
+  const addOfflineRegistration = async (registrationData) => {
+    const yatraId = String(registrationData.yatra_id || '').trim();
+    if (!yatraId) {
+      throw new Error('Please select a yatra date');
+    }
+
+    const firstName = String(registrationData.first_name || '').trim();
+    const lastName = String(registrationData.last_name || '').trim();
+    const phone = String(registrationData.phone || '').trim();
+    const birthdate = String(registrationData.birthdate || '').trim();
+    const gender = String(registrationData.gender || '').trim();
+
+    if (!firstName || !lastName || !phone || !birthdate || !gender) {
+      throw new Error('Please fill all required fields');
+    }
+
+    const targetYatra = yatraDates.find(date => String(date.id) === yatraId);
+    if (!targetYatra) {
+      throw new Error('Selected yatra date was not found');
+    }
+
+    const maxCapacity = Number(targetYatra.max_capacity || 0);
+    if (maxCapacity > 0) {
+      const currentCount = busRegistrations.filter(reg => String(reg.yatra_id) === yatraId).length;
+      if (currentCount >= maxCapacity) {
+        throw new Error('Sorry, max capacity reached for this yatra');
+      }
+    }
+
+    const savedRegistration = await yatrikRegistrationsDB.create({
+      first_name: firstName,
+      last_name: lastName,
+      phone,
+      alt_phone: String(registrationData.alt_phone || '').trim() || null,
+      birthdate,
+      gender,
+      remarks: String(registrationData.remarks || '').trim() || null,
+      yatra_id: Number(yatraId),
+      registration_source: 'offline',
+    });
+
+    const nextRegistrations = [savedRegistration, ...busRegistrations];
+    setBusRegistrations(nextRegistrations);
+    updateCache({ busRegistrations: nextRegistrations });
+    pushToast('Offline registration added successfully.', 'success');
+    return savedRegistration;
+  };
+
   const exportRegistrationsToCSV = () => {
     const filtered = busRegistrations.filter(reg => registrationYatraFilter === 'all' || String(reg.yatra_id) === String(registrationYatraFilter));
     if (filtered.length === 0) { alert('No data to export'); return; }
-    const headers = ['Yatra Date', 'First Name', 'Last Name', 'Phone', 'Alt Phone', 'Gender', 'Birthdate', 'Remarks'];
+    const headers = ['Yatra Date', 'First Name', 'Last Name', 'Phone', 'Alt Phone', 'Gender', 'Birthdate', 'Source', 'Remarks'];
     const rows = filtered.map(reg => {
       const yatraDate = yatraDates.find(d => String(d.id) === String(reg.yatra_id))?.date_text || 'Unknown';
-      return [yatraDate, reg.first_name, reg.last_name, reg.phone, reg.alt_phone || '', reg.gender, reg.birthdate, (reg.remarks || '').replace(/,/g, ';')];
+      return [yatraDate, reg.first_name, reg.last_name, reg.phone, reg.alt_phone || '', reg.gender, reg.birthdate, reg.registration_source || 'online', (reg.remarks || '').replace(/,/g, ';')];
     });
     const csvContent = [headers, ...rows].map(e => e.join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1209,7 +1259,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         <AdminPanel 
           activeTab={activeTab} setActiveTab={(tab) => navigate(`/admin/${tab}`)} loadedData={loadedData} loadMembers={loadMembers} loadJinalayas={loadJinalayas} loadReports={loadReports} loadBusYatra={loadBusYatra} loadPaymentIntents={loadPaymentIntents} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} handleLogout={handleLogout}
           upashrays={upashrays} upashraySearch={upashraySearch} setUpashraySearch={setUpashraySearch} setIsModalOpen={setIsModalOpen} startEdit={startEdit} deleteUpashray={deleteUpashray} isModalOpen={isModalOpen} resetForm={resetForm} editingId={editingId} formData={formData} setFormData={setFormData} handleSaveUpashray={handleSaveUpashray} handleMultipleFilesChange={handleMultipleFilesChange} removeMediaFile={removeMediaFile} deleteExistingMedia={deleteExistingMedia}
-          yatraSearch={yatraSearch} setYatraSearch={setYatraSearch} setEditingYatraDateId={setEditingYatraDateId} setYatraDateFormData={setYatraDateFormData} setIsYatraDateModalOpen={setIsYatraDateModalOpen} yatraDates={yatraDates} busRegistrations={busRegistrations} toggleRegistrationStatus={toggleRegistrationStatus} deleteYatraDate={deleteYatraDate} registrationYatraFilter={registrationYatraFilter} setRegistrationYatraFilter={setRegistrationYatraFilter} exportRegistrationsToCSV={exportRegistrationsToCSV} deleteRegistration={deleteRegistration} isYatraDateModalOpen={isYatraDateModalOpen} editingYatraDateId={editingYatraDateId} yatraDateFormData={yatraDateFormData} handleYatraFileChange={handleYatraFileChange} handleYatraDateSubmit={handleYatraDateSubmit}
+          yatraSearch={yatraSearch} setYatraSearch={setYatraSearch} setEditingYatraDateId={setEditingYatraDateId} setYatraDateFormData={setYatraDateFormData} setIsYatraDateModalOpen={setIsYatraDateModalOpen} yatraDates={yatraDates} busRegistrations={busRegistrations} toggleRegistrationStatus={toggleRegistrationStatus} deleteYatraDate={deleteYatraDate} registrationYatraFilter={registrationYatraFilter} setRegistrationYatraFilter={setRegistrationYatraFilter} exportRegistrationsToCSV={exportRegistrationsToCSV} deleteRegistration={deleteRegistration} addOfflineRegistration={addOfflineRegistration} isYatraDateModalOpen={isYatraDateModalOpen} editingYatraDateId={editingYatraDateId} yatraDateFormData={yatraDateFormData} handleYatraFileChange={handleYatraFileChange} handleYatraDateSubmit={handleYatraDateSubmit}
           members={members} memberSearch={memberSearch} setMemberSearch={setMemberSearch} setIsMemberModalOpen={setIsMemberModalOpen} toggleMemberAccess={toggleMemberAccess} startEditMember={startEditMember} deleteMember={deleteMember} isMemberModalOpen={isMemberModalOpen} resetMemberForm={resetMemberForm} editingMemberId={editingMemberId} memberFormData={memberFormData} setMemberFormData={setMemberFormData} handleSaveMember={handleSaveMember}
           jinalayas={jinalayas} jinalayaSearch={jinalayaSearch} setJinalayaSearch={setJinalayaSearch} setIsJinalayaModalOpen={setIsJinalayaModalOpen} startEditJinalaya={startEditJinalaya} deleteJinalaya={deleteJinalaya} isJinalayaModalOpen={isJinalayaModalOpen} resetJinalayaForm={resetJinalayaForm} editingJinalayaId={editingJinalayaId} jinalayaFormData={jinalayaFormData} setJinalayaFormData={setJinalayaFormData} handleSaveJinalaya={handleSaveJinalaya}
           allReports={allReports} reportUpashrayFilter={reportUpashrayFilter} setReportUpashrayFilter={setReportUpashrayFilter} reportMemberFilter={reportMemberFilter} setReportMemberFilter={setReportMemberFilter} reportDateFilter={reportDateFilter} setReportDateFilter={setReportDateFilter} setSelectedReport={setSelectedReport} deleteReport={deleteReport} isReportModalOpen={isReportModalOpen} setIsReportModalOpen={setIsReportModalOpen} selectedReport={selectedReport} openReportAndPrint={openReportAndPrint}

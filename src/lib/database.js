@@ -273,6 +273,7 @@ export const yatraDatesDB = {
         image: yatraDate.image,
         registration_open: yatraDate.registration_open,
         price_per_person: yatraDate.price_per_person || 900,
+        max_capacity: yatraDate.max_capacity === '' || yatraDate.max_capacity === undefined ? null : Number(yatraDate.max_capacity),
         created_at: new Date().toISOString() 
       }])
       .select();
@@ -286,6 +287,11 @@ export const yatraDatesDB = {
       normalizedUpdates.trip_date = normalizeTripDate(normalizedUpdates.date_text);
     }
     delete normalizedUpdates.date_text;
+    if (normalizedUpdates.max_capacity !== undefined) {
+      normalizedUpdates.max_capacity = normalizedUpdates.max_capacity === '' || normalizedUpdates.max_capacity === null
+        ? null
+        : Number(normalizedUpdates.max_capacity);
+    }
 
     const { data, error } = await supabase
       .from('yatra_dates')
@@ -657,7 +663,7 @@ export const yatrikRegistrationsDB = {
   async create(registration) {
     const { data, error } = await supabase
       .from('yatrik_registrations')
-      .insert([{ ...registration, created_at: new Date().toISOString() }])
+      .insert([{ ...registration, registration_source: registration.registration_source || 'online', created_at: new Date().toISOString() }])
       .select();
     if (error) throw error;
     return data?.[0];
@@ -666,6 +672,7 @@ export const yatrikRegistrationsDB = {
   async createMultiple(registrations) {
     const prepared = registrations.map(reg => ({
       ...reg,
+      registration_source: reg.registration_source || 'online',
       created_at: new Date().toISOString()
     }));
     const { data, error } = await supabase

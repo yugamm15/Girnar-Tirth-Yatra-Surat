@@ -78,6 +78,19 @@ const YatraDateModal = ({
               placeholder="Optional details about this yatra"
             />
           </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Max Capacity</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={yatraDateFormData.max_capacity || ''}
+                  onChange={(e) => setYatraDateFormData({ ...yatraDateFormData, max_capacity: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-200 text-sm py-3 px-4 outline-none focus:border-[#c5a059] transition-colors"
+                  placeholder="Optional"
+                />
+              </div>
+            </div>
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-sm">
             <div>
               <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-700">Open for Registration</h4>

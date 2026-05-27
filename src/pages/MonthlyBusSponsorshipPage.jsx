@@ -4,6 +4,8 @@ import { LightPageShell } from '../components/LightPageShell.jsx';
 import TopLineLoader from '../components/TopLineLoader.jsx';
 import ToastViewport from '../components/ToastViewport.jsx';
 import { sponsorshipSchemesDB, paymentIntentsDB, yatraDatesDB } from '../lib/database.js';
+import { siteCopy } from '../content/siteCopy.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatDateForDisplay, isFutureYatraTrip } from '../utils/dateUtils.js';
 
 const emptySponsor = {
@@ -15,6 +17,8 @@ const emptySponsor = {
 };
 
 const MonthlyBusSponsorshipPage = () => {
+  const { t } = useLanguage();
+  const pageCopy = siteCopy.monthlyBusPage;
   const navigate = useNavigate();
   const [schemes, setSchemes] = useState([]);
   const [yatraDates, setYatraDates] = useState([]);
@@ -258,7 +262,7 @@ const MonthlyBusSponsorshipPage = () => {
                           <p className="mt-2 text-sm text-gray-500 leading-relaxed">{scheme.description || 'Support the monthly yatra through this sponsorship option.'}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-[10px] uppercase tracking-[0.25em] text-gray-400 font-bold">Per Trip</p>
+                          <p className="text-[10px] uppercase tracking-[0.25em] text-gray-400 font-bold">{t(pageCopy.sponsorshipPerBus)}</p>
                           <p className="mt-1 text-2xl font-headline text-[#c5a059]">₹{Number(scheme.amount || 0)}</p>
                         </div>
                       </div>

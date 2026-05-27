@@ -9,7 +9,7 @@ import { FormSelect } from '../components/FormSelect.jsx';
 import { FormInput } from '../components/FormInput.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { dbCache, yatraDatesDB } from '../lib/database.js';
+import { dbCache, yatraDatesDB, yatrikRegistrationsDB } from '../lib/database.js';
 import { formatDateForDisplay } from '../utils/dateUtils.js';
 
 const YatraBookingPage = () => {
@@ -19,6 +19,7 @@ const YatraBookingPage = () => {
   const [yatra, setYatra] = useState(null);
   const [loading, setLoading] = useState(true);
   const [yatricks, setYatricks] = useState([]);
+  const [capacityNotice, setCapacityNotice] = useState(null);
   const cacheKey = 'monthly_bus_yatra_dates';
 
   const [currentYatrik, setCurrentYatrik] = useState({
@@ -49,15 +50,27 @@ const YatraBookingPage = () => {
   useEffect(() => {
     const loadYatra = async () => {
       try {
+        setCapacityNotice(null);
         // Try cache first for instant load
         const cached = dbCache.read(cacheKey);
         if (cached) {
           const found = cached.find(d => String(d.id) === String(yatraId));
           if (found) {
+            const cachedMaxCapacity = Number(found.max_capacity || 0);
+            const cachedBookedCount = Number(found.registered_count || 0);
+            const cachedIsFull = cachedMaxCapacity > 0 && cachedBookedCount >= cachedMaxCapacity;
+            if (cachedIsFull) {
+              setCapacityNotice({
+                yatraName: found.trip_date ? formatDateForDisplay(found.trip_date) : (typeof found.date === 'object' ? found.date.en : found.date),
+                contactNumbers: t(siteCopy.contactPage.info.phoneValue),
+              });
+            }
             setYatra({
               ...found,
               date_text: found.trip_date ? formatDateForDisplay(found.trip_date) : (typeof found.date === 'object' ? found.date.en : found.date),
-              description: typeof found.description === 'object' ? found.description.en : found.description
+              description: typeof found.description === 'object' ? found.description.en : found.description,
+              registeredCount: cachedBookedCount,
+              max_capacity: found.max_capacity ?? null,
             });
             setLoading(false);
           }
@@ -69,10 +82,24 @@ const YatraBookingPage = () => {
           if (!yatra) navigate('/monthly-bus-yatra');
           return;
         }
+
+        const registrations = await yatrikRegistrationsDB.getByYatraId(yatraId);
+        const maxCapacity = Number(found.max_capacity || 0);
+        const bookedCount = registrations.length;
+        const isFull = maxCapacity > 0 && bookedCount >= maxCapacity;
+
+        if (isFull) {
+          setCapacityNotice({
+            yatraName: found.trip_date ? formatDateForDisplay(found.trip_date) : found.date_text || '',
+            contactNumbers: t(siteCopy.contactPage.info.phoneValue),
+          });
+        }
         
         setYatra({
           ...found,
           date_text: found.trip_date ? formatDateForDisplay(found.trip_date) : found.date_text || '',
+          registeredCount: bookedCount,
+          max_capacity: found.max_capacity ?? null,
         });
       } catch (err) {
         console.error('Error loading yatra:', err);
@@ -85,7 +112,7 @@ const YatraBookingPage = () => {
       }
     };
     loadYatra();
-  }, [yatraId, navigate]);
+  }, [yatraId, navigate, t]);
 
   const handleInputChange = (field, value) => {
     setCurrentYatrik(prev => ({ ...prev, [field]: value }));
@@ -100,6 +127,15 @@ const YatraBookingPage = () => {
       pushToast('Please fill all required fields', 'error');
       return;
     }
+
+    const maxCapacity = Number(yatra?.max_capacity || 0);
+    const alreadyBooked = Number(yatra?.registeredCount || 0);
+    const seatsRemaining = maxCapacity > 0 ? Math.max(maxCapacity - alreadyBooked - yatricks.length, 0) : null;
+    if (maxCapacity > 0 && seatsRemaining !== null && seatsRemaining <= 0) {
+      pushToast('Sorry, max capacity reached for this yatra', 'error');
+      return;
+    }
+
     setYatricks(prev => [...prev, currentYatrik]);
     setCurrentYatrik({
       firstName: '',
@@ -120,8 +156,16 @@ const YatraBookingPage = () => {
   const totalYatrikCount = yatricks.length + (validateYatrik(currentYatrik) ? 1 : 0);
   const pricePerPerson = yatra?.price_per_person || 900;
   const totalAmount = totalYatrikCount * pricePerPerson;
+  const maxCapacity = Number(yatra?.max_capacity || 0);
+  const registeredCount = Number(yatra?.registeredCount || 0);
+  const seatsRemaining = maxCapacity > 0 ? Math.max(maxCapacity - registeredCount, 0) : null;
 
   const handleProceedToPayment = () => {
+    if (capacityNotice) {
+      pushToast('Sorry, max capacity reached for this yatra', 'error');
+      return;
+    }
+
     let finalToSubmit = [...yatricks];
     
     const hasAnyData = Object.values(currentYatrik).some(v => String(v || '').trim() !== '');
@@ -137,6 +181,11 @@ const YatraBookingPage = () => {
 
     if (finalToSubmit.length === 0) {
       pushToast('Please add at least one yatrik to proceed', 'error');
+      return;
+    }
+
+    if (maxCapacity > 0 && finalToSubmit.length > seatsRemaining) {
+      pushToast('Sorry, max capacity reached for this yatra', 'error');
       return;
     }
     
@@ -169,6 +218,40 @@ const YatraBookingPage = () => {
               <div className="h-80 bg-white border border-gray-100"></div>
             </div>
           </div>
+        </div>
+      </LightPageShell>
+    );
+  }
+
+  if (capacityNotice) {
+    const contactNumbers = String(capacityNotice.contactNumbers || '').split('/').map(num => num.trim()).filter(Boolean);
+
+    return (
+      <LightPageShell>
+        <div className="max-w-3xl mx-auto py-20 px-6 text-center">
+          <div className="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-10 border border-red-100">
+            <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86l-8.25 14.28A2 2 0 003.78 21h16.44a2 2 0 001.73-2.86L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-headline text-gray-900 mb-6">Max Capacity Reached</h1>
+          <p className="text-gray-600 text-lg leading-relaxed mb-8">
+            Sorry, max capacity reached for <span className="font-bold text-[#c5a059]">{capacityNotice.yatraName}</span>. Please contact the numbers below.
+          </p>
+          <div className="space-y-3 mb-10">
+            {contactNumbers.map((number) => (
+              <a
+                key={number}
+                href={`tel:${number.replace(/[^0-9]/g, '')}`}
+                className="block text-[#8f6d2f] font-bold text-lg hover:text-[#b08d4a] transition-colors"
+              >
+                {number}
+              </a>
+            ))}
+          </div>
+          <Link to="/monthly-bus-yatra" className="inline-flex px-8 py-4 bg-[#c5a059] text-white font-bold uppercase tracking-widest text-xs hover:bg-[#b08d4a] transition-all">
+            Back to Yatra List
+          </Link>
         </div>
       </LightPageShell>
     );
