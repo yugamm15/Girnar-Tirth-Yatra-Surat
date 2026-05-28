@@ -272,16 +272,7 @@ const JinalayJirnodharPage = () => {
               </MapContainer>
             </div>
             
-            <div className="mt-8 flex flex-wrap justify-center gap-6">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#c5a059]"></div>
-                <span className="text-[10px] uppercase tracking-widest text-gray-600 font-bold">Active Restoration</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#c5a059]/40"></div>
-                <span className="text-[10px] uppercase tracking-widest text-gray-600 font-bold">Planned Tirth Routes</span>
-              </div>
-            </div>
+
             
             <p className="mt-8 text-[10px] md:text-xs text-[#8f6d2f] uppercase tracking-[0.3em] font-bold opacity-60">Interactive Map: Zoom and drag to explore cities & states</p>
           </div>
