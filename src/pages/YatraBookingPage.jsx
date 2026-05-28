@@ -10,7 +10,7 @@ import { FormInput } from '../components/FormInput.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { dbCache, yatraDatesDB, yatrikRegistrationsDB } from '../lib/database.js';
-import { formatDateForDisplay } from '../utils/dateUtils.js';
+import { formatDateForDisplay, isFutureYatraTrip } from '../utils/dateUtils.js';
 
 const YatraBookingPage = () => {
   const { yatraId } = useParams();
@@ -78,7 +78,7 @@ const YatraBookingPage = () => {
 
         // Fetch fresh data from DB
         const found = await yatraDatesDB.getById(yatraId);
-        if (!found || !found.registration_open) {
+        if (!found || !found.registration_open || !isFutureYatraTrip(found)) {
           if (!yatra) navigate('/monthly-bus-yatra');
           return;
         }
@@ -291,7 +291,24 @@ const YatraBookingPage = () => {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 items-stretch">
+        <div className="flex flex-col lg:grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-12 items-stretch">
+          
+          {/* Mobile-only Image Container (shows above form) */}
+          <div className="lg:hidden light-panel-soft p-6 bg-gray-50 border border-gray-200 overflow-hidden flex flex-col">
+            <SecureImage 
+              src={yatra?.image} 
+              alt={yatra?.date_text}
+              containerClassName="w-full h-48 rounded-sm mb-6 shrink-0"
+              className="w-full h-full object-cover"
+            />
+            <div className="flex-1">
+              <h3 className="text-xl font-headline text-gray-900">{yatra?.date_text}</h3>
+              <p className="text-sm text-gray-500 mt-3 leading-relaxed italic">{yatra?.description}</p>
+            </div>
+            <div className="mt-8 pt-4 border-t border-gray-200/50">
+              <p className="text-[9px] uppercase tracking-[0.2em] font-bold text-gray-400">Yatra For Mothly Bus yatra</p>
+            </div>
+          </div>
           <section className="light-panel p-8 md:p-12 bg-white border border-[#ddd2b7] relative overflow-hidden shadow-sm flex flex-col">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#c5a059]/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
             
@@ -372,7 +389,7 @@ const YatraBookingPage = () => {
           </section>
 
           <aside className="space-y-6 flex flex-col h-full">
-            <div className="light-panel-soft p-6 bg-gray-50 border border-gray-200 overflow-hidden flex flex-col">
+            <div className="hidden lg:flex light-panel-soft p-6 bg-gray-50 border border-gray-200 overflow-hidden flex-col">
               <SecureImage 
                 src={yatra?.image} 
                 alt={yatra?.date_text}

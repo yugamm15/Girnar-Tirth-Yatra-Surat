@@ -418,6 +418,7 @@ export const siteCopy = {
     yatraSeatsLeft: tr('Seats Left', 'સીટ બાકી', 'सीट शेष'),
     yatraBookNow: tr('Book Now', 'હવે બુક કરો', 'अभी बुक करें'),
     yatraClosed: tr('Closed', 'બંધ', 'बंद'),
+    yatraUpcoming: tr('Upcoming', 'આગામી', 'आगामी'),
     yatraFull: tr('Full', 'પૂર્ણ', 'पूर्ण'),
     yatraComingSoon: tr('Coming Soon', 'ટૂંક સમયમાં', 'जल्द आ रहा है'),
     yatraMaxCapacityReached: tr('Max Capacity Reached', 'મહત્તમ ક્ષમતા પૂર્ણ થઈ', 'अधिकतम क्षमता पूर्ण हो गई'),

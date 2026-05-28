@@ -21,7 +21,7 @@ const EventsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           <article className="light-panel-soft light-card-image overflow-hidden">
             <img
-              src="/image/5.jpg"
+              src="/images/5-Pathsala Vitran.png"
               alt={t(pageCopy.sections[0].title)}
               className="w-full h-56 object-cover"
               loading="lazy"

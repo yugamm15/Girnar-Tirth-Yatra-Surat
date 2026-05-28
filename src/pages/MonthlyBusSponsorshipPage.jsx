@@ -17,7 +17,7 @@ const emptySponsor = {
 };
 
 const MonthlyBusSponsorshipPage = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const pageCopy = siteCopy.monthlyBusPage;
   const navigate = useNavigate();
   const [schemes, setSchemes] = useState([]);
@@ -78,6 +78,25 @@ const MonthlyBusSponsorshipPage = () => {
       cancelled = true;
     };
   }, []);
+
+  const getLocalizedSchemeLabel = (scheme) => {
+    if (!scheme) return 'Unnamed Scheme';
+    if (language === 'gu') {
+      return String(scheme?.title || '').trim() || 'Unnamed Scheme';
+    }
+    const source = String(scheme?.description || scheme?.title || '').trim();
+    if (!source) return 'Unnamed Scheme';
+    const parts = source.split('|').map((part) => part.trim()).filter(Boolean);
+    if (parts.length === 0) return source;
+    const languageIndex = { en: 0, gu: 1, hi: 2 }[language] ?? 0;
+    return parts[Math.min(languageIndex, parts.length - 1)] || parts[0];
+  };
+
+  const getCleanDescription = (scheme) => {
+    const desc = String(scheme?.description || '').trim();
+    if (desc.includes('|')) return 'Support the monthly yatra through this sponsorship option.';
+    return desc || 'Support the monthly yatra through this sponsorship option.';
+  };
 
   const selectedScheme = useMemo(
     () => schemes.find((scheme) => Number(scheme.id) === Number(selectedSchemeId)) || null,
@@ -239,7 +258,7 @@ const MonthlyBusSponsorshipPage = () => {
           </div>
           <div className="bg-[#fcf9f2] border border-[#c5a059]/20 px-6 py-4 rounded-sm">
             <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#9f7c3d] mb-1">Selected Amount</p>
-            <p className="text-2xl font-headline text-gray-900">₹{totalAmount}</p>
+            <p className="text-2xl font-headline text-gray-900">₹{selectedScheme ? Number(selectedScheme.amount || 0) : 0}</p>
           </div>
         </header>
 
@@ -258,8 +277,8 @@ const MonthlyBusSponsorshipPage = () => {
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <h2 className="text-xl font-headline text-gray-900">{scheme.title}</h2>
-                          <p className="mt-2 text-sm text-gray-500 leading-relaxed">{scheme.description || 'Support the monthly yatra through this sponsorship option.'}</p>
+                          <h2 className="text-xl font-headline text-gray-900">{getLocalizedSchemeLabel(scheme)}</h2>
+                          <p className="mt-2 text-sm text-gray-500 leading-relaxed">{getCleanDescription(scheme)}</p>
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-[10px] uppercase tracking-[0.25em] text-gray-400 font-bold">{t(pageCopy.sponsorshipPerBus)}</p>
@@ -280,6 +299,45 @@ const MonthlyBusSponsorshipPage = () => {
                   No sponsorship schemes are live yet. Please check back soon.
                 </div>
               )}
+            </div>
+            
+            {/* Offline Sponsorship Box */}
+            <div className="bg-white border border-[#c5a059]/30 shadow-md p-6 md:p-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#c5a059]/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+              <h3 className="text-xl md:text-2xl font-headline text-gray-900 mb-4 flex items-center gap-3 relative z-10">
+                <svg className="w-6 h-6 text-[#c5a059]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                Offline Payment Support
+              </h3>
+              <p className="text-sm text-gray-600 mb-6 leading-relaxed relative z-10">
+                If you prefer to make your sponsorship contribution via direct bank transfer, cash, or offline methods, please contact our team members below:
+              </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+                <a href="tel:9979858710" className="flex items-center gap-4 bg-[#fcf9f2] border border-[#c5a059]/20 p-4 hover:bg-[#c5a059] hover:text-white transition-all group rounded-sm shadow-sm">
+                  <div className="w-10 h-10 bg-white group-hover:bg-white/20 flex items-center justify-center rounded-full shadow-sm text-[#c5a059] group-hover:text-white transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400 group-hover:text-white/80 font-bold mb-1">Milan Bhai</p>
+                    <p className="text-lg font-headline text-gray-900 group-hover:text-white transition-colors">99798 58710</p>
+                  </div>
+                </a>
+                <a href="tel:7990522291" className="flex items-center gap-4 bg-[#fcf9f2] border border-[#c5a059]/20 p-4 hover:bg-[#c5a059] hover:text-white transition-all group rounded-sm shadow-sm">
+                  <div className="w-10 h-10 bg-white group-hover:bg-white/20 flex items-center justify-center rounded-full shadow-sm text-[#c5a059] group-hover:text-white transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400 group-hover:text-white/80 font-bold mb-1">Jigar Bhai</p>
+                    <p className="text-lg font-headline text-gray-900 group-hover:text-white transition-colors">79905 22291</p>
+                  </div>
+                </a>
+              </div>
             </div>
           </section>
 
@@ -381,7 +439,7 @@ const MonthlyBusSponsorshipPage = () => {
                   <p className="mt-2 text-3xl font-headline text-gray-900">₹{totalAmount}</p>
                 </div>
                 <div className="text-right text-[10px] uppercase tracking-[0.25em] text-gray-500 font-bold">
-                  {selectedScheme ? selectedScheme.title : 'No scheme selected'}
+                  {selectedScheme ? getLocalizedSchemeLabel(selectedScheme) : 'No scheme selected'}
                 </div>
               </div>
               <p className="mt-4 text-sm text-gray-600 leading-relaxed">

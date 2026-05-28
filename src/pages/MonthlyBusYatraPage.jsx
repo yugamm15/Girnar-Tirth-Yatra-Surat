@@ -8,7 +8,7 @@ import SecureImage from '../components/SecureImage.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { dbCache, sponsorshipSchemesDB, yatraDatesDB, yatrikRegistrationsDB } from '../lib/database.js';
-import { formatDateForDisplay } from '../utils/dateUtils.js';
+import { formatDateForDisplay, isFutureYatraTrip } from '../utils/dateUtils.js';
 
 const MonthlyBusYatraPage = () => {
   const { t, language } = useLanguage();
@@ -89,7 +89,8 @@ const MonthlyBusYatraPage = () => {
           return;
         }
 
-        const nextDates = records.map((record) => ({
+        const futureRecords = records.filter(isFutureYatraTrip);
+        const nextDates = futureRecords.map((record) => ({
           id: record.id,
           date: { en: formatDateForDisplay(record.trip_date || record.date_text), gu: formatDateForDisplay(record.trip_date || record.date_text), hi: formatDateForDisplay(record.trip_date || record.date_text) },
           description: { en: record.description, gu: record.description, hi: record.description },
@@ -100,6 +101,13 @@ const MonthlyBusYatraPage = () => {
           registered_count: counts[String(record.id)] || 0,
           is_full: Number(record.max_capacity || 0) > 0 && (counts[String(record.id)] || 0) >= Number(record.max_capacity || 0)
         }));
+
+        nextDates.sort((a, b) => {
+          if (a.registration_open !== b.registration_open) {
+            return a.registration_open ? -1 : 1;
+          }
+          return new Date(a.date_raw) - new Date(b.date_raw);
+        });
 
         if (!cancelled) {
           setYatraDates(nextDates);
@@ -202,7 +210,7 @@ const MonthlyBusYatraPage = () => {
     }
 
     if (!yatra.registration_open) {
-      return t(pageCopy.yatraClosed);
+      return t(pageCopy.yatraUpcoming);
     }
 
     if (maxCapacity > 0) {
@@ -359,8 +367,9 @@ const MonthlyBusYatraPage = () => {
         </section>
 
         {/* Sponsorship Module */}
-        <section className="space-y-8">
-          <div className="text-center">
+        <section className="light-panel p-6 md:p-12 space-y-8 border border-[#c5a059]/30 bg-[#fcf9f2] shadow-sm relative overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#c5a059_1px,transparent_1px)] [background-size:20px_20px]"></div>
+          <div className="relative z-10 text-center">
             <h2 className="text-3xl md:text-4xl font-headline text-gray-900">{t(pageCopy.sponsorshipTitle)}</h2>
             <div className="mt-2 w-20 h-1 bg-[#c5a059] mx-auto opacity-40 rounded-full" />
             <p className="mt-4 text-sm md:text-base text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -368,7 +377,7 @@ const MonthlyBusYatraPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             {isLoadingSchemes ? (
               <div className="md:col-span-2 xl:col-span-4 p-6 bg-white border border-gray-100 shadow-sm text-sm text-gray-500">{t(pageCopy.sponsorshipLoading)}</div>
             ) : sponsorshipSchemes.length > 0 ? (
@@ -430,8 +439,8 @@ const MonthlyBusYatraPage = () => {
                           {t(pageCopy.yatraFull)}
                         </div>
                       ) : !yatra.registration_open && (
-                        <div className="absolute top-2 right-2 bg-gray-100 text-gray-400 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm border border-gray-200">
-                          {t(pageCopy.yatraClosed)}
+                        <div className="absolute top-2 right-2 bg-gray-100 text-gray-500 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-sm border border-gray-200">
+                          {t(pageCopy.yatraUpcoming)}
                         </div>
                       )}
                       <SecureImage 
@@ -455,7 +464,7 @@ const MonthlyBusYatraPage = () => {
                             {getYatraStatusLabel(yatra, bookedCount, maxCapacity, seatsLeft, isFull)}
                           </span>
                           <svg className="w-5 h-5 text-gray-300 group-hover:text-[#c5a059] group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4-4m4-4H3" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                           </svg>
                         </div>
                       </div>

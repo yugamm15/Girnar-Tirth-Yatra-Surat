@@ -7,6 +7,7 @@ import { SiteFooter } from '../components/SiteFooter.jsx';
 import { SiteNavbar } from '../components/SiteNavbar.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { upashraysDB, jinalayasDB } from '../lib/database.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -32,6 +33,28 @@ const sceneImages = {
 const HomePage = () => {
   const { t } = useLanguage();
   const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
+  const [upashrayCount, setUpashrayCount] = useState(null);
+  const [jinalayCount, setJinalayCount] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchCounts = async () => {
+      try {
+        const [upashrays, jinalayas] = await Promise.all([
+          upashraysDB.getAll(),
+          jinalayasDB.getAll()
+        ]);
+        if (mounted) {
+          setUpashrayCount(upashrays.length);
+          setJinalayCount(jinalayas.length);
+        }
+      } catch (err) {
+        console.error('Failed to fetch counts for home page:', err);
+      }
+    };
+    fetchCounts();
+    return () => { mounted = false; };
+  }, []);
   const [activeSceneId, setActiveSceneId] = useState('hero');
   const scrollContainerRef = useRef(null);
   const sectionRefs = useRef({});
@@ -746,7 +769,9 @@ const HomePage = () => {
               </h2>
               <p className="home-reveal text-sm md:text-lg text-on-surface-variant font-light leading-relaxed">{t(siteCopy.home.upashray.paragraph)}</p>
               <div className="home-reveal mt-4 bg-white/5 p-3 rounded-sm text-center inline-block">
-                <span className="block text-primary text-xl md:text-3xl font-headline mb-0.5 font-bold">{t(siteCopy.home.upashray.countValue)}</span>
+                <span className="block text-primary text-xl md:text-3xl font-headline mb-0.5 font-bold">
+                  {upashrayCount !== null ? `${upashrayCount}+` : t(siteCopy.home.upashray.countValue)}
+                </span>
                 <span className="text-white uppercase tracking-widest text-[8px] md:text-[10px]">{t(siteCopy.home.upashray.countLabel)}</span>
               </div>
               <div>
@@ -786,7 +811,9 @@ const HomePage = () => {
               </h2>
               <p className="home-reveal text-sm md:text-lg text-on-surface-variant font-light leading-relaxed">{t(siteCopy.home.jinalayHome.paragraph)}</p>
               <div className="home-reveal mt-4 bg-white/5 p-3 rounded-sm text-center inline-block">
-                <span className="block text-secondary text-xl md:text-3xl font-headline mb-0.5 font-bold">{t(siteCopy.home.jinalayHome.countValue)}</span>
+                <span className="block text-secondary text-xl md:text-3xl font-headline mb-0.5 font-bold">
+                  {jinalayCount !== null ? `${jinalayCount}+` : `${t(siteCopy.home.jinalayHome.countValue)}+`}
+                </span>
                 <span className="text-white uppercase tracking-widest text-[8px] md:text-[10px]">{t(siteCopy.home.jinalayHome.countLabel)}</span>
               </div>
               <div>
