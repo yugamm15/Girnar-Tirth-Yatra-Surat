@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { formatDateToISO } from '../utils/dateUtils.js';
+import { convertImageFileToWebP, sanitizeImageFileName } from '../utils/imageUtils.js';
 
 const DATABASE_CACHE_PREFIX = 'girnar_db_cache_v1';
 
@@ -40,6 +41,52 @@ const normalizeTripDate = (value) => {
 export const dbCache = {
   read: readCache,
   write: writeCache,
+  remove(key) {
+    try {
+      localStorage.removeItem(`${DATABASE_CACHE_PREFIX}:${key}`);
+    } catch {
+      // Ignore cache removal failures in non-browser or restricted contexts.
+    }
+  },
+};
+
+export const uploadWebPImage = async ({ bucketName, folderName, recordId, file, mediaType, quality = 0.82 }) => {
+  if (!file) {
+    throw new Error('Image file is required.');
+  }
+
+  try {
+    console.log('[uploadWebPImage] start', { bucketName, folderName, recordId, mediaType, fileName: file.name });
+    const webpBlob = await convertImageFileToWebP(file, { quality });
+    console.log('[uploadWebPImage] converted to webp', { size: webpBlob.size, type: webpBlob.type });
+
+    const safeFileName = sanitizeImageFileName(file.name || 'image');
+    const storagePath = `${folderName}/${recordId}/${mediaType}-${Date.now()}-${safeFileName}.webp`;
+
+    const result = await supabase.storage
+      .from(bucketName)
+      .upload(storagePath, webpBlob, {
+        contentType: 'image/webp',
+        upsert: false,
+      });
+
+    // Log full result for debugging (will include error if any)
+    console.log('[uploadWebPImage] upload result', result);
+
+    if (result?.error) {
+      console.error('[uploadWebPImage] upload error', result.error);
+      throw result.error;
+    }
+
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(storagePath);
+    const publicUrl = data?.publicUrl || '';
+    console.log('[uploadWebPImage] publicUrl', publicUrl);
+    return publicUrl;
+  } catch (err) {
+    // Surface helpful debugging information
+    console.error('[uploadWebPImage] unexpected error', err);
+    throw err;
+  }
 };
 
 // ============== UPASHRAYS ==============
@@ -486,6 +533,35 @@ export const upashrayMediaDB = {
       .from('upashray_media')
       .insert([{ ...mediaItem, created_at: new Date().toISOString() }])
       .select();
+    if (error) throw error;
+    return data?.[0];
+  },
+
+  async upload(upashrayId, file, mediaType) {
+    const normalizedType = String(mediaType || '').trim().toLowerCase();
+    if (!upashrayId) throw new Error('Upashray ID is required.');
+    if (!normalizedType) throw new Error('Media type is required.');
+
+    const fileUrl = await uploadWebPImage({
+      bucketName: 'upashray-media',
+      folderName: 'upashrays',
+      recordId: upashrayId,
+      file,
+      mediaType: normalizedType,
+    });
+
+    const { data, error } = await supabase
+      .from('upashray_media')
+      .insert([{
+        upashray_id: upashrayId,
+        media_type: normalizedType,
+        file_url: fileUrl,
+        alt_text: `${normalizedType} image`,
+        sort_order: 0,
+        created_at: new Date().toISOString()
+      }])
+      .select();
+
     if (error) throw error;
     return data?.[0];
   },

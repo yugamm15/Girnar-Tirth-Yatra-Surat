@@ -116,8 +116,7 @@ const JinalayaModal = ({
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
-                      const url = URL.createObjectURL(file);
-                      setJinalayaFormData({ ...jinalayaFormData, beforeImg: url });
+                      setJinalayaFormData({ ...jinalayaFormData, beforeFile: file });
                     }
                   }}
                   className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-[#c5a059]/10 file:text-[#c5a059] hover:file:bg-[#c5a059]/20"
@@ -130,8 +129,7 @@ const JinalayaModal = ({
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
-                      const url = URL.createObjectURL(file);
-                      setJinalayaFormData({ ...jinalayaFormData, processImg: url });
+                      setJinalayaFormData({ ...jinalayaFormData, processFile: file });
                     }
                   }}
                   className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-[#c5a059]/10 file:text-[#c5a059] hover:file:bg-[#c5a059]/20"
@@ -144,8 +142,7 @@ const JinalayaModal = ({
                   onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
-                      const url = URL.createObjectURL(file);
-                      setJinalayaFormData({ ...jinalayaFormData, afterImg: url });
+                      setJinalayaFormData({ ...jinalayaFormData, afterFile: file });
                     }
                   }}
                   className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-[#c5a059]/10 file:text-[#c5a059] hover:file:bg-[#c5a059]/20"

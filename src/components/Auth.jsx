@@ -1,7 +1,8 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient.js';
-import { upashraysDB, membersDB, jinalayasDB, checkingReportsDB, adminProfilesDB, yatrikRegistrationsDB, yatraDatesDB, upashrayMediaDB, paymentIntentsDB } from '../lib/database.js';
+import { upashraysDB, membersDB, jinalayasDB, checkingReportsDB, adminProfilesDB, yatrikRegistrationsDB, yatraDatesDB, upashrayMediaDB, paymentIntentsDB, uploadWebPImage } from '../lib/database.js';
+import { dbCache } from '../lib/database.js';
 import LoginForm from './auth/LoginForm';
 import LoadingOverlay from './auth/LoadingOverlay';
 import AdminPanel from './admin/AdminPanel';
@@ -208,6 +209,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   // Form State for Adding/Editing Jinalaya
   const [jinalayaFormData, setJinalayaFormData] = useState({
     name: '', village: '', route: '', mulnayak: '', location: '', description: '',
+    beforeFile: null, processFile: null, afterFile: null,
     beforeFiles: [], processFiles: [], afterFiles: [], status: 'plan'
   });
 
@@ -799,9 +801,11 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
 
       if (editingId) { setUpashrays(prev => prev.map(u => u.id === editingId ? { ...u, ...processedUpashray } : u)); }
       else { setUpashrays(prev => [processedUpashray, ...prev]); }
+      dbCache.remove('upashray_jirnodhar_page');
+      dbCache.remove(`upashray_detail_${upashrayId}`);
       loadUpashrayReports(); resetForm();
       pushToast(editingId ? 'Upashray updated successfully.' : 'Upashray created successfully.', 'success');
-    } catch (err) { pushToast('Failed to save upashray', 'error'); } finally { setIsProcessing(false); }
+    } catch (err) { console.error('Failed to save upashray:', err); pushToast(err?.message || 'Failed to save upashray', 'error'); } finally { setIsProcessing(false); }
   };
 
   const startEdit = async (u) => {
@@ -818,9 +822,9 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         trusty: u.trusty || '', mobile: u.mobile || '',
         location: u.location || '', slug: u.slug || '', status: u.status || 'plan',
         beforeFiles: [], processFiles: [], afterFiles: [],
-        existingBeforeMedia: media.filter(m => m.category === 'Before'),
-        existingProcessMedia: media.filter(m => m.category === 'Process'),
-        existingAfterMedia: media.filter(m => m.category === 'After')
+        existingBeforeMedia: media.filter(m => m.media_type === 'before'),
+        existingProcessMedia: media.filter(m => m.media_type === 'process'),
+        existingAfterMedia: media.filter(m => m.media_type === 'after')
       });
       setIsModalOpen(true);
     } catch (err) { } finally { setIsProcessing(false); }
@@ -949,23 +953,62 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         route: jinalayaFormData.route,
         mulnayak: jinalayaFormData.mulnayak,
         description: jinalayaFormData.description,
-        location: jinalayaFormData.location, 
-        status: jinalayaFormData.status.toLowerCase(), 
-        before_img: getPersistableImageUrl(jinalayaFormData.beforeImg),
-        process_img: getPersistableImageUrl(jinalayaFormData.processImg), 
-        after_img: getPersistableImageUrl(jinalayaFormData.afterImg)
+        location: jinalayaFormData.location,
+        status: jinalayaFormData.status.toLowerCase()
       };
+
       let savedJinalaya;
       if (editingJinalayaId) {
         savedJinalaya = await jinalayasDB.update(editingJinalayaId, data);
-        setJinalayas(prev => prev.map(j => j.id === editingJinalayaId ? { ...savedJinalaya, beforeImg: savedJinalaya.before_img, processImg: savedJinalaya.process_img, afterImg: savedJinalaya.after_img } : j));
       } else {
         savedJinalaya = await jinalayasDB.create(data);
-        setJinalayas(prev => [{ ...savedJinalaya, beforeImg: savedJinalaya.before_img, processImg: savedJinalaya.process_img, afterImg: savedJinalaya.after_img }, ...prev]);
       }
+
+      const imageFields = [
+        { fileField: 'beforeFile', imageField: 'beforeImg', dbField: 'before_img', mediaType: 'before' },
+        { fileField: 'processFile', imageField: 'processImg', dbField: 'process_img', mediaType: 'process' },
+        { fileField: 'afterFile', imageField: 'afterImg', dbField: 'after_img', mediaType: 'after' }
+      ];
+
+      const imageUpdates = {};
+      for (const field of imageFields) {
+        const selectedFile = jinalayaFormData[field.fileField];
+        if (selectedFile) {
+          imageUpdates[field.dbField] = await uploadWebPImage({
+            bucketName: 'jinalaya-media',
+            folderName: 'jinalayas',
+            recordId: savedJinalaya.id,
+            file: selectedFile,
+            mediaType: field.mediaType
+          });
+        } else {
+          imageUpdates[field.dbField] = getPersistableImageUrl(jinalayaFormData[field.imageField]);
+        }
+      }
+
+      if (Object.values(imageUpdates).some(Boolean)) {
+        savedJinalaya = await jinalayasDB.update(savedJinalaya.id, imageUpdates);
+      }
+
+      const normalizedJinalaya = {
+        ...savedJinalaya,
+        beforeImg: getSafeImageUrl(savedJinalaya.before_img, '/images/Upasray.png'),
+        processImg: getSafeImageUrl(savedJinalaya.process_img, '/images/Upasray.png'),
+        afterImg: getSafeImageUrl(savedJinalaya.after_img, '/images/Upasray.png')
+      };
+
+      if (editingJinalayaId) {
+        setJinalayas(prev => prev.map(j => j.id === editingJinalayaId ? normalizedJinalaya : j));
+      } else {
+        setJinalayas(prev => [normalizedJinalaya, ...prev]);
+      }
+
+      dbCache.remove('jinalay_jirnodhar_page');
+      dbCache.remove(`jinalay_detail_${savedJinalaya.id}`);
+
       resetJinalayaForm();
       pushToast(editingJinalayaId ? 'Jinalaya updated successfully.' : 'Jinalaya added successfully.', 'success');
-    } catch (err) { pushToast('Failed to save jinalaya', 'error'); } finally { setIsProcessing(false); }
+    } catch (err) { console.error('Failed to save jinalaya:', err); pushToast(err?.message || 'Failed to save jinalaya', 'error'); } finally { setIsProcessing(false); }
   };
 
   const startEditJinalaya = (j) => {
@@ -976,7 +1019,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       route: j.route || '',
       mulnayak: j.mulnayak || '',
       description: j.description || '',
-      location: j.location || '', status: j.status || 'plan', 
+      location: j.location || '', status: j.status || 'plan',
+      beforeFile: null, processFile: null, afterFile: null,
       beforeImg: j.beforeImg || '', processImg: j.processImg || '', afterImg: j.afterImg || ''
     });
     setIsJinalayaModalOpen(true);
@@ -1006,6 +1050,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setEditingJinalayaId(null);
     setJinalayaFormData({
       name: '', village: '', route: '', mulnayak: '', location: '', description: '',
+      beforeFile: null, processFile: null, afterFile: null,
       beforeImg: '', processImg: '', afterImg: '', status: 'plan'
     });
     setIsJinalayaModalOpen(false);
