@@ -84,6 +84,7 @@ const UpashrayJirnodharPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const listingsRef = useRef(null);
   const shouldScrollRef = useRef(false);
   const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
@@ -171,12 +172,21 @@ const UpashrayJirnodharPage = () => {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const filteredUpashrays = useMemo(() => {
+    if (!searchQuery.trim()) return upashrays;
+    const lowerQuery = searchQuery.toLowerCase();
+    return upashrays.filter(u => 
+      u.name?.toLowerCase().includes(lowerQuery) || 
+      u.village?.toLowerCase().includes(lowerQuery)
+    );
+  }, [upashrays, searchQuery]);
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [upashrays.length]);
+  }, [filteredUpashrays.length, searchQuery]);
 
-  const totalPages = Math.max(1, Math.ceil(upashrays.length / itemsPerPage));
-  const visibleUpashrays = upashrays.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredUpashrays.length / itemsPerPage));
+  const visibleUpashrays = filteredUpashrays.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const goToPage = (nextPage) => {
     setCurrentPage(Math.min(Math.max(nextPage, 1), totalPages));
@@ -203,6 +213,7 @@ const UpashrayJirnodharPage = () => {
   }, [currentPage]);
 
   const delayPerPin = Math.min(150, 4000 / Math.max(1, upashrays.length));
+  const pinIconsRef = useRef({});
 
   const getVisiblePageNumbers = () => {
     const maxVisible = 4;
@@ -218,18 +229,24 @@ const UpashrayJirnodharPage = () => {
   };
 
   const mapLocations = useMemo(() => {
-    return upashrays.map(u => parseLocation(u.location)).filter(Boolean);
-  }, [upashrays]);
+    return filteredUpashrays.map(u => parseLocation(u.location)).filter(Boolean);
+  }, [filteredUpashrays]);
 
   const mapMarkers = useMemo(() => {
-    return upashrays.map((upashray, idx) => {
+    return filteredUpashrays.map((upashray) => {
       const coords = parseLocation(upashray.location);
       if (!coords) return null;
+      
+      const originalIdx = upashrays.findIndex(u => u.id === upashray.id);
+      if (!pinIconsRef.current[upashray.id]) {
+        pinIconsRef.current[upashray.id] = createCustomIcon(originalIdx * delayPerPin, originalIdx, isMobileViewport);
+      }
+
       return (
         <Marker 
           key={upashray.id} 
           position={coords} 
-          icon={createCustomIcon(idx * delayPerPin, idx, isMobileViewport)}
+          icon={pinIconsRef.current[upashray.id]}
         >
           <Popup className="custom-popup">
             <div className="text-center p-1 flex flex-col items-center">
@@ -301,6 +318,22 @@ const UpashrayJirnodharPage = () => {
           </div>
         </section>
 
+        {/* Search Bar Section */}
+        <section className="px-6 md:px-0 flex justify-center md:justify-end">
+          <div className="w-full max-w-md relative">
+            <input
+              type="text"
+              placeholder="Search by name or village..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-3 pl-11 border border-[#ddd2b7] bg-white rounded-md text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#c5a059]/50 focus:border-[#c5a059] shadow-sm transition-all"
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-4 top-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </section>
+
         {loading ? (
           <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {[...Array(6)].map((_, i) => (
@@ -318,9 +351,9 @@ const UpashrayJirnodharPage = () => {
           <section className="light-panel light-panel-left p-6 md:p-10">
             <p className="text-red-600">{error}</p>
           </section>
-        ) : upashrays.length === 0 ? (
-          <section className="light-panel light-panel-left p-6 md:p-10">
-            <p className="text-gray-600">No upashrays found. Please add some from the admin panel.</p>
+        ) : filteredUpashrays.length === 0 ? (
+          <section className="light-panel light-panel-left p-6 md:p-10 text-center">
+            <p className="text-gray-600 italic">{searchQuery ? 'No Upashrays match your search.' : 'No upashrays found. Please add some from the admin panel.'}</p>
           </section>
         ) : (
           <section ref={listingsRef} className="space-y-6 scroll-mt-24">
@@ -401,7 +434,7 @@ const UpashrayJirnodharPage = () => {
                 </div>
 
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#8f6d2f] font-bold opacity-70">
-                  Showing {visibleUpashrays.length} of {upashrays.length} records
+                  Showing {visibleUpashrays.length} of {filteredUpashrays.length} records
                 </p>
               </div>
             )}

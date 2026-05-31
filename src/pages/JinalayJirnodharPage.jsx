@@ -82,6 +82,7 @@ const JinalayJirnodharPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const listingsRef = useRef(null);
   const shouldScrollRef = useRef(false);
   const [isMobileViewport, setIsMobileViewport] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
@@ -143,12 +144,21 @@ const JinalayJirnodharPage = () => {
     };
   }, []);
 
+  const filteredJinalayas = useMemo(() => {
+    if (!searchQuery.trim()) return jinalayas;
+    const lowerQuery = searchQuery.toLowerCase();
+    return jinalayas.filter(j => 
+      j.name?.toLowerCase().includes(lowerQuery) || 
+      j.village?.toLowerCase().includes(lowerQuery)
+    );
+  }, [jinalayas, searchQuery]);
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [jinalayas.length]);
+  }, [filteredJinalayas.length, searchQuery]);
 
-  const totalPages = Math.max(1, Math.ceil(jinalayas.length / itemsPerPage));
-  const visibleJinalayas = jinalayas.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredJinalayas.length / itemsPerPage));
+  const visibleJinalayas = filteredJinalayas.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const goToPage = (nextPage) => {
     setCurrentPage(Math.min(Math.max(nextPage, 1), totalPages));
@@ -175,6 +185,7 @@ const JinalayJirnodharPage = () => {
   }, [currentPage]);
 
   const delayPerPin = Math.min(150, 4000 / Math.max(1, jinalayas.length));
+  const pinIconsRef = useRef({});
 
   const getVisiblePageNumbers = () => {
     const maxVisible = 4;
@@ -190,18 +201,24 @@ const JinalayJirnodharPage = () => {
   };
 
   const mapLocations = useMemo(() => {
-    return jinalayas.map(j => parseLocation(j.location)).filter(Boolean);
-  }, [jinalayas]);
+    return filteredJinalayas.map(j => parseLocation(j.location)).filter(Boolean);
+  }, [filteredJinalayas]);
 
   const mapMarkers = useMemo(() => {
-    return jinalayas.map((jinalaya, idx) => {
+    return filteredJinalayas.map((jinalaya) => {
       const coords = parseLocation(jinalaya.location);
       if (!coords) return null;
+      
+      const originalIdx = jinalayas.findIndex(j => j.id === jinalaya.id);
+      if (!pinIconsRef.current[jinalaya.id]) {
+        pinIconsRef.current[jinalaya.id] = createCustomIcon(originalIdx * delayPerPin, originalIdx, isMobileViewport);
+      }
+
       return (
         <Marker 
           key={jinalaya.id} 
           position={coords} 
-          icon={createCustomIcon(idx * delayPerPin, idx, isMobileViewport)}
+          icon={pinIconsRef.current[jinalaya.id]}
         >
           <Popup className="custom-popup">
             <div className="text-center p-1 flex flex-col items-center">
@@ -278,6 +295,22 @@ const JinalayJirnodharPage = () => {
           </div>
         </section>
 
+        {/* Search Bar Section */}
+        <section className="px-6 md:px-0 flex justify-center md:justify-end">
+          <div className="w-full max-w-md relative">
+            <input
+              type="text"
+              placeholder="Search by name or village..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-3 pl-11 border border-[#ddd2b7] bg-white rounded-md text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#c5a059]/50 focus:border-[#c5a059] shadow-sm transition-all"
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-4 top-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </section>
+
         {loading ? (
           <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {[...Array(6)].map((_, i) => (
@@ -295,9 +328,9 @@ const JinalayJirnodharPage = () => {
           <section className="light-panel light-panel-left p-6 md:p-10">
             <p className="text-red-600">{error}</p>
           </section>
-        ) : jinalayas.length === 0 ? (
+        ) : filteredJinalayas.length === 0 ? (
           <section className="light-panel light-panel-left p-6 md:p-10 text-center">
-            <p className="text-gray-600 italic">No Jinalaya records found. Check back later for updates.</p>
+            <p className="text-gray-600 italic">{searchQuery ? 'No Jinalayas match your search.' : 'No Jinalaya records found. Check back later for updates.'}</p>
           </section>
         ) : (
           <section ref={listingsRef} className="space-y-6 scroll-mt-24">
@@ -386,7 +419,7 @@ const JinalayJirnodharPage = () => {
                 </div>
 
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#8f6d2f] font-bold opacity-70">
-                  Showing {visibleJinalayas.length} of {jinalayas.length} records
+                  Showing {visibleJinalayas.length} of {filteredJinalayas.length} records
                 </p>
               </div>
             )}

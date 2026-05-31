@@ -122,9 +122,12 @@ CREATE TABLE yatrik_registrations (
 -- ============== CHECKING REPORTS TABLE ==============
 CREATE TABLE checking_reports (
   id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  member_id BIGINT REFERENCES members(id) ON DELETE SET NULL,
   upashray_id BIGINT REFERENCES upashrays(id) ON DELETE CASCADE,
+  jinalaya_id BIGINT REFERENCES jinalayas(id) ON DELETE CASCADE,
   report_date DATE DEFAULT CURRENT_DATE,
   points JSONB,  -- Array of checking points with descriptions and status
+  general_notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -195,6 +198,8 @@ CREATE INDEX idx_payment_intents_module_key ON payment_intents(module_key);
 CREATE INDEX idx_payment_intents_status ON payment_intents(status);
 CREATE INDEX idx_payment_intents_reference ON payment_intents(reference_type, reference_id);
 CREATE INDEX idx_checking_reports_upashray_id ON checking_reports(upashray_id);
+CREATE INDEX idx_checking_reports_jinalaya_id ON checking_reports(jinalaya_id);
+CREATE INDEX idx_checking_reports_member_id ON checking_reports(member_id);
 CREATE INDEX idx_contact_created_at ON contact_messages(created_at);
 CREATE INDEX idx_upashray_media_upashray_id ON upashray_media(upashray_id);
 CREATE INDEX idx_upashray_media_type ON upashray_media(media_type);
