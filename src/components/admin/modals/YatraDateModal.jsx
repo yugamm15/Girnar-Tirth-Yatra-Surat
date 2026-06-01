@@ -60,7 +60,7 @@ const YatraDateModal = ({
                   {yatraDateFormData.image && (
                     <button 
                       type="button"
-                      onClick={() => setYatraDateFormData({ ...yatraDateFormData, image: '' })}
+                      onClick={() => setYatraDateFormData({ ...yatraDateFormData, image: '', imageFile: null })}
                       className="text-[10px] text-red-500 font-bold uppercase hover:underline"
                     >
                       Remove Photo

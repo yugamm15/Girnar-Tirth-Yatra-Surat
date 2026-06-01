@@ -9,7 +9,8 @@ const UpashrayModal = ({
   handleSaveUpashray, 
   handleMultipleFilesChange, 
   removeMediaFile, 
-  deleteExistingMedia 
+  deleteExistingMedia,
+  deleteLegacyUpashrayMedia
 }) => {
   if (!isModalOpen) return null;
 
@@ -137,6 +138,24 @@ const UpashrayModal = ({
               <div className="flex flex-col gap-3">
                 <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Before</span>
                 
+                {/* Legacy Media */}
+                {formData.beforeImg && formData.beforeImg !== '/images/Upasray.png' && (
+                  <div className="bg-blue-50 border border-blue-100 p-3 rounded flex justify-between items-center mb-2">
+                    <a href={formData.beforeImg} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate text-[9px]">
+                      View Legacy Image
+                    </a>
+                    {editingId && (
+                      <button
+                        type="button"
+                        onClick={() => deleteLegacyUpashrayMedia(editingId, 'before')}
+                        className="text-red-500 hover:text-red-700 font-bold ml-2 text-[9px]"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                )}
+                
                 {/* Existing Media */}
                 {formData.existingBeforeMedia && formData.existingBeforeMedia.length > 0 && (
                   <div className="bg-blue-50 border border-blue-100 p-3 rounded space-y-2">
@@ -186,6 +205,24 @@ const UpashrayModal = ({
               <div className="flex flex-col gap-3">
                 <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">In-Process</span>
                 
+                {/* Legacy Media */}
+                {formData.processImg && formData.processImg !== '/images/Upasray.png' && (
+                  <div className="bg-blue-50 border border-blue-100 p-3 rounded flex justify-between items-center mb-2">
+                    <a href={formData.processImg} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate text-[9px]">
+                      View Legacy Image
+                    </a>
+                    {editingId && (
+                      <button
+                        type="button"
+                        onClick={() => deleteLegacyUpashrayMedia(editingId, 'process')}
+                        className="text-red-500 hover:text-red-700 font-bold ml-2 text-[9px]"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                )}
+                
                 {/* Existing Media */}
                 {formData.existingProcessMedia && formData.existingProcessMedia.length > 0 && (
                   <div className="bg-blue-50 border border-blue-100 p-3 rounded space-y-2">
@@ -234,6 +271,24 @@ const UpashrayModal = ({
               {/* After Images */}
               <div className="flex flex-col gap-3">
                 <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">After</span>
+                
+                {/* Legacy Media */}
+                {formData.afterImg && formData.afterImg !== '/images/Upasray.png' && (
+                  <div className="bg-blue-50 border border-blue-100 p-3 rounded flex justify-between items-center mb-2">
+                    <a href={formData.afterImg} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate text-[9px]">
+                      View Legacy Image
+                    </a>
+                    {editingId && (
+                      <button
+                        type="button"
+                        onClick={() => deleteLegacyUpashrayMedia(editingId, 'after')}
+                        className="text-red-500 hover:text-red-700 font-bold ml-2 text-[9px]"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                )}
                 
                 {/* Existing Media */}
                 {formData.existingAfterMedia && formData.existingAfterMedia.length > 0 && (

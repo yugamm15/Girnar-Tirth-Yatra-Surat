@@ -6,7 +6,8 @@ const JinalayaModal = ({
   editingJinalayaId, 
   jinalayaFormData, 
   setJinalayaFormData, 
-  handleSaveJinalaya 
+  handleSaveJinalaya,
+  deleteJinalayaMedia
 }) => {
   if (!isJinalayaModalOpen) return null;
 
@@ -111,6 +112,22 @@ const JinalayaModal = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="flex flex-col gap-2">
                 <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Before</span>
+                {jinalayaFormData.beforeImg && jinalayaFormData.beforeImg !== '/images/Upasray.png' && (
+                  <div className="bg-blue-50 border border-blue-100 p-3 rounded flex justify-between items-center mb-2">
+                    <a href={jinalayaFormData.beforeImg} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate text-[9px]">
+                      View Existing Image
+                    </a>
+                    {editingJinalayaId && (
+                      <button
+                        type="button"
+                        onClick={() => deleteJinalayaMedia(editingJinalayaId, 'before')}
+                        className="text-red-500 hover:text-red-700 font-bold ml-2 text-[9px]"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                )}
                 <input
                   type="file"
                   onChange={(e) => {
@@ -124,6 +141,22 @@ const JinalayaModal = ({
               </div>
               <div className="flex flex-col gap-2">
                 <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">In-Process</span>
+                {jinalayaFormData.processImg && jinalayaFormData.processImg !== '/images/Upasray.png' && (
+                  <div className="bg-blue-50 border border-blue-100 p-3 rounded flex justify-between items-center mb-2">
+                    <a href={jinalayaFormData.processImg} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate text-[9px]">
+                      View Existing Image
+                    </a>
+                    {editingJinalayaId && (
+                      <button
+                        type="button"
+                        onClick={() => deleteJinalayaMedia(editingJinalayaId, 'process')}
+                        className="text-red-500 hover:text-red-700 font-bold ml-2 text-[9px]"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                )}
                 <input
                   type="file"
                   onChange={(e) => {
@@ -137,6 +170,22 @@ const JinalayaModal = ({
               </div>
               <div className="flex flex-col gap-2">
                 <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">After</span>
+                {jinalayaFormData.afterImg && jinalayaFormData.afterImg !== '/images/Upasray.png' && (
+                  <div className="bg-blue-50 border border-blue-100 p-3 rounded flex justify-between items-center mb-2">
+                    <a href={jinalayaFormData.afterImg} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate text-[9px]">
+                      View Existing Image
+                    </a>
+                    {editingJinalayaId && (
+                      <button
+                        type="button"
+                        onClick={() => deleteJinalayaMedia(editingJinalayaId, 'after')}
+                        className="text-red-500 hover:text-red-700 font-bold ml-2 text-[9px]"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                )}
                 <input
                   type="file"
                   onChange={(e) => {

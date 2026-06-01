@@ -25,7 +25,7 @@ const AdminPanel = ({
   handleLogout,
   // Upashray props
   upashrays, upashraySearch, setUpashraySearch, setIsModalOpen, startEdit, deleteUpashray,
-  isModalOpen, resetForm, editingId, formData, setFormData, handleSaveUpashray, handleMultipleFilesChange, removeMediaFile, deleteExistingMedia,
+  isModalOpen, resetForm, editingId, formData, setFormData, handleSaveUpashray, handleMultipleFilesChange, removeMediaFile, deleteExistingMedia, deleteLegacyUpashrayMedia,
   // Bus Yatra props
   yatraSearch, setYatraSearch, setEditingYatraDateId, setYatraDateFormData, setIsYatraDateModalOpen, yatraDates, busRegistrations, toggleRegistrationStatus, deleteYatraDate, registrationYatraFilter, setRegistrationYatraFilter, exportRegistrationsToCSV, deleteRegistration,
   addOfflineRegistration,
@@ -36,7 +36,7 @@ const AdminPanel = ({
   isMemberModalOpen, resetMemberForm, editingMemberId, memberFormData, setMemberFormData, handleSaveMember,
   // Jinalaya props
   jinalayas, jinalayaSearch, setJinalayaSearch, setIsJinalayaModalOpen, startEditJinalaya, deleteJinalaya,
-  isJinalayaModalOpen, resetJinalayaForm, editingJinalayaId, jinalayaFormData, setJinalayaFormData, handleSaveJinalaya,
+  isJinalayaModalOpen, resetJinalayaForm, editingJinalayaId, jinalayaFormData, setJinalayaFormData, handleSaveJinalaya, deleteJinalayaMedia,
   // Report props
   allReports, reportUpashrayFilter, setReportUpashrayFilter, reportMemberFilter, setReportMemberFilter, reportDateFilter, setReportDateFilter, setSelectedReport, deleteReport,
   isReportModalOpen, 
@@ -258,6 +258,7 @@ const AdminPanel = ({
         handleMultipleFilesChange={handleMultipleFilesChange}
         removeMediaFile={removeMediaFile}
         deleteExistingMedia={deleteExistingMedia}
+        deleteLegacyUpashrayMedia={deleteLegacyUpashrayMedia}
       />
 
       <MemberModal 
@@ -277,6 +278,7 @@ const AdminPanel = ({
         jinalayaFormData={jinalayaFormData}
         setJinalayaFormData={setJinalayaFormData}
         handleSaveJinalaya={handleSaveJinalaya}
+        deleteJinalayaMedia={deleteJinalayaMedia}
       />
 
       <YatraDateModal 

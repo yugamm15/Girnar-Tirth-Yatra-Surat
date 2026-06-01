@@ -134,7 +134,8 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         open: true, title: options.title || 'Confirm', message: options.message || 'Are you sure?',
         confirmLabel: options.confirmLabel || 'Confirm', cancelLabel: options.cancelLabel || 'Cancel',
         danger: options.danger || false,
-        onConfirm: () => { setConfirmState(prev => ({ ...prev, open: false })); resolve(true); }
+        onConfirm: () => { setConfirmState(prev => ({ ...prev, open: false })); resolve(true); },
+        onCancel: () => { setConfirmState(prev => ({ ...prev, open: false })); resolve(false); }
       });
     });
   };
@@ -759,6 +760,56 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     } catch (err) { pushToast('Failed to delete media.', 'error'); } finally { setIsProcessing(false); }
   };
 
+  const deleteLegacyUpashrayMedia = async (id, category) => {
+    const confirmed = await requestConfirmation({
+      title: 'Delete this image?',
+      message: 'This will permanently remove the image from the database.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Keep',
+      danger: true
+    });
+    if (!confirmed) return;
+    
+    setIsProcessing(true);
+    setProcessingMessage('Deleting legacy media...');
+    try {
+      const dbField = category === 'before' ? 'before_img' : category === 'process' ? 'process_img' : 'after_img';
+      const stateField = category === 'before' ? 'beforeImg' : category === 'process' ? 'processImg' : 'afterImg';
+      
+      await upashraysDB.update(id, { [dbField]: null });
+      setFormData(prev => ({ ...prev, [stateField]: '/images/Upasray.png' }));
+      setUpashrays(prev => prev.map(u => u.id === id ? { ...u, [stateField]: '/images/Upasray.png' } : u));
+      dbCache.remove('upashray_jirnodhar_page');
+      dbCache.remove(`upashray_detail_${id}`);
+      pushToast('Legacy media removed successfully.', 'success');
+    } catch (err) { pushToast('Failed to delete legacy media.', 'error'); } finally { setIsProcessing(false); }
+  };
+
+  const deleteJinalayaMedia = async (id, category) => {
+    const confirmed = await requestConfirmation({
+      title: 'Delete this image?',
+      message: 'This will permanently remove the image from the database.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Keep',
+      danger: true
+    });
+    if (!confirmed) return;
+    
+    setIsProcessing(true);
+    setProcessingMessage('Deleting media...');
+    try {
+      const dbField = category === 'before' ? 'before_img' : category === 'process' ? 'process_img' : 'after_img';
+      const stateField = category === 'before' ? 'beforeImg' : category === 'process' ? 'processImg' : 'afterImg';
+      
+      await jinalayasDB.update(id, { [dbField]: null });
+      setJinalayaFormData(prev => ({ ...prev, [stateField]: '/images/Upasray.png' }));
+      setJinalayas(prev => prev.map(j => j.id === id ? { ...j, [stateField]: '/images/Upasray.png' } : j));
+      dbCache.remove('jinalay_jirnodhar_page');
+      dbCache.remove(`jinalay_detail_${id}`);
+      pushToast('Media removed successfully.', 'success');
+    } catch (err) { pushToast('Failed to delete media.', 'error'); } finally { setIsProcessing(false); }
+  };
+
   const handleSaveUpashray = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
@@ -824,7 +875,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         beforeFiles: [], processFiles: [], afterFiles: [],
         existingBeforeMedia: media.filter(m => m.media_type === 'before'),
         existingProcessMedia: media.filter(m => m.media_type === 'process'),
-        existingAfterMedia: media.filter(m => m.media_type === 'after')
+        existingAfterMedia: media.filter(m => m.media_type === 'after'),
+        beforeImg: u.beforeImg || '/images/Upasray.png',
+        processImg: u.processImg || '/images/Upasray.png',
+        afterImg: u.afterImg || '/images/Upasray.png'
       });
       setIsModalOpen(true);
     } catch (err) { } finally { setIsProcessing(false); }
@@ -1061,7 +1115,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     const file = e.target.files[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      setYatraDateFormData({ ...yatraDateFormData, image: url });
+      setYatraDateFormData({ ...yatraDateFormData, image: url, imageFile: file });
     }
   };
 
@@ -1070,20 +1124,42 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setIsProcessing(true);
     setProcessingMessage(editingYatraDateId ? 'Updating Yatra Date...' : 'Saving Yatra Date...');
     try {
+      let savedDate;
       const data = {
         date_text: yatraDateFormData.date_text,
         description: yatraDateFormData.description,
-        image: yatraDateFormData.image,
         registration_open: yatraDateFormData.registration_open,
         price_per_person: yatraDateFormData.price_per_person || 900,
         max_capacity: yatraDateFormData.max_capacity === '' ? null : yatraDateFormData.max_capacity,
       };
-      if (editingYatraDateId) await yatraDatesDB.update(editingYatraDateId, data);
-      else await yatraDatesDB.create(data);
+
+      if (!yatraDateFormData.imageFile) {
+        data.image = yatraDateFormData.image;
+      }
+
+      if (editingYatraDateId) {
+        savedDate = await yatraDatesDB.update(editingYatraDateId, data);
+      } else {
+        savedDate = await yatraDatesDB.create(data);
+      }
+
+      if (yatraDateFormData.imageFile) {
+        setProcessingMessage('Uploading Image...');
+        const imageUrl = await uploadWebPImage({
+          bucketName: 'Yatra_dates',
+          folderName: 'yatra-dates',
+          recordId: savedDate.id,
+          file: yatraDateFormData.imageFile,
+          mediaType: 'cover'
+        });
+        savedDate = await yatraDatesDB.update(savedDate.id, { image: imageUrl });
+      }
+
       await loadBusYatra();
       setIsYatraDateModalOpen(false);
+      setYatraDateFormData({ date_text: '', description: '', image: '', registration_open: true, max_capacity: '', imageFile: null });
       pushToast(editingYatraDateId ? 'Yatra date updated.' : 'Yatra date added.', 'success');
-    } catch (err) { pushToast('Failed to save yatra date', 'error'); } finally { setIsProcessing(false); }
+    } catch (err) { pushToast(err.message || 'Failed to save yatra date', 'error'); } finally { setIsProcessing(false); }
   };
 
   const toggleRegistrationStatus = async (id, currentStatus) => {
@@ -1282,7 +1358,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       <ConfirmModal
         open={confirmState.open} title={confirmState.title} message={confirmState.message}
         confirmLabel={confirmState.confirmLabel} cancelLabel={confirmState.cancelLabel} danger={confirmState.danger}
-        onConfirm={confirmState.onConfirm} onCancel={() => setConfirmState(prev => ({ ...prev, open: false }))}
+        onConfirm={confirmState.onConfirm} onCancel={confirmState.onCancel}
       />
     </>
   );
@@ -1303,10 +1379,10 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
         <GlobalUX />
         <AdminPanel 
           activeTab={activeTab} setActiveTab={(tab) => navigate(`/admin/${tab}`)} loadedData={loadedData} loadMembers={loadMembers} loadJinalayas={loadJinalayas} loadReports={loadReports} loadBusYatra={loadBusYatra} loadPaymentIntents={loadPaymentIntents} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} handleLogout={handleLogout}
-          upashrays={upashrays} upashraySearch={upashraySearch} setUpashraySearch={setUpashraySearch} setIsModalOpen={setIsModalOpen} startEdit={startEdit} deleteUpashray={deleteUpashray} isModalOpen={isModalOpen} resetForm={resetForm} editingId={editingId} formData={formData} setFormData={setFormData} handleSaveUpashray={handleSaveUpashray} handleMultipleFilesChange={handleMultipleFilesChange} removeMediaFile={removeMediaFile} deleteExistingMedia={deleteExistingMedia}
+          upashrays={upashrays} upashraySearch={upashraySearch} setUpashraySearch={setUpashraySearch} setIsModalOpen={setIsModalOpen} startEdit={startEdit} deleteUpashray={deleteUpashray} isModalOpen={isModalOpen} resetForm={resetForm} editingId={editingId} formData={formData} setFormData={setFormData} handleSaveUpashray={handleSaveUpashray} handleMultipleFilesChange={handleMultipleFilesChange} removeMediaFile={removeMediaFile} deleteExistingMedia={deleteExistingMedia} deleteLegacyUpashrayMedia={deleteLegacyUpashrayMedia}
           yatraSearch={yatraSearch} setYatraSearch={setYatraSearch} setEditingYatraDateId={setEditingYatraDateId} setYatraDateFormData={setYatraDateFormData} setIsYatraDateModalOpen={setIsYatraDateModalOpen} yatraDates={yatraDates} busRegistrations={busRegistrations} toggleRegistrationStatus={toggleRegistrationStatus} deleteYatraDate={deleteYatraDate} registrationYatraFilter={registrationYatraFilter} setRegistrationYatraFilter={setRegistrationYatraFilter} exportRegistrationsToCSV={exportRegistrationsToCSV} deleteRegistration={deleteRegistration} addOfflineRegistration={addOfflineRegistration} isYatraDateModalOpen={isYatraDateModalOpen} editingYatraDateId={editingYatraDateId} yatraDateFormData={yatraDateFormData} handleYatraFileChange={handleYatraFileChange} handleYatraDateSubmit={handleYatraDateSubmit}
           members={members} memberSearch={memberSearch} setMemberSearch={setMemberSearch} setIsMemberModalOpen={setIsMemberModalOpen} toggleMemberAccess={toggleMemberAccess} startEditMember={startEditMember} deleteMember={deleteMember} isMemberModalOpen={isMemberModalOpen} resetMemberForm={resetMemberForm} editingMemberId={editingMemberId} memberFormData={memberFormData} setMemberFormData={setMemberFormData} handleSaveMember={handleSaveMember}
-          jinalayas={jinalayas} jinalayaSearch={jinalayaSearch} setJinalayaSearch={setJinalayaSearch} setIsJinalayaModalOpen={setIsJinalayaModalOpen} startEditJinalaya={startEditJinalaya} deleteJinalaya={deleteJinalaya} isJinalayaModalOpen={isJinalayaModalOpen} resetJinalayaForm={resetJinalayaForm} editingJinalayaId={editingJinalayaId} jinalayaFormData={jinalayaFormData} setJinalayaFormData={setJinalayaFormData} handleSaveJinalaya={handleSaveJinalaya}
+          jinalayas={jinalayas} jinalayaSearch={jinalayaSearch} setJinalayaSearch={setJinalayaSearch} setIsJinalayaModalOpen={setIsJinalayaModalOpen} startEditJinalaya={startEditJinalaya} deleteJinalaya={deleteJinalaya} isJinalayaModalOpen={isJinalayaModalOpen} resetJinalayaForm={resetJinalayaForm} editingJinalayaId={editingJinalayaId} jinalayaFormData={jinalayaFormData} setJinalayaFormData={setJinalayaFormData} handleSaveJinalaya={handleSaveJinalaya} deleteJinalayaMedia={deleteJinalayaMedia}
           allReports={allReports} reportUpashrayFilter={reportUpashrayFilter} setReportUpashrayFilter={setReportUpashrayFilter} reportMemberFilter={reportMemberFilter} setReportMemberFilter={setReportMemberFilter} reportDateFilter={reportDateFilter} setReportDateFilter={setReportDateFilter} setSelectedReport={setSelectedReport} deleteReport={deleteReport} isReportModalOpen={isReportModalOpen} setIsReportModalOpen={setIsReportModalOpen} selectedReport={selectedReport} openReportAndPrint={openReportAndPrint}
         />
       </>
