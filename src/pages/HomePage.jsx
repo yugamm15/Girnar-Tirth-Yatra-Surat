@@ -897,13 +897,13 @@ const HomePage = () => {
             sectionRefs.current.join = element;
           }}
           data-scene-id="join"
-          className="home-scene snap-section relative min-h-screen flex items-center justify-center py-20"
+          className="home-scene snap-section relative min-h-screen flex flex-col"
         >
           <div className="absolute inset-0 z-0 overflow-hidden">
             <img src={isMobileViewport ? sceneImages.joinMobile : sceneImages.join} alt={t(siteCopy.home.scenes[6].label)} className="home-bg h-full w-full object-cover brightness-[0.36]" loading="lazy" decoding="async" />
           </div>
 
-          <div className="relative z-20 px-6 text-center">
+          <div className="relative z-20 flex-grow flex flex-col items-center justify-center px-6 text-center pt-20">
             <h2 className="home-reveal text-4xl md:text-8xl font-headline text-white font-bold tracking-tight mb-8 md:mb-12">
               {t(siteCopy.home.join.title)}
             </h2>
@@ -922,10 +922,10 @@ const HomePage = () => {
               </Link>
             </div>
           </div>
-        </section>
 
-        <section className="relative z-20 bg-surface pt-16 md:pt-24">
-          <SiteFooter variant="dark" />
+          <div className="relative z-20 w-full mt-auto bg-transparent">
+            <SiteFooter variant="dark" />
+          </div>
         </section>
       </main>
 

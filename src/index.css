@@ -433,22 +433,13 @@ body.mobile-nav-open {
 }
 
 @media (max-width: 768px) {
-  .snap-container {
-    scroll-snap-type: y proximity;
-  }
-
   .snap-section {
     content-visibility: auto;
     contain-intrinsic-size: 100vh;
   }
 
   .home-scene.snap-section:not([data-scene-id='hero']) {
-    height: auto !important;
-    min-height: 100svh;
-    overflow: visible !important;
-    align-items: center !important;
-    padding-top: calc(env(safe-area-inset-top) + 4.25rem) !important;
-    padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
+    overflow: hidden !important;
   }
 
   .home-bg {
