@@ -26,7 +26,7 @@ const YatraBookingPage = () => {
     firstName: '',
     lastName: '',
     phone: '',
-    altPhone: '',
+    email: '',
     birthdate: '',
     gender: '',
     remarks: '',
@@ -119,7 +119,7 @@ const YatraBookingPage = () => {
   };
 
   const validateYatrik = (yatrik) => {
-    return yatrik.firstName && yatrik.lastName && yatrik.phone && yatrik.birthdate && yatrik.gender;
+    return yatrik.firstName && yatrik.lastName && yatrik.phone && yatrik.email && yatrik.birthdate && yatrik.gender;
   };
 
   const addYatrik = () => {
@@ -141,7 +141,7 @@ const YatraBookingPage = () => {
       firstName: '',
       lastName: '',
       phone: '',
-      altPhone: '',
+      email: '',
       birthdate: '',
       gender: '',
       remarks: '',
@@ -343,11 +343,12 @@ const YatraBookingPage = () => {
                 placeholder="10 digit mobile number"
               />
               <FormInput
-                label="Alt Phone Number"
-                type="tel"
-                value={currentYatrik.altPhone}
-                onChange={(e) => handleInputChange('altPhone', e.target.value)}
-                placeholder="Optional backup number"
+                label="Email ID"
+                required
+                type="email"
+                value={currentYatrik.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                placeholder="For ticket confirmation"
               />
               <FormInput
                 label="Birthdate"

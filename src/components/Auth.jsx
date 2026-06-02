@@ -1256,7 +1256,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       first_name: firstName,
       last_name: lastName,
       phone,
-      alt_phone: String(registrationData.alt_phone || '').trim() || null,
+      email: String(registrationData.email || '').trim() || null,
       birthdate,
       gender,
       remarks: String(registrationData.remarks || '').trim() || null,

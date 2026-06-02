@@ -74,7 +74,7 @@ const YatraPaymentPage = () => {
             first_name: y.firstName,
             last_name: y.lastName,
             phone: y.phone,
-            alt_phone: y.altPhone,
+            email: y.email,
             birthdate: y.birthdate,
             gender: y.gender,
             remarks: y.remarks ? `${y.remarks} (Payment ID: ${response.razorpay_payment_id})` : `Payment ID: ${response.razorpay_payment_id}`,
@@ -85,6 +85,11 @@ const YatraPaymentPage = () => {
           // Save to database
           await yatrikRegistrationsDB.createMultiple(registrations);
           
+          // Send Ticket Email asynchronously (don't await so it doesn't block the UI navigation)
+          import('../utils/emailUtils.js').then(({ sendTicketEmail }) => {
+            sendTicketEmail(bookingInfo, response.razorpay_payment_id, latestYatra?.date_text, latestYatra?.image, bookingInfo.yatricks);
+          }).catch(err => console.error('Failed to load email util:', err));
+
           // Finalize booking
           sessionStorage.removeItem('pending_booking');
           navigate('/monthly-bus-yatra/success', { 
@@ -216,7 +221,7 @@ const YatraPaymentPage = () => {
                     Important Note:
                   </p>
                   <p className="text-[10px] text-gray-500 mt-2 leading-relaxed italic">
-                    By clicking "Confirm & Pay", you agree to our terms of service. Tickets are non-refundable but transferable with 48h notice.
+                    By clicking "Confirm & Pay", you agree to our terms of service. Tickets cannot be canceled and there will be no refund on cancellation. Bus number and seat number will be sent to you via WhatsApp.
                   </p>
                 </div>
               </div>

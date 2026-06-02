@@ -24,7 +24,7 @@ const BusYatraTab = ({
     first_name: '',
     last_name: '',
     phone: '',
-    alt_phone: '',
+    email: '',
     birthdate: '',
     gender: '',
     remarks: '',
@@ -36,7 +36,7 @@ const BusYatraTab = ({
       first_name: '',
       last_name: '',
       phone: '',
-      alt_phone: '',
+      email: '',
       birthdate: '',
       gender: '',
       remarks: '',
@@ -371,11 +371,12 @@ const BusYatraTab = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Alternative Phone</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Email ID</label>
                   <input
-                    type="tel"
-                    value={offlineFormData.alt_phone}
-                    onChange={(e) => setOfflineFormData({ ...offlineFormData, alt_phone: e.target.value })}
+                    type="email"
+                    required
+                    value={offlineFormData.email}
+                    onChange={(e) => setOfflineFormData({ ...offlineFormData, email: e.target.value })}
                     className="w-full bg-gray-50 border border-gray-200 text-sm py-3 px-4 outline-none focus:border-[#c5a059] transition-colors"
                   />
                 </div>
