@@ -41,12 +41,12 @@ export const sendTicketEmail = async (bookingInfo, paymentId, yatraDateText, yat
       to_email: emailTo,
       to_name: `${primaryYatrik.firstName} ${primaryYatrik.lastName}`,
       yatra_date: yatraDateText,
-      yatra_image: yatraImage,
+      yatra_image_html: yatraImage ? `<img src="${yatraImage}" alt="Yatra Date" style="width: 100%; height: 180px; object-fit: cover; display: block;" />` : '',
       payment_id: paymentId,
       total_amount: `₹${bookingInfo.totalAmount}`,
       passenger_count: yatricks.length,
       passenger_details: passengerDetailsHTML,
-      important_note: 'Tickets cannot be canceled and there will be no refund on cancellation. Bus number and seat number will be sent to you via WhatsApp.'
+      important_note: '* Tickets cannot be canceled and there will be no refund on cancellation. * Tickets are strictly non-transferable. * Bus number and seat number will be sent to you via WhatsApp.'
     };
 
     const response = await emailjs.send(

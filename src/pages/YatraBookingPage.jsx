@@ -128,12 +128,15 @@ const YatraBookingPage = () => {
       return;
     }
 
-    const maxCapacity = Number(yatra?.max_capacity || 0);
-    const alreadyBooked = Number(yatra?.registeredCount || 0);
-    const seatsRemaining = maxCapacity > 0 ? Math.max(maxCapacity - alreadyBooked - yatricks.length, 0) : null;
-    if (maxCapacity > 0 && seatsRemaining !== null && seatsRemaining <= 0) {
-      pushToast('Sorry, max capacity reached for this yatra', 'error');
-      return;
+    const maxCap = Number(yatra?.max_capacity || 0);
+    const booked = Number(yatra?.registeredCount || 0);
+    const available = maxCap > 0 ? Math.max(maxCap - booked, 0) : null;
+    
+    if (available !== null) {
+      if (yatricks.length >= available - 1) {
+        pushToast(`Sorry, only ${available} ticket${available === 1 ? '' : 's'} available for this date. You cannot add more.`, 'error');
+        return;
+      }
     }
 
     setYatricks(prev => [...prev, currentYatrik]);
@@ -256,6 +259,10 @@ const YatraBookingPage = () => {
       </LightPageShell>
     );
   }
+
+  const totalYatraCapacity = Number(yatra?.max_capacity || 0);
+  const totalYatraBooked = Number(yatra?.registeredCount || 0);
+  const totalYatraAvailable = totalYatraCapacity > 0 ? Math.max(totalYatraCapacity - totalYatraBooked, 0) : null;
 
   return (
     <LightPageShell>

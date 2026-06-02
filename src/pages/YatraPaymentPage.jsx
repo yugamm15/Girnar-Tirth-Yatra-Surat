@@ -6,6 +6,7 @@ import TopLineLoader from '../components/TopLineLoader.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { yatraDatesDB, yatrikRegistrationsDB } from '../lib/database.js';
+import { sendTicketEmail } from '../utils/emailUtils.js';
 
 const YatraPaymentPage = () => {
   const navigate = useNavigate();
@@ -85,10 +86,14 @@ const YatraPaymentPage = () => {
           // Save to database
           await yatrikRegistrationsDB.createMultiple(registrations);
           
-          // Send Ticket Email asynchronously (don't await so it doesn't block the UI navigation)
-          import('../utils/emailUtils.js').then(({ sendTicketEmail }) => {
-            sendTicketEmail(bookingInfo, response.razorpay_payment_id, latestYatra?.date_text, latestYatra?.image, bookingInfo.yatricks);
-          }).catch(err => console.error('Failed to load email util:', err));
+          // Send Ticket Email and wait for it to complete
+          try {
+            // Prevent huge base64 strings from crashing EmailJS
+            const safeImage = (latestYatra?.image && latestYatra.image.length < 2000) ? latestYatra.image : '';
+            await sendTicketEmail(bookingInfo, response.razorpay_payment_id, latestYatra?.date_text, safeImage, bookingInfo.yatricks);
+          } catch (emailErr) {
+            console.error('Email failed, but booking succeeded:', emailErr);
+          }
 
           // Finalize booking
           sessionStorage.removeItem('pending_booking');

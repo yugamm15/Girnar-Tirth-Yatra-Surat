@@ -1248,7 +1248,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     if (maxCapacity > 0) {
       const currentCount = busRegistrations.filter(reg => String(reg.yatra_id) === yatraId).length;
       if (currentCount >= maxCapacity) {
-        throw new Error('Sorry, max capacity reached for this yatra');
+        throw new Error('Sorry, this yatra is completely full (0 tickets remaining).');
       }
     }
 
