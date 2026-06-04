@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { LightPageShell } from '../components/LightPageShell.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import SecureImage from '../components/SecureImage.jsx';
 
 const EventsPage = () => {
   const { t } = useLanguage();
@@ -20,7 +21,7 @@ const EventsPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           <article className="light-panel-soft light-card-image overflow-hidden">
-            <img
+            <SecureImage
               src="/images/5-Pathsala Vitran.png"
               alt={t(pageCopy.sections[0].title)}
               className="w-full h-56 object-cover"
@@ -41,7 +42,7 @@ const EventsPage = () => {
           </article>
 
           <article className="light-panel-soft light-card-image overflow-hidden">
-            <img
+            <SecureImage
               src="/images/164.1.jpg"
               alt={t(pageCopy.sections[1].title)}
               className="w-full h-56 object-cover"
