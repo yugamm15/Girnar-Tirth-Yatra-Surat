@@ -45,9 +45,9 @@ const NavDropdown = ({ item, t, isDark, activeLinkClass, idleLinkClass, navLinkT
 
       {/* Dropdown Menu */}
       <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 transition-all duration-300 ${
-        isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'
+        isOpen ? 'opacity-100 translate-y-0 pointer-events-auto visible' : 'opacity-0 translate-y-2 pointer-events-none invisible'
       }`}>
-        <div className={`min-w-[200px] overflow-hidden rounded-xl border shadow-2xl ${
+        <div className={`min-w-[200px] overflow-hidden rounded-xl border shadow-2xl isolate transform-gpu ${
           isDark 
             ? 'bg-[#0a0a0a]/95 backdrop-blur-xl border-white/10 shadow-black/50' 
             : 'bg-white/95 backdrop-blur-xl border-gray-100 shadow-gray-200/50'
@@ -122,8 +122,8 @@ export const SiteNavbar = ({ variant = 'light' }) => {
   const brandClass = 'pointer-events-auto flex items-center justify-center';
 
   const desktopNavClass = isDark
-    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white/5 backdrop-blur-xl rounded-full border border-primary/20 shadow-lg shadow-black/5 pointer-events-auto'
-    : 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white rounded-full border border-gray-200 shadow-lg shadow-gray-200/50 pointer-events-auto';
+    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white/5 backdrop-blur-xl rounded-full border border-primary/20 shadow-lg shadow-black/5 pointer-events-auto isolate transform-gpu'
+    : 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white rounded-full border border-gray-200 shadow-lg shadow-gray-200/50 pointer-events-auto isolate transform-gpu';
 
   const activeLinkClass = isDark ? 'text-primary border-b border-primary pb-1' : 'text-[#c5a059] border-b border-[#c5a059] pb-1';
   const idleLinkClass = isDark ? 'text-white hover:text-primary' : 'text-gray-500 hover:text-[#c5a059]';

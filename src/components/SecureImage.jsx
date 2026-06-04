@@ -40,7 +40,10 @@ const SecureImage = ({
         alt={alt}
         className={`select-none pointer-events-none transition-opacity duration-700 ease-in-out ${className} ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
         style={{ 
-          ...style 
+          ...style,
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden',
+          imageRendering: 'high-quality'
         }}
         loading={loading}
         decoding={decoding}

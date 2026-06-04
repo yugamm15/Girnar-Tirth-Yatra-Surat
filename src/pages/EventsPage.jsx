@@ -42,7 +42,7 @@ const EventsPage = () => {
 
           <article className="light-panel-soft light-card-image overflow-hidden">
             <img
-              src="/image/6.JPG"
+              src="/images/164.1.jpg"
               alt={t(pageCopy.sections[1].title)}
               className="w-full h-56 object-cover"
               loading="lazy"

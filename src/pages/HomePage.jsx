@@ -12,8 +12,8 @@ import { upashraysDB, jinalayasDB } from '../lib/database.js';
 gsap.registerPlugin(ScrollTrigger);
 
 const sceneImages = {
-  hero: '/images/81 (2).JPG',
-  heroMobile: '/images/81 (2).JPG',
+  hero: '/images/!st image.jpg',
+  heroMobile: '/images/!st image.jpg',
   about: '/image/2.JPG',
   aboutMobile: '/images/mobile/about-2.webp',
   bus: '/images/girnar_Bus_picture.png',
@@ -24,8 +24,8 @@ const sceneImages = {
   jinalayMobile: '/images/Jinalaya-jirnodhar.JPG',
   pathsala: '/images/5-Pathsala Vitran.png',
   pathsalaMobile: '/images/5-Pathsala Vitran.png',
-  rituals: '/image/6.JPG',
-  ritualsMobile: '/images/mobile/rituals-6.webp',
+  rituals: '/images/164.1.jpg',
+  ritualsMobile: '/images/164.1.jpg',
   join: '/image/7.jpg',
   joinMobile: '/images/mobile/join-7.webp',
 };
@@ -205,8 +205,8 @@ const HomePage = () => {
 
         onWheelMobile({
           deltaY,
-          preventDefault: () => {},
-          stopPropagation: () => {},
+          preventDefault: () => { },
+          stopPropagation: () => { },
         });
       };
 
@@ -310,8 +310,8 @@ const HomePage = () => {
       if (Math.abs(deltaY) > 30) {
         onWheelDoc({
           deltaY,
-          preventDefault: () => {},
-          stopPropagation: () => {},
+          preventDefault: () => { },
+          stopPropagation: () => { },
         });
       }
     };
@@ -562,18 +562,16 @@ const HomePage = () => {
               aria-label={scene.label}
             >
               <span
-                className={`absolute right-6 md:right-8 text-[8px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] transition-opacity duration-300 whitespace-nowrap opacity-0 group-hover:opacity-100 ${
-                  isActive ? 'text-primary' : 'text-neutral-500'
-                }`}
+                className={`absolute right-6 md:right-8 text-[8px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] transition-opacity duration-300 whitespace-nowrap opacity-0 group-hover:opacity-100 ${isActive ? 'text-primary' : 'text-neutral-500'
+                  }`}
               >
                 {scene.label}
               </span>
               <span
-                className={`rounded-full transition-all duration-300 ${
-                  isActive
+                className={`rounded-full transition-all duration-300 ${isActive
                     ? 'w-1.5 h-1.5 md:w-2 md:h-2 bg-primary ring-2 md:ring-4 ring-primary/25'
                     : 'w-1 h-1 md:w-1.5 md:h-1.5 bg-neutral-700 group-hover:bg-white'
-                }`}
+                  }`}
               />
             </button>
           );
@@ -722,7 +720,7 @@ const HomePage = () => {
                 {t(siteCopy.home.monthlyBus.title)}
               </h2>
               <p className="home-reveal text-sm md:text-xl text-on-surface-variant font-light leading-relaxed">{t(siteCopy.home.monthlyBus.paragraph)}</p>
-              
+
               <div className="home-reveal mt-8 grid grid-cols-2 gap-4 md:gap-8 border-t border-white/10 pt-6 md:pt-8">
                 <div>
                   <span className="block text-primary uppercase tracking-widest text-[8px] md:text-[10px] mb-1 font-bold opacity-80">{t(siteCopy.home.monthlyBus.frequencyLabel)}</span>
@@ -864,7 +862,7 @@ const HomePage = () => {
           className="home-scene snap-section relative min-h-screen flex items-center py-20"
         >
           <div className="absolute inset-0 z-0 overflow-hidden">
-            <img src={isMobileViewport ? sceneImages.ritualsMobile : sceneImages.rituals} alt={t(siteCopy.home.scenes[6].label)} className="home-bg h-full w-full object-cover brightness-[0.33]" loading="lazy" decoding="async" />
+            <img src={isMobileViewport ? sceneImages.ritualsMobile : sceneImages.rituals} alt={t(siteCopy.home.scenes[6].label)} className="home-bg h-full w-full object-cover object-center md:object-left brightness-[0.33]" loading="lazy" decoding="async" />
           </div>
           <div className="relative z-20 w-full px-6 md:px-24 flex justify-center md:justify-start">
             <article className="frosted-premium p-8 md:p-14 max-w-sm md:max-w-2xl border-l-[6px] border-secondary text-left">
