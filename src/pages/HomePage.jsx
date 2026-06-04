@@ -12,8 +12,8 @@ import { upashraysDB, jinalayasDB } from '../lib/database.js';
 gsap.registerPlugin(ScrollTrigger);
 
 const sceneImages = {
-  hero: '/images/!st image.jpg',
-  heroMobile: '/images/!st image.jpg',
+  hero: '/images/1st.jpg',
+  heroMobile: '/images/1st.jpg',
   about: '/image/2.JPG',
   aboutMobile: '/images/mobile/about-2.webp',
   bus: '/images/girnar_Bus_picture.png',
@@ -569,8 +569,8 @@ const HomePage = () => {
               </span>
               <span
                 className={`rounded-full transition-all duration-300 ${isActive
-                    ? 'w-1.5 h-1.5 md:w-2 md:h-2 bg-primary ring-2 md:ring-4 ring-primary/25'
-                    : 'w-1 h-1 md:w-1.5 md:h-1.5 bg-neutral-700 group-hover:bg-white'
+                  ? 'w-1.5 h-1.5 md:w-2 md:h-2 bg-primary ring-2 md:ring-4 ring-primary/25'
+                  : 'w-1 h-1 md:w-1.5 md:h-1.5 bg-neutral-700 group-hover:bg-white'
                   }`}
               />
             </button>
@@ -593,7 +593,7 @@ const HomePage = () => {
                 id="hero-locked-bg"
                 src={sceneImages.hero}
                 alt={t(siteCopy.home.hero.lineTwo)}
-                className="home-bg h-full w-full object-cover object-center select-none"
+                className="home-bg h-full w-full object-cover object-[78%_center] md:object-center select-none"
                 style={{
                   filter: heroBackdropVisible ? 'blur(9px) brightness(0.42)' : 'blur(0px) brightness(0.95)',
                   transition: 'filter 1s ease',
