@@ -593,7 +593,7 @@ const HomePage = () => {
                 id="hero-locked-bg"
                 src={sceneImages.hero}
                 alt={t(siteCopy.home.hero.lineTwo)}
-                className="home-bg h-full w-full object-cover object-[78%_center] md:object-center select-none"
+                className="home-bg h-full w-full object-cover object-[65%_center] select-none"
                 style={{
                   filter: heroBackdropVisible ? 'blur(9px) brightness(0.42)' : 'blur(0px) brightness(0.95)',
                   transition: 'filter 1s ease',
@@ -862,7 +862,7 @@ const HomePage = () => {
           className="home-scene snap-section relative min-h-screen flex items-center py-20"
         >
           <div className="absolute inset-0 z-0 overflow-hidden">
-            <img src={isMobileViewport ? sceneImages.ritualsMobile : sceneImages.rituals} alt={t(siteCopy.home.scenes[6].label)} className="home-bg h-full w-full object-cover object-center md:object-left brightness-[0.33]" loading="lazy" decoding="async" />
+            <img src={isMobileViewport ? sceneImages.ritualsMobile : sceneImages.rituals} alt={t(siteCopy.home.scenes[6].label)} className="home-bg h-full w-full object-cover object-center brightness-[0.33]" loading="lazy" decoding="async" />
           </div>
           <div className="relative z-20 w-full px-6 md:px-24 flex justify-center md:justify-start">
             <article className="frosted-premium p-8 md:p-14 max-w-sm md:max-w-2xl border-l-[6px] border-secondary text-left">

@@ -403,12 +403,32 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       const [busData, datesData] = await Promise.all([
         yatrikRegistrationsDB.getAll(), yatraDatesDB.getAll()
       ]);
-      const processedDates = datesData.map(d => ({
-        ...d,
-        date_text: d.trip_date ? formatDateForDisplay(d.trip_date) : d.date_text || '',
-        registration_open: d.registration_open !== false,
-        max_capacity: d.max_capacity ?? null,
-      }));
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const processedDates = datesData.map(d => {
+        let isPast = false;
+        if (d.trip_date || d.date_text) {
+          const tripDate = new Date(d.trip_date || d.date_text);
+          if (!isNaN(tripDate.getTime()) && tripDate < today) {
+            isPast = true;
+          }
+        }
+        
+        let regOpen = d.registration_open !== false;
+        if (isPast && regOpen) {
+          regOpen = false;
+          yatraDatesDB.update(d.id, { registration_open: false }).catch(console.error);
+        }
+
+        return {
+          ...d,
+          date_text: d.trip_date ? formatDateForDisplay(d.trip_date) : d.date_text || '',
+          registration_open: regOpen,
+          max_capacity: d.max_capacity ?? null,
+          is_past: isPast
+        };
+      });
       setBusRegistrations(busData);
       setYatraDates(processedDates);
       setLoadedData(prev => ({ ...prev, busYatra: true }));
@@ -1163,6 +1183,13 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
   };
 
   const toggleRegistrationStatus = async (id, currentStatus) => {
+    if (!currentStatus) {
+      const yatraDate = yatraDates.find(d => d.id === id);
+      if (yatraDate && yatraDate.is_past) {
+        pushToast("Sorry, this yatra date is gone...", "error");
+        return;
+      }
+    }
     const confirmed = await requestConfirmation({
       title: currentStatus ? 'Close Registration?' : 'Open Registration?',
       message: currentStatus 
