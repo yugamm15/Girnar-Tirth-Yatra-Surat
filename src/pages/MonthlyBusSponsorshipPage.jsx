@@ -172,7 +172,7 @@ const MonthlyBusSponsorshipPage = () => {
     const description = `${selectedScheme.title} for ${selectedTripIds.length} trip${selectedTripIds.length > 1 ? 's' : ''}`;
 
     const paymentOptions = {
-      key: 'rzp_test_SrZgeH6l9HUchN',
+      key: 'rzp_test_SzZbEdw7SjFADc',
       amount: totalAmount * 100,
       currency: 'INR',
       name: 'Girnar Seva Group',

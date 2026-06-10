@@ -40,6 +40,7 @@ const YatraBookingPage = () => {
     cancelLabel: 'Cancel',
     onConfirm: () => {}
   });
+  const [highlightSummary, setHighlightSummary] = useState(false);
 
   const pushToast = (message, type = 'info') => {
     const id = Date.now().toString();
@@ -162,6 +163,15 @@ const YatraBookingPage = () => {
   const maxCapacity = Number(yatra?.max_capacity || 0);
   const registeredCount = Number(yatra?.registeredCount || 0);
   const seatsRemaining = maxCapacity > 0 ? Math.max(maxCapacity - registeredCount, 0) : null;
+
+  const handleScrollToPayment = () => {
+    const summaryEl = document.getElementById('booking-summary');
+    if (summaryEl) {
+      summaryEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setHighlightSummary(true);
+      setTimeout(() => setHighlightSummary(false), 2000);
+    }
+  };
 
   const handleProceedToPayment = () => {
     if (capacityNotice) {
@@ -386,12 +396,18 @@ const YatraBookingPage = () => {
               </div>
             </div>
 
-            <div className="mt-12 flex justify-end relative z-10">
+            <div className="mt-12 flex flex-col sm:flex-row justify-end gap-4 relative z-10">
               <button
                 onClick={addYatrik}
-                className="group flex items-center gap-3 px-8 py-4 bg-[#fcf9f2] border border-[#c5a059] text-[#c5a059] font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#c5a059] hover:text-white transition-all duration-300"
+                className="group flex items-center justify-center gap-3 px-8 py-4 bg-[#fcf9f2] border border-[#c5a059] text-[#c5a059] font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#c5a059] hover:text-white transition-all duration-300 w-full sm:w-auto"
               >
                 <span className="text-lg">+</span> Add Another Yatrik
+              </button>
+              <button
+                onClick={handleScrollToPayment}
+                className="group flex items-center justify-center gap-3 px-8 py-4 bg-[#c5a059] border border-[#c5a059] text-white font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#b08d4a] hover:border-[#b08d4a] transition-all duration-300 w-full sm:w-auto shadow-lg shadow-[#c5a059]/20"
+              >
+                Pay Now
               </button>
             </div>
           </section>
@@ -413,7 +429,14 @@ const YatraBookingPage = () => {
               </div>
             </div>
 
-            <div className="light-panel p-8 bg-white border border-[#c5a059]/30 shadow-xl mt-auto">
+            <div 
+              id="booking-summary"
+              className={`light-panel p-8 bg-white border transition-all duration-500 shadow-xl mt-auto ${
+                highlightSummary 
+                  ? 'border-[#c5a059] ring-4 ring-[#c5a059]/30 scale-[1.02]' 
+                  : 'border-[#c5a059]/30'
+              }`}
+            >
               <h2 className="text-2xl font-headline text-gray-900 mb-8 pb-4 border-b border-gray-100">Booking Summary</h2>
               
               <div className="space-y-4 mb-8">

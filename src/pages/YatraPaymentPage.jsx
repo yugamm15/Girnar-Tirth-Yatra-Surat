@@ -46,7 +46,7 @@ const YatraPaymentPage = () => {
 
     // Razorpay Options
     const options = {
-      key: 'rzp_test_SrZgeH6l9HUchN', // Your provided Razorpay Test Key
+      key: 'rzp_test_SzZbEdw7SjFADc', // Your provided Razorpay Test Key
       amount: bookingInfo.totalAmount * 100, // Amount in paise (90000 = 900 INR)
       currency: 'INR',
       name: 'Girnar Seva Group',

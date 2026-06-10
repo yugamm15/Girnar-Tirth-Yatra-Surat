@@ -224,15 +224,24 @@ const JinalayJirnodharPage = () => {
             <div className="text-center p-1 flex flex-col items-center">
               <h3 className="font-headline font-bold text-[#7a5f2d] text-sm mb-1">{jinalaya.name}</h3>
               <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-3">{jinalaya.village}</p>
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`}
-                target="_blank"
-                rel="noreferrer"
-                className="bg-[#c5a059] !text-white px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider hover:bg-[#b08d4a] transition-colors w-full shadow-sm mt-1 inline-flex items-center justify-center"
-                onClick={(e) => e.stopPropagation()}
-              >
-                Direction
-              </a>
+              <div className="flex flex-col gap-2 w-full mt-1">
+                <Link
+                  to={`/jinalay-jirnodhar/${jinalaya.id}`}
+                  className="bg-transparent border border-[#c5a059] !text-[#c5a059] px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider hover:bg-[#c5a059] hover:!text-white transition-colors w-full shadow-sm inline-flex items-center justify-center"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  View Details
+                </Link>
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-[#c5a059] !text-white px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-wider hover:bg-[#b08d4a] transition-colors w-full shadow-sm inline-flex items-center justify-center"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Direction
+                </a>
+              </div>
             </div>
           </Popup>
         </Marker>

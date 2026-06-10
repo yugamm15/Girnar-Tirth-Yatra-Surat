@@ -55,7 +55,18 @@ const UpashrayDetailPage = () => {
           applyDetailState(cachedState);
           setLoading(false);
         } else {
-          setLoading(true);
+          const listCache = dbCache.read('upashray_jirnodhar_page');
+          if (listCache) {
+            const initialUpashray = listCache.find(u => u.slug === slug || u.id.toString() === slug);
+            if (initialUpashray) {
+              setUpashray(initialUpashray);
+              setLoading(false);
+            } else {
+              setLoading(true);
+            }
+          } else {
+            setLoading(true);
+          }
         }
 
         const upashrayData = await upashraysDB.getBySlug(slug, 'id, name, village, route, trusty, mobile, location, description, slug, status, before_img, process_img, after_img, created_at');

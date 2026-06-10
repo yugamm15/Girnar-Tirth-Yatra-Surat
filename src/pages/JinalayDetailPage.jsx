@@ -53,7 +53,18 @@ const JinalayDetailPage = () => {
           setJinalaya(sanitizeJinalaya(cachedState));
           setLoading(false);
         } else {
-          setLoading(true);
+          const listCache = dbCache.read('jinalay_jirnodhar_page');
+          if (listCache) {
+            const initialJinalaya = listCache.find(j => j.id.toString() === id);
+            if (initialJinalaya) {
+              setJinalaya(sanitizeJinalaya(initialJinalaya));
+              setLoading(false);
+            } else {
+              setLoading(true);
+            }
+          } else {
+            setLoading(true);
+          }
         }
 
         const data = await jinalayasDB.getById(id);
