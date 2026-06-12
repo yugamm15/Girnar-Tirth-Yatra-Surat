@@ -5,7 +5,7 @@ import SecureImage from '../components/SecureImage.jsx';
 import TopLineLoader from '../components/TopLineLoader.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { siteCopy } from '../content/siteCopy.js';
-import { yatraDatesDB, yatrikRegistrationsDB } from '../lib/database.js';
+import { yatraDatesDB, yatrikRegistrationsDB, demoYatrikRegistrationsDB } from '../lib/database.js';
 import { sendTicketEmail } from '../utils/emailUtils.js';
 
 const YatraPaymentPage = () => {
@@ -42,6 +42,25 @@ const YatraPaymentPage = () => {
       alert('Razorpay SDK failed to load. Are you online?');
       setIsProcessing(false);
       return;
+    }
+
+    // Save to Demo Table for backup
+    try {
+      const demoRegistrations = bookingInfo.yatricks.map(y => ({
+        first_name: y.firstName,
+        last_name: y.lastName,
+        phone: y.phone,
+        email: y.email,
+        birthdate: y.birthdate,
+        gender: y.gender,
+        remarks: y.remarks || '',
+        yatra_id: parseInt(bookingInfo.yatraId),
+        registration_source: 'pending_payment',
+      }));
+      await demoYatrikRegistrationsDB.createMultiple(demoRegistrations);
+    } catch (demoErr) {
+      console.warn('Failed to save to demo backup table:', demoErr);
+      // We don't block the actual payment if demo table fails
     }
 
     // Razorpay Options
@@ -217,6 +236,11 @@ const YatraPaymentPage = () => {
                         <p className="text-sm font-bold text-gray-900">{y.firstName} {y.lastName}</p>
                         <p className="text-[10px] text-gray-500 uppercase tracking-widest">{y.gender} · {y.phone}</p>
                       </div>
+                      <Link to={`/monthly-bus-yatra/booking/${bookingInfo.yatraId}`} className="text-gray-300 hover:text-[#c5a059] transition-colors p-2" title="Edit Yatrik">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </Link>
                     </div>
                   ))}
                 </div>

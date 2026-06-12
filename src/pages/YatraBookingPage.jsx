@@ -102,6 +102,18 @@ const YatraBookingPage = () => {
           registeredCount: bookedCount,
           max_capacity: found.max_capacity ?? null,
         });
+
+        const pendingRaw = sessionStorage.getItem('pending_booking');
+        if (pendingRaw) {
+          try {
+            const pending = JSON.parse(pendingRaw);
+            if (String(pending.yatraId) === String(yatraId) && Array.isArray(pending.yatricks) && pending.yatricks.length > 0) {
+              setYatricks(pending.yatricks);
+            }
+          } catch (e) {
+            console.error('Error parsing pending booking:', e);
+          }
+        }
       } catch (err) {
         console.error('Error loading yatra:', err);
         if (!yatra) {
@@ -155,6 +167,14 @@ const YatraBookingPage = () => {
 
   const removeYatrik = (index) => {
     setYatricks(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const editYatrik = (index) => {
+    const yatrikToEdit = yatricks[index];
+    setYatricks(prev => prev.filter((_, i) => i !== index));
+    setCurrentYatrik(yatrikToEdit);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    pushToast('You can now edit this yatrik details', 'info');
   };
 
   const totalYatrikCount = yatricks.length + (validateYatrik(currentYatrik) ? 1 : 0);
@@ -491,11 +511,18 @@ const YatraBookingPage = () => {
                       <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-medium">{y.gender} · {y.phone}</p>
                     </div>
                   </div>
-                  <button onClick={() => removeYatrik(idx)} className="text-gray-300 hover:text-red-500 transition-colors p-2">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => editYatrik(idx)} className="text-gray-300 hover:text-[#c5a059] transition-colors p-2" title="Edit Yatrik">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
+                    <button onClick={() => removeYatrik(idx)} className="text-gray-300 hover:text-red-500 transition-colors p-2" title="Remove Yatrik">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

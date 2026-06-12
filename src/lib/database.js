@@ -761,6 +761,24 @@ export const yatrikRegistrationsDB = {
   }
 };
 
+// ============== DEMO YATRIK REGISTRATIONS ==============
+
+export const demoYatrikRegistrationsDB = {
+  async createMultiple(registrations) {
+    const prepared = registrations.map(reg => ({
+      ...reg,
+      registration_source: reg.registration_source || 'online',
+      created_at: new Date().toISOString()
+    }));
+    const { data, error } = await supabase
+      .from('demo_yatrik_registrations')
+      .insert(prepared)
+      .select();
+    if (error) throw error;
+    return data || [];
+  }
+};
+
 // ============== CHECKING REPORTS ==============
 
 export const checkingReportsDB = {
