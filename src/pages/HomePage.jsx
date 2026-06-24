@@ -12,8 +12,8 @@ import { upashraysDB, jinalayasDB } from '../lib/database.js';
 gsap.registerPlugin(ScrollTrigger);
 
 const sceneImages = {
-  hero: '/images/1st.jpg',
-  heroMobile: '/images/1st.jpg',
+  hero: '/images/!st image.jpg',
+  heroMobile: '/images/!st image.jpg',
   about: '/image/2.JPG',
   aboutMobile: '/images/mobile/about-2.webp',
   bus: '/images/girnar_Bus_picture.png',
@@ -588,12 +588,12 @@ const HomePage = () => {
         >
           <div className="absolute inset-0 z-0">
             <picture>
-              <source media="(max-width: 768px)" srcSet={sceneImages.heroMobile} type="image/webp" />
+              <source media="(max-width: 768px)" srcSet={sceneImages.heroMobile} />
               <img
                 id="hero-locked-bg"
                 src={sceneImages.hero}
                 alt={t(siteCopy.home.hero.lineTwo)}
-                className="home-bg h-full w-full object-cover object-[65%_center] select-none"
+                className="home-bg h-full w-full object-cover object-center md:object-[65%_center] select-none"
                 style={{
                   filter: heroBackdropVisible ? 'blur(9px) brightness(0.42)' : 'blur(0px) brightness(0.95)',
                   transition: 'filter 1s ease',
