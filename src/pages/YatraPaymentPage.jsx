@@ -33,6 +33,10 @@ const YatraPaymentPage = () => {
     });
   };
 
+  const baseAmount = bookingInfo ? bookingInfo.totalAmount : 0;
+  const gstAmount = Math.round(baseAmount * 0.03);
+  const finalAmount = baseAmount + gstAmount;
+
   const handlePaymentSubmit = async () => {
     setIsProcessing(true);
 
@@ -66,7 +70,7 @@ const YatraPaymentPage = () => {
     // Razorpay Options
     const options = {
       key: 'rzp_test_SzZbEdw7SjFADc', // Your provided Razorpay Test Key
-      amount: bookingInfo.totalAmount * 100, // Amount in paise (90000 = 900 INR)
+      amount: finalAmount * 100, // Amount in paise (90000 = 900 INR)
       currency: 'INR',
       name: 'Girnar Seva Group',
       description: `Booking for ${bookingInfo.yatricks.length} Yatrick(s)`,
@@ -194,7 +198,11 @@ const YatraPaymentPage = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Yatricks ({bookingInfo.yatricks.length})</span>
-                      <span className="font-bold text-gray-900">₹{bookingInfo.totalAmount}</span>
+                      <span className="font-bold text-gray-900">₹{baseAmount}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">GST (3%)</span>
+                      <span className="font-bold text-gray-900">₹{gstAmount}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Convenience Fee</span>
@@ -202,7 +210,7 @@ const YatraPaymentPage = () => {
                     </div>
                     <div className="pt-3 border-t border-gray-200 flex justify-between items-baseline">
                       <span className="text-gray-900 font-bold">Payable Amount</span>
-                      <span className="text-2xl font-headline text-[#c5a059]">₹{bookingInfo.totalAmount}</span>
+                      <span className="text-2xl font-headline text-[#c5a059]">₹{finalAmount}</span>
                     </div>
                   </div>
                 </section>
@@ -218,7 +226,7 @@ const YatraPaymentPage = () => {
                       Processing...
                     </>
                   ) : (
-                    `Confirm & Pay ₹${bookingInfo.totalAmount}`
+                    `Confirm & Pay ₹${finalAmount}`
                   )}
                 </button>
               </div>

@@ -119,7 +119,9 @@ const MonthlyBusSponsorshipPage = () => {
     }
   }, [schemes, selectedSchemeId]);
 
-  const totalAmount = (selectedScheme ? Number(selectedScheme.amount || 0) : 0) * selectedTripIds.length;
+  const baseAmount = (selectedScheme ? Number(selectedScheme.amount || 0) : 0) * selectedTripIds.length;
+  const gstAmount = Math.round(baseAmount * 0.03);
+  const totalAmount = baseAmount + gstAmount;
 
   const loadRazorpay = () => {
     return new Promise((resolve) => {
@@ -221,6 +223,8 @@ const MonthlyBusSponsorshipPage = () => {
               scheme_title: selectedScheme.title,
               sponsor_notes: sponsorForm.notes.trim(),
               selected_trip_ids: selectedTripIds,
+              base_amount: baseAmount,
+              gst_amount: gstAmount,
             },
           });
 
@@ -433,6 +437,16 @@ const MonthlyBusSponsorshipPage = () => {
             </section>
 
             <section className="bg-[#fcf9f2] border border-[#c5a059]/20 shadow-lg p-6 md:p-8">
+              <div className="flex flex-col gap-2 border-b border-[#c5a059]/10 pb-4 mb-4">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Base Amount</span>
+                  <span className="font-bold text-gray-900">₹{baseAmount}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">GST (3%)</span>
+                  <span className="font-bold text-gray-900">₹{gstAmount}</span>
+                </div>
+              </div>
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <h3 className="text-xs uppercase tracking-[0.25em] font-bold text-[#9f7c3d]">Payable Amount</h3>
@@ -443,7 +457,7 @@ const MonthlyBusSponsorshipPage = () => {
                 </div>
               </div>
               <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-                The amount is calculated per selected trip. You can choose multiple trips before paying.
+                The base amount is calculated per selected trip. GST of 3% is added to the final payable amount. You can choose multiple trips before paying.
               </p>
               <button
                 type="button"
