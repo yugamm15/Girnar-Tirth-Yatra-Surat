@@ -173,13 +173,37 @@ const MonthlyBusSponsorshipPage = () => {
 
     const description = `${selectedScheme.title} for ${selectedTripIds.length} trip${selectedTripIds.length > 1 ? 's' : ''}`;
 
+    let orderData;
+    try {
+      const orderRes = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: totalAmount * 100,
+          currency: 'INR',
+          receipt: `sponsor_${Date.now()}`
+        })
+      });
+      if (!orderRes.ok) {
+        const errJson = await orderRes.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Failed to initialize payment order');
+      }
+      orderData = await orderRes.json();
+    } catch (err) {
+      console.error('Order creation failed:', err);
+      pushToast('Unable to initiate payment: ' + err.message, 'error');
+      setProcessing(false);
+      return;
+    }
+
     const paymentOptions = {
-      key: 'rzp_test_SzZbEdw7SjFADc',
-      amount: totalAmount * 100,
-      currency: 'INR',
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: orderData.amount,
+      currency: orderData.currency || 'INR',
+      order_id: orderData.order_id,
       name: 'Girnar Seva Group',
       description,
-      image: '/images/logo.png',
+      image: window.location.origin + '/images/logo2.png',
       prefill: {
         name: sponsorForm.name,
         contact: sponsorForm.phone,
@@ -190,12 +214,31 @@ const MonthlyBusSponsorshipPage = () => {
         scheme_id: String(selectedScheme.id),
         trip_ids: selectedTripIds.join(','),
       },
-      theme: { color: '#c5a059' },
+      theme: {
+        color: '#c5a059',
+        backdrop_color: 'rgba(10, 10, 10, 0.85)'
+      },
       modal: {
         ondismiss: () => setProcessing(false),
       },
       handler: async (response) => {
         try {
+          const verifyRes = await fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            })
+          });
+          const verifyData = await verifyRes.json().catch(() => ({}));
+          if (!verifyRes.ok || !verifyData.success) {
+            pushToast('Payment signature verification failed. Record not saved.', 'error');
+            setProcessing(false);
+            return;
+          }
+
           await paymentIntentsDB.create({
             module_key: 'sponsorship',
             reference_type: 'sponsorship_scheme',
@@ -241,6 +284,10 @@ const MonthlyBusSponsorshipPage = () => {
     };
 
     const paymentObject = new window.Razorpay(paymentOptions);
+    paymentObject.on('payment.failed', function (response) {
+      pushToast('Payment Failed: ' + (response.error?.description || 'Unknown error'), 'error');
+      setProcessing(false);
+    });
     paymentObject.open();
   };
 

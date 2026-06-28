@@ -67,20 +67,62 @@ const YatraPaymentPage = () => {
       // We don't block the actual payment if demo table fails
     }
 
+    // Create order from backend
+    let orderData;
+    try {
+      const orderRes = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: finalAmount * 100,
+          currency: 'INR',
+          receipt: `yatra_${Date.now()}`
+        })
+      });
+      if (!orderRes.ok) {
+        const errJson = await orderRes.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Failed to initialize payment order');
+      }
+      orderData = await orderRes.json();
+    } catch (err) {
+      console.error('Order creation failed:', err);
+      alert('Unable to initiate payment: ' + err.message);
+      setIsProcessing(false);
+      return;
+    }
+
     // Razorpay Options
     const options = {
-      key: 'rzp_test_SzZbEdw7SjFADc', // Your provided Razorpay Test Key
-      amount: finalAmount * 100, // Amount in paise (90000 = 900 INR)
-      currency: 'INR',
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: orderData.amount,
+      currency: orderData.currency || 'INR',
+      order_id: orderData.order_id,
       name: 'Girnar Seva Group',
       description: `Booking for ${bookingInfo.yatricks.length} Yatrick(s)`,
-      image: '/images/logo.png', // Your logo
+      image: window.location.origin + '/images/logo2.png', // Your official brand logo
       handler: async function (response) {
         // This function executes after a successful payment
         console.log('Payment Successful:', response.razorpay_payment_id);
         
         try {
           setIsProcessing(true);
+
+          // Verify Payment Signature on Backend
+          const verifyRes = await fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            })
+          });
+          const verifyData = await verifyRes.json().catch(() => ({}));
+          if (!verifyRes.ok || !verifyData.success) {
+            alert('Payment signature verification failed. Registration not saved.');
+            setIsProcessing(false);
+            return;
+          }
 
           const [latestYatra, latestRegistrations] = await Promise.all([
             yatraDatesDB.getById(bookingInfo.yatraId),
@@ -139,6 +181,7 @@ const YatraPaymentPage = () => {
       },
       theme: {
         color: '#c5a059',
+        backdrop_color: 'rgba(10, 10, 10, 0.85)'
       },
       modal: {
         ondismiss: function() {
@@ -148,6 +191,10 @@ const YatraPaymentPage = () => {
     };
 
     const paymentObject = new window.Razorpay(options);
+    paymentObject.on('payment.failed', function (response) {
+      alert('Payment Failed: ' + (response.error?.description || 'Unknown error'));
+      setIsProcessing(false);
+    });
     paymentObject.open();
   };
 
