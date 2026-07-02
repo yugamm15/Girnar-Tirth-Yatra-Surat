@@ -13,7 +13,28 @@ export const siteCopy = {
   brandLocation: tr('Surat', 'સુરત', 'सूरत'),
   navItems: [
     { key: 'home', path: '/', label: tr('Home', 'મુખપૃષ્ઠ', 'होम') },
-    { key: 'about', path: '/about-girnar', label: tr('About Girnar', 'ગિરનાર વિષે', 'गिरनार परिचय') },
+    {
+      key: 'about',
+      path: '#',
+      label: tr('About Girnar', 'ગિરનાર વિષે', 'गिरनार परिचय'),
+      dropdown: [
+        {
+          key: 'bhavyatra',
+          path: '/about-girnar',
+          label: tr('Girnar Bhavyatra', 'ગિરનાર ભાવયાત્રા', 'गिरनार भावयात्रा'),
+        },
+        {
+          key: '14jinalaya',
+          path: '/14-jinalaya',
+          label: tr('14 Jinalaya', '૧૪ જિનાલય', '14 जिनालय'),
+        },
+        {
+          key: 'sahesavan',
+          path: '/sahesavan-tirth',
+          label: tr('Sahesavan Tirth', 'સહેસાવન તીર્થ', 'सहेसावन तीर्थ'),
+        },
+      ],
+    },
     {
       key: 'jirnodhar',
       path: '#',
@@ -106,6 +127,32 @@ export const siteCopy = {
         '"નિર્દોષ ગોચરીની તેમની સાધનાએ અનેક પરીક્ષાઓ લીધી, છતાં દરેક પ્રસંગે તેમની તપસ્યા વધુ ઊંડી બનતી ગઈ."',
         '"निर्दोष गोचरी की साधना ने उन्हें कई बार परखा, फिर भी हर अवसर पर उनकी तपस्या और गहरी होती गई।"',
       ),
+      spiritualMasters: [
+        {
+          name: tr(
+            'P.P. Acharya Bhagwant Shri Hemprabhasurishwarji M.S.',
+            'પૂ. આચાર્ય ભગવંત શ્રી હેમપ્રભસૂરીશ્વરજી મ.સા.',
+            'पू. आचार्य भगवंत श्री हेमप्रभसूरीश्वरजी म.सा.'
+          ),
+          image: '/images/upashrayjinalaya/1.JPG',
+        },
+        {
+          name: tr(
+            'P.P. Acharya Bhagwant Shri Hemvallabhsurishwarji M.S.',
+            'પૂ. આચાર્ય ભગવંત શ્રી હેમવલ્લભસૂરીશ્વરજી મ.સા.',
+            'पू. आचार्य भगवंत श्री हेमवल्लभसूरीश्वरजी म.सा.'
+          ),
+          image: '/images/upashrayjinalaya/2.jpeg',
+        },
+        {
+          name: tr(
+            'P.P. Acharya Bhagwant Shri Munichandrasurishwarji M.S.',
+            'પૂ. આચાર્ય ભગવંત શ્રી મુનિચંદ્રસૂરીશ્વરજી મ.સા.',
+            'पू. आचार्य भगवंत श्री मुनिचन्द्रसूरीश्वरजी म.सा.'
+          ),
+          image: '/images/upashrayjinalaya/3.jpeg',
+        },
+      ],
       groupBadge: tr('Group Seva Mission', 'સમૂહ સેવા મિશન', 'समूह सेवा मिशन'),
       groupTitle: tr('A Community Built on Seva', 'સેવાને કેન્દ્રમાં રાખતો સમૂહ', 'सेवा केंद्रित समुदाय'),
       groupParagraphs: [
@@ -554,6 +601,238 @@ export const siteCopy = {
     privacy: tr('Privacy', 'ગોપનીયતા', 'गोपनीयता'),
     rituals: tr('Rituals', 'વિધિઓ', 'अनुष्ठान'),
     contact: tr('Contact', 'સંપર્ક', 'संपर्क'),
+  },
+  fourteenJinalayaPage: {
+    heroBadge: tr('14 Jinalaya · Coming Soon', '૧૪ જિનાલય · ટૂંક સમયમાં', '14 जिनालय · जल्द आ रहा है'),
+    heroTitle: tr('14 Jinalaya Girnar Tirth Darshan', '૧૪ જિનાલય ગિરનાર તીર્થ દર્શન', '14 जिनालय गिरनार तीर्थ दर्शन'),
+    heroDescription: tr(
+      'Detailed information, divine history, and spiritual significance of the sacred 14 Jinalayas on Shri Giriraj will be published here very soon.',
+      'શ્રી ગિરિરાજ પર આવેલા પવિત્ર ૧૪ જિનાલયોની વિગતવાર માહિતી, દિવ્ય ઈતિહાસ અને આધ્યાત્મિક મહત્વ ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+      'श्री गिरिराज पर स्थित पवित्र 14 जिनालयों की विस्तृत जानकारी, दिव्य इतिहास और आध्यात्मिक महत्व जल्द ही यहाँ प्रस्तुत किया जाएगा।'
+    ),
+    comingSoonNote: tr(
+      'Our research and documentation team is compiling detailed steps and high-resolution darshan of all 14 Jinalayas.',
+      'અમારી સંશોધન અને દસ્તાવેજીકરણ ટીમ તમામ ૧૪ જિનાલયોના વિગતવાર પગથિયાં અને હાઈ-રિઝોલ્યુશન દર્શન સંકલિત કરી રહી છે.',
+      'हमारी शोध और दस्तावेज़ीकरण टीम सभी 14 जिनालयों के विस्तृत चरण और हाई-रेज़ोल्यूशन दर्शन संकलित कर रही है।'
+    ),
+    jinalayasList: [
+      {
+        id: 'neminath-bhagwan-toonk',
+        title: tr('1. NEMINATH BHAGWAN TOONK', '૧. શ્રી નેમિનાથજીની ટૂંક', '1. श्री नेमिनाथजी की टोंक'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Shri Neminath Bhagwan Toonk will be updated soon.',
+          'શ્રી નેમિનાથજીની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'श्री नेमिनाथजी की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/1-neminath-bhagwan-toonk.jpg',
+      },
+      {
+        id: 'merakvasi-toonk',
+        title: tr('2. MERAKVASI TOONK', '૨. મેરકવાસી ટૂંક', '2. मेरकवासी टोंक'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Merakvasi Toonk will be updated soon.',
+          'મેરકવાસી ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'मेरकवासी टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/2-merakvasi-toonk.jpg',
+      },
+      {
+        id: 'sangram-soni-toonk',
+        title: tr('3. SANGRAM SONI’S TOONK', '૩. સંગરામસોની ની ટૂંક', '3. संग्रामसोनी की टोंक'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Sangram Soni’s Toonk will be updated soon.',
+          'સંગરામસોની ની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'संग्रामसोनी की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/3-sangram-soni-toonk.jpg',
+      },
+      {
+        id: 'kumarpal-toonk',
+        title: tr('4. KUMARPAL’S TOONK', '૪. કુમારપાળની ટૂંક', '4. कुमारपाल की टोंक'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Kumarpal’s Toonk will be updated soon.',
+          'કુમારપાળની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'कुमारपाल की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/4-kumarpal-toonk.jpg',
+      },
+      {
+        id: 'chandraprabha-swami-temple',
+        title: tr('5. CHANDRAPRABHA SWAMI TEMPLE', '૫. શ્રી ચન્દ્રપ્રભસ્વામીનું જિનાલય', '5. श्री चन्द्रप्रभस्वामी का जिनालय'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Chandraprabha Swami Temple will be updated soon.',
+          'શ્રી ચન્દ્રપ્રભસ્વામીના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'श्री चन्द्रप्रभस्वामी के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/5-chandraprabha-swami-temple.jpg',
+      },
+      {
+        id: 'masingh-bhojraj-temple',
+        title: tr('6. MASINGH BHOJRAJ TEMPLE', '૬. માનસંગ ભોજરાજનું જિનાલય', '6. मानसंग भोजराज का जिनालय'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Masingh Bhojraj Temple will be updated soon.',
+          'માનસંગ ભોજરાજના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'मानसंग भोजराज के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/6-masingh-bhojraj-temple.jpg',
+      },
+      {
+        id: 'vastupal-tejpal-temple',
+        title: tr('7. VASTUPAL – TEJPAL TEMPLE', '૭. વસ્તુપાલ – તેજપાલનું જિનાલય', '7. वस्तुपाल – तेजपाल का जिनालय'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Vastupal – Tejpal Temple will be updated soon.',
+          'વસ્તુપાલ – તેજપાલના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'वस्तुपाल – तेजपाल के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/7-vastupal-tejpal-temple.jpg',
+      },
+      {
+        id: 'gumastan-temple',
+        title: tr('8. GUMASTAN TEMPLE', '૮. ગુમાસ્તાનું દેરાસર', '8. गुमास्ता का देरासर'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Gumastan Temple will be updated soon.',
+          'ગુમાસ્તાના દેરાસરનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'गुमास्ता के देरासर का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/8-gumastan-temple.jpg',
+      },
+      {
+        id: 'king-samprati-temple',
+        title: tr('9. KING SAMPRATI’S TEMPLE', '૯. સંપ્રતિ રાજાની ટૂંક', '9. संप्रति राजा की टोंक'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of King Samprati’s Temple will be updated soon.',
+          'સંપ્રતિ રાજાની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'संप्रति राजा की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/9-king-samprati-temple.jpg',
+      },
+      {
+        id: 'gyanvav-temple',
+        title: tr('10. GYANVAV TEMPLE', '૧૦. જ્ઞાનવાવનું જિનાલય', '10. ज्ञानवाव का जिनालय'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Gyanvav Temple will be updated soon.',
+          'જ્ઞાનવાવના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'ज्ञानवाव के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/10-gyanvav-temple.jpg',
+      },
+      {
+        id: 'dharmsinh-hemchand-temple',
+        title: tr('11. DHARMSHRI HEMCHAND TEMPLE', '૧૧. શેઠ ધરમચંદ હેમચંદનું જિનાલય', '11. सेठ धरमचंद हेमचंद का जिनालय'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Dharmsinh Hemchand Temple will be updated soon.',
+          'શેઠ ધરમચંદ હેમચંદના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'सेठ धरमचंद हेमचंद के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/11-dharmsinh-hemchand-temple.jpg',
+      },
+      {
+        id: 'mallavalu-temple',
+        title: tr('12. MALLAVALU TEMPLE', '૧૨. મલ્લવાળુ જિનાલય', '12. मल्लवालु जिनालय'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Mallavalu Temple will be updated soon.',
+          'મલ્લવાળુ જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'मल्लवालु जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/12-mallavalu-temple.jpg',
+      },
+      {
+        id: 'chaumukhji-temple',
+        title: tr('13. CHAUMUKHJI TEMPLE', '૧૩. ચૌમુખજીનું જિનાલય', '13. चौमुखजी का जिनालय'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Chaumukhji Temple will be updated soon.',
+          'ચૌમુખજીના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'चौमुखजी के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/13-chaumukhji-temple.jpg',
+      },
+      {
+        id: 'rahnemi-temple',
+        title: tr('14. RAHNEMI TEMPLE', '૧૪. રહનેમિનું જિનાલય', '14. रहनेमि का जिनालय'),
+        description: tr(
+          'Detailed history, architectural grandeur, and spiritual glory of Rahnemi Temple will be updated soon.',
+          'રહનેમિના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
+          'रहनेमि के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+        ),
+        image: '/images/14-jinalaya/14-rahnemi-temple.jpg',
+      },
+    ],
+  },
+  sahesavanTirthPage: {
+    heroBadge: tr('Sahesavan Tirth · Sacred Heritage', 'સહેસાવન તીર્થ · પાવન ધરોહર', 'सहेसावन तीर्थ · पावन धरोहर'),
+    heroTitle: tr('Shri Sahesavan Tirth Bhavyatra', 'શ્રી સહેસાવન તીર્થ ભાવયાત્રા', 'श्री सहेसावन तीर्थ भावयात्रा'),
+    heroDescription: tr(
+      'The holy land of Lord Neminath\'s Diksha and Kevalgyan Kalyanaks. Explore the sacred shrines and holy spots along the serene slopes of Sahesavan.',
+      'પ્રભુ નેમિનાથના દીક્ષા અને કેવળજ્ઞાન કલ્યાણકની પાવન ભૂમિ. સહેસાવન તીર્થના પવિત્ર સ્થાનો અને જિનાલયોનાં ભાવદર્શન કરો.',
+      'प्रभु नेमिनाथ के दीक्षा और केवलज्ञान कल्याणक की पावन भूमि। सहेसावन तीर्थ के पवित्र स्थानों और जिनालयों के भावदर्शन करें।'
+    ),
+    comingSoonNote: tr(
+      'Detailed historical documentation and high-resolution darshan photographs for these holy spots are coming soon.',
+      'આ પાવન સ્થાનોનો વિસ્તૃત ઇતિહાસ અને ઉચ્ચ ગુણવત્તાવાળા દર્શન ફોટોગ્રાફ્સ ટૂંક સમયમાં ઉપલબ્ધ થશે.',
+      'इन पावन स्थानों का विस्तृत इतिहास और उच्च गुणवत्ता वाले दर्शन फोटोग्राफ्स जल्द ही उपलब्ध होंगे।'
+    ),
+    spotsList: [
+      {
+        id: 1,
+        title: tr('Sahesavan Tirth', 'સહેસાવન તીર્થ', 'सहेसावन तीर्थ'),
+        description: tr(
+          'Detailed spiritual significance, history, and divine darshan details of this holy spot are coming soon.',
+          'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
+          'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
+        ),
+        image: '/images/sahesavan/sahesavan-tirth.jpg',
+      },
+      {
+        id: 2,
+        title: tr('Samavasaran Tirth', 'સમવસરણ તીર્થ', 'समवसरण तीर्थ'),
+        description: tr(
+          'Detailed spiritual significance, history, and divine darshan details of this holy spot are coming soon.',
+          'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
+          'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
+        ),
+        image: '/images/sahesavan/samavasaran-tirth.jpg',
+      },
+      {
+        id: 3,
+        title: tr("Jivit Swami's Pratima", 'જીવિત સ્વામીની પ્રતિમા', 'जीवित स्वामी की प्रतिमा'),
+        description: tr(
+          'Detailed spiritual significance, history, and divine darshan details of this holy spot are coming soon.',
+          'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
+          'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
+        ),
+        image: '/images/sahesavan/jivit-swami-pratima.jpg',
+      },
+      {
+        id: 4,
+        title: tr('Diksha Kalyanak', 'દીક્ષા કલ્યાણક', 'दीक्षा कल्याणक'),
+        description: tr(
+          'Detailed spiritual significance, history, and divine darshan details of this holy spot are coming soon.',
+          'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
+          'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
+        ),
+        image: '/images/sahesavan/diksha-kalyanak.jpg',
+      },
+      {
+        id: 5,
+        title: tr('Moksh Kalyanak', 'મોક્ષ કલ્યાણક', 'मोक्ष कल्याणक'),
+        description: tr(
+          'Detailed spiritual significance, history, and divine darshan details of this holy spot are coming soon.',
+          'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
+          'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
+        ),
+        image: '/images/sahesavan/moksh-kalyanak.jpg',
+      },
+      {
+        id: 6,
+        title: tr("Himanshu Suri Dada's Charan Paduka", 'હિમાંશુસૂરિ દાદાની ચરણ પાદુકા', 'हिमांशुसूरि दादा की चरण पादुका'),
+        description: tr(
+          'Detailed spiritual significance, history, and divine darshan details of this holy spot are coming soon.',
+          'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
+          'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
+        ),
+        image: '/images/sahesavan/himanshusuri-dada-charan-paduka.jpg',
+      },
+    ],
   },
 };
 

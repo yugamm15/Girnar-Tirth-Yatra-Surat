@@ -6,6 +6,8 @@ import { useLanguage } from './context/LanguageContext.jsx';
 
 import HomePage from './pages/HomePage.jsx';
 import AboutGirnarPage from './pages/AboutGirnarPage.jsx';
+import FourteenJinalayaPage from './pages/FourteenJinalayaPage.jsx';
+import SahesavanTirthPage from './pages/SahesavanTirthPage.jsx';
 import UpashrayJirnodharPage from './pages/UpashrayJirnodharPage.jsx';
 import JinalayJirnodharPage from './pages/JinalayJirnodharPage.jsx';
 import UpashrayDetailPage from './pages/UpashrayDetailPage.jsx';
@@ -56,6 +58,8 @@ const AppRoutes = () => {
       <Routes location={location}>
         <Route path="/" element={withLazyBoundary(<HomePage />)} />
         <Route path="/about-girnar" element={withLazyBoundary(<AboutGirnarPage />)} />
+        <Route path="/14-jinalaya" element={withLazyBoundary(<FourteenJinalayaPage />)} />
+        <Route path="/sahesavan-tirth" element={withLazyBoundary(<SahesavanTirthPage />)} />
         <Route path="/upashray-jirnodhar" element={withLazyBoundary(<UpashrayJirnodharPage />)} />
         <Route path="/jinalay-jirnodhar" element={withLazyBoundary(<JinalayJirnodharPage />)} />
         <Route path="/upashray-jirnodhar/:slug" element={withLazyBoundary(<UpashrayDetailPage />)} />

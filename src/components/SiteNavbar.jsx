@@ -9,7 +9,13 @@ const isActivePath = (pathname, targetPath) => {
     return pathname === '/';
   }
 
-  if (targetPath === '/upashray-jirnodhar' || targetPath === '/jinalay-jirnodhar') {
+  if (
+    targetPath === '/upashray-jirnodhar' ||
+    targetPath === '/jinalay-jirnodhar' ||
+    targetPath === '/about-girnar' ||
+    targetPath === '/14-jinalaya' ||
+    targetPath === '/sahesavan-tirth'
+  ) {
     return pathname === targetPath || pathname.startsWith(targetPath + '/');
   }
 
@@ -21,22 +27,21 @@ const NavDropdown = ({ item, t, isDark, activeLinkClass, idleLinkClass, navLinkT
   const isAnyChildActive = item.dropdown?.some(sub => isActivePath(location.pathname, sub.path));
 
   return (
-    <div 
+    <div
       className="relative group"
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
       <button
         type="button"
-        className={`${
-          isAnyChildActive ? activeLinkClass : idleLinkClass
-        } ${navLinkTypographyClass} transition-colors duration-300 text-center leading-none whitespace-nowrap flex items-center gap-1.5`}
+        className={`${isAnyChildActive ? activeLinkClass : idleLinkClass
+          } ${navLinkTypographyClass} transition-colors duration-300 text-center leading-none whitespace-nowrap flex items-center gap-1.5`}
       >
         {t(item.label)}
-        <svg 
-          className={`w-3 h-3 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          viewBox="0 0 24 24" 
+        <svg
+          className={`w-3 h-3 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
           stroke="currentColor"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -44,25 +49,22 @@ const NavDropdown = ({ item, t, isDark, activeLinkClass, idleLinkClass, navLinkT
       </button>
 
       {/* Dropdown Menu */}
-      <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 transition-all duration-300 ${
-        isOpen ? 'opacity-100 translate-y-0 pointer-events-auto visible' : 'opacity-0 translate-y-2 pointer-events-none invisible'
-      }`}>
-        <div className={`min-w-[200px] overflow-hidden rounded-xl border shadow-2xl isolate transform-gpu ${
-          isDark 
-            ? 'bg-[#0a0a0a]/95 backdrop-blur-xl border-white/10 shadow-black/50' 
-            : 'bg-white/95 backdrop-blur-xl border-gray-100 shadow-gray-200/50'
+      <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 z-[1300] transition-all duration-200 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto visible' : 'opacity-0 translate-y-2 pointer-events-none invisible'
         }`}>
+        <div className={`min-w-[210px] overflow-hidden rounded-xl border ${isDark
+          ? 'bg-[#111111] border-white/20 shadow-xl shadow-black/30'
+          : 'bg-white border-gray-200 shadow-xl shadow-gray-300/30'
+          }`}>
           {item.dropdown.map((subItem) => {
             const isSubActive = isActivePath(location.pathname, subItem.path);
             return (
               <Link
                 key={subItem.key}
                 to={subItem.path}
-                className={`block px-5 py-4 text-[11px] 2xl:text-[12px] font-headline tracking-widest uppercase transition-colors whitespace-nowrap ${
-                  isSubActive 
-                    ? isDark ? 'text-primary bg-white/5' : 'text-[#c5a059] bg-gray-50'
-                    : isDark ? 'hover:text-primary hover:bg-white/5 text-white/70' : 'hover:text-[#c5a059] hover:bg-gray-50 text-gray-600'
-                }`}
+                className={`block px-5 py-4 text-[11px] 2xl:text-[12px] font-headline tracking-widest uppercase transition-colors whitespace-nowrap ${isSubActive
+                  ? isDark ? 'text-primary bg-white/10 font-bold' : 'text-[#c5a059] bg-gray-100 font-bold'
+                  : isDark ? 'hover:text-primary hover:bg-white/10 text-white/85' : 'hover:text-[#c5a059] hover:bg-gray-100 text-gray-700'
+                  }`}
               >
                 {t(subItem.label)}
               </Link>
@@ -122,18 +124,18 @@ export const SiteNavbar = ({ variant = 'light' }) => {
   const brandClass = 'pointer-events-auto flex items-center justify-center';
 
   const desktopNavClass = isDark
-    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white/5 backdrop-blur-xl rounded-full border border-primary/20 shadow-lg shadow-black/5 pointer-events-auto isolate transform-gpu'
-    : 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white rounded-full border border-gray-200 shadow-lg shadow-gray-200/50 pointer-events-auto isolate transform-gpu';
+    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-[#111111] rounded-full border border-primary/30 shadow-lg shadow-black/10 pointer-events-auto'
+    : 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white rounded-full border border-gray-200 shadow-lg shadow-gray-200/50 pointer-events-auto';
 
   const activeLinkClass = isDark ? 'text-primary border-b border-primary pb-1' : 'text-[#c5a059] border-b border-[#c5a059] pb-1';
   const idleLinkClass = isDark ? 'text-white hover:text-primary' : 'text-gray-500 hover:text-[#c5a059]';
 
   const menuButtonClass = isMobileViewport
     ? isDark
-      ? 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-white/5 backdrop-blur-xl rounded-full border border-primary/20 pointer-events-auto'
+      ? 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-[#111111] rounded-full border border-primary/30 pointer-events-auto'
       : 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto'
     : isDark
-      ? 'xl:hidden flex items-center justify-center w-12 h-12 bg-white/5 backdrop-blur-xl rounded-full border border-primary/20 pointer-events-auto'
+      ? 'xl:hidden flex items-center justify-center w-12 h-12 bg-[#111111] rounded-full border border-primary/30 pointer-events-auto'
       : 'xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto';
 
   const burgerLineClass = isDark ? 'bg-primary' : 'bg-[#c5a059]';
@@ -180,9 +182,8 @@ export const SiteNavbar = ({ variant = 'light' }) => {
                   key={item.key}
                   aria-label={t(item.label)}
                   to={item.path}
-                  className={`${
-                    isSelected ? activeLinkClass : idleLinkClass
-                  } ${navLinkTypographyClass} transition-colors duration-300 text-center leading-none whitespace-nowrap`}
+                  className={`${isSelected ? activeLinkClass : idleLinkClass
+                    } ${navLinkTypographyClass} transition-colors duration-300 text-center leading-none whitespace-nowrap`}
                 >
                   {t(item.label)}
                 </Link>
@@ -212,15 +213,13 @@ export const SiteNavbar = ({ variant = 'light' }) => {
       </nav>
 
       <div
-        className={`fixed inset-0 z-[1400] transition-opacity duration-500 xl:hidden ${
-          isDark ? 'bg-black/60' : 'bg-black/40'
-        } ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-[1400] transition-opacity duration-500 xl:hidden ${isDark ? 'bg-black/60' : 'bg-black/40'
+          } ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <div
-          className={`absolute right-0 top-0 h-full w-[86%] max-w-[360px] overflow-y-auto overscroll-contain transition-transform duration-500 transform ${
-            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          } ${isDark ? 'bg-[#0a0a0a] border-l border-primary/10' : 'bg-white'} shadow-2xl flex flex-col`}
+          className={`absolute right-0 top-0 h-full w-[86%] max-w-[360px] overflow-y-auto overscroll-contain transition-transform duration-500 transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            } ${isDark ? 'bg-[#0a0a0a] border-l border-primary/10' : 'bg-white'} shadow-2xl flex flex-col`}
           onClick={(event) => event.stopPropagation()}
         >
           <div className={`flex flex-col items-center pt-16 pb-8 px-6 ${isDark ? 'border-b border-primary/10' : 'border-b border-gray-100'}`}>
@@ -242,11 +241,10 @@ export const SiteNavbar = ({ variant = 'light' }) => {
                 const isAnyChildActive = item.dropdown.some(sub => isActivePath(location.pathname, sub.path));
                 return (
                   <div key={item.key} className={`border-b ${isDark ? 'border-white/5' : 'border-gray-50'}`}>
-                    <div className={`px-8 py-5 font-headline text-[13px] tracking-[0.03em] ${
-                      isAnyChildActive 
-                        ? isDark ? 'text-primary font-bold' : 'text-[#c5a059] font-bold'
-                        : isDark ? 'text-white/65' : 'text-gray-600'
-                    }`}>
+                    <div className={`px-8 py-5 font-headline text-[13px] tracking-[0.03em] ${isAnyChildActive
+                      ? isDark ? 'text-primary font-bold' : 'text-[#c5a059] font-bold'
+                      : isDark ? 'text-white/65' : 'text-gray-600'
+                      }`}>
                       {t(item.label)}
                     </div>
                     <div className={`${isDark ? 'bg-white/5' : 'bg-gray-50/50'} py-2`}>
@@ -257,11 +255,10 @@ export const SiteNavbar = ({ variant = 'light' }) => {
                             key={subItem.key}
                             to={subItem.path}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className={`w-full block text-left px-12 py-3 font-headline text-[11px] tracking-[0.05em] uppercase transition-colors ${
-                              isSubSelected
-                                ? isDark ? 'text-primary font-bold' : 'text-[#c5a059] font-bold'
-                                : isDark ? 'text-white/50' : 'text-gray-500'
-                            }`}
+                            className={`w-full block text-left px-12 py-3 font-headline text-[11px] tracking-[0.05em] uppercase transition-colors ${isSubSelected
+                              ? isDark ? 'text-primary font-bold' : 'text-[#c5a059] font-bold'
+                              : isDark ? 'text-white/50' : 'text-gray-500'
+                              }`}
                           >
                             {t(subItem.label)}
                           </Link>
@@ -278,17 +275,15 @@ export const SiteNavbar = ({ variant = 'light' }) => {
                   key={item.key}
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`w-full block text-left px-8 py-5 border-b font-headline text-[13px] tracking-[0.03em] transition-colors ${
-                    isDark ? 'border-white/5' : 'border-gray-50'
-                  } ${
-                    isSelected
+                  className={`w-full block text-left px-8 py-5 border-b font-headline text-[13px] tracking-[0.03em] transition-colors ${isDark ? 'border-white/5' : 'border-gray-50'
+                    } ${isSelected
                       ? isDark
                         ? 'text-primary font-bold bg-primary/5'
                         : 'text-[#c5a059] font-bold'
                       : isDark
                         ? 'text-white/65 active:text-primary'
                         : 'text-gray-600 active:text-[#c5a059]'
-                  }`}
+                    }`}
                 >
                   {t(item.label)}
                 </Link>

@@ -438,8 +438,16 @@ body.mobile-nav-open {
     contain-intrinsic-size: 100vh;
   }
 
-  .home-scene.snap-section:not([data-scene-id='hero']) {
+  .home-scene.snap-section:not([data-scene-id='hero']):not([data-scene-id='about']) {
     overflow: hidden !important;
+  }
+
+  .home-scene.snap-section[data-scene-id='about'] {
+    height: auto !important;
+    min-height: 100dvh;
+    padding-top: 5.5rem;
+    padding-bottom: 5.5rem;
+    overflow: visible !important;
   }
 
   .home-bg {

@@ -648,7 +648,7 @@ const HomePage = () => {
             sectionRefs.current.about = element;
           }}
           data-scene-id="about"
-          className="home-scene snap-section relative min-h-screen flex items-center py-20"
+          className="home-scene snap-section relative min-h-screen flex items-center pt-28 md:pt-36 pb-16"
         >
           <div className="absolute inset-0 z-0 overflow-hidden">
             <img
@@ -661,38 +661,32 @@ const HomePage = () => {
               onContextMenu={(e) => e.preventDefault()}
             />
           </div>
-          <div className="relative z-20 w-full px-4 md:px-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 items-center">
-            <article className="frosted-premium rounded-sm border-t-2 border-primary p-5 md:p-10 mx-auto w-full">
-              <span className="text-primary font-headline text-[10px] tracking-[0.5em] uppercase opacity-60">{t(siteCopy.home.intro.acharyaBadge)}</span>
-              <h2 className="home-reveal text-[1.1rem] md:text-4xl font-headline mt-3 text-white leading-tight">{t(siteCopy.home.intro.acharyaTitle)}</h2>
-              <div className="mt-3 md:mt-6 space-y-3 text-on-surface-variant leading-5 md:leading-relaxed font-light text-[11px] md:text-sm">
-                {siteCopy.home.intro.acharyaParagraphs.map((paragraph, index) => (
-                  <p className="home-reveal" key={index}>
-                    {t(paragraph)}
-                  </p>
-                ))}
-                <p className="home-reveal italic text-primary/80">{t(siteCopy.home.intro.quote)}</p>
-              </div>
-            </article>
-            <article className="frosted-premium rounded-sm border-t-2 border-primary p-5 md:p-10 flex flex-col mx-auto w-full">
-              <span className="text-primary font-headline text-[10px] tracking-[0.5em] uppercase opacity-60">{t(siteCopy.aboutPage.portraitPanelTitle)}</span>
-              <div className="mt-3 md:mt-6 rounded-sm overflow-hidden border border-primary/20 bg-black/35">
-                <img
-                  src={isMobileViewport ? '/images/mobile/portrait.webp' : '/images/P.P. Acharya Hemvallabh M.S..jpeg'}
-                  alt={t(siteCopy.aboutPage.portraitPanelTitle)}
-                  className="home-reveal w-full h-[220px] md:h-[420px] object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <p className="home-reveal mt-3 text-on-surface-variant leading-5 font-light text-[11px] md:text-sm">{t(siteCopy.aboutPage.portraitPanelCaption)}</p>
-              <Link
-                to="/about-girnar"
-                className="home-reveal inline-block mt-3 text-primary text-[10px] uppercase tracking-[0.25em] font-bold border-b border-primary/50 pb-1"
-              >
-                {t(siteCopy.common.readMore)}
-              </Link>
-            </article>
+          <div className="relative z-20 w-full px-4 md:px-12 max-w-7xl mx-auto flex flex-col items-center">
+            <span className="text-primary font-headline text-xs sm:text-sm tracking-[0.45em] md:tracking-[0.55em] uppercase font-bold mb-6 md:mb-10 text-center drop-shadow-md">
+              {t(siteCopy.home.intro.acharyaBadge)}
+            </span>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full max-w-md md:max-w-none mx-auto">
+              {siteCopy.home.intro.spiritualMasters?.map((master, index) => (
+                <article
+                  key={index}
+                  className="home-reveal frosted-premium rounded-xl border-t-2 border-primary p-4 sm:p-5 md:p-6 flex flex-col items-center text-center group transition-all duration-500 hover:border-primary/80 hover:-translate-y-1.5 shadow-2xl bg-black/40"
+                >
+                  <div className="w-full h-64 sm:h-72 md:h-[340px] lg:h-[380px] rounded-lg overflow-hidden border border-primary/20 bg-black/60 mb-4 md:mb-5 relative">
+                    <img
+                      src={master.image}
+                      alt={t(master.name)}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-headline font-bold text-white group-hover:text-primary transition-colors duration-300 leading-snug px-1">
+                    {t(master.name)}
+                  </h3>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
