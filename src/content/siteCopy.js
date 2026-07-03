@@ -603,7 +603,7 @@ export const siteCopy = {
     contact: tr('Contact', 'સંપર્ક', 'संपर्क'),
   },
   fourteenJinalayaPage: {
-    heroBadge: tr('14 Jinalaya · Coming Soon', '૧૪ જિનાલય · ટૂંક સમયમાં', '14 जिनालय · जल्द आ रहा है'),
+    heroBadge: tr('14 Jinalaya · Darshan', '૧૪ જિનાલય · દર્શન', '14 जिनालय · दर्शन'),
     heroTitle: tr('14 Jinalaya Girnar Tirth Darshan', '૧૪ જિનાલય ગિરનાર તીર્થ દર્શન', '14 जिनालय गिरनार तीर्थ दर्शन'),
     heroDescription: tr(
       'Detailed information, divine history, and spiritual significance of the sacred 14 Jinalayas on Shri Giriraj will be published here very soon.',
@@ -624,7 +624,7 @@ export const siteCopy = {
           'શ્રી નેમિનાથજીની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'श्री नेमिनाथजी की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/1-neminath-bhagwan-toonk.jpg',
+        image: '/images/14 jinalaya/1.neminath.jpg',
       },
       {
         id: 'merakvasi-toonk',
@@ -634,7 +634,7 @@ export const siteCopy = {
           'મેરકવાસી ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'मेरकवासी टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/2-merakvasi-toonk.jpg',
+        image: '/images/14 jinalaya/2.merakvasi.jpg',
       },
       {
         id: 'sangram-soni-toonk',
@@ -644,7 +644,7 @@ export const siteCopy = {
           'સંગરામસોની ની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'संग्रामसोनी की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/3-sangram-soni-toonk.jpg',
+        image: '/images/14 jinalaya/3..SANGRAM SONI.jpg',
       },
       {
         id: 'kumarpal-toonk',
@@ -654,7 +654,7 @@ export const siteCopy = {
           'કુમારપાળની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'कुमारपाल की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/4-kumarpal-toonk.jpg',
+        image: '/images/14 jinalaya/4.KUMARPAL.jpg',
       },
       {
         id: 'chandraprabha-swami-temple',
@@ -664,7 +664,7 @@ export const siteCopy = {
           'શ્રી ચન્દ્રપ્રભસ્વામીના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'श्री चन्द्रप्रभस्वामी के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/5-chandraprabha-swami-temple.jpg',
+        image: '/images/14 jinalaya/5.CHANDRAPRABHA SWAMI.JPG',
       },
       {
         id: 'masingh-bhojraj-temple',
@@ -674,7 +674,7 @@ export const siteCopy = {
           'માનસંગ ભોજરાજના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'मानसंग भोजराज के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/6-masingh-bhojraj-temple.jpg',
+        image: '/images/14 jinalaya/6.MASINGH BHOJRAJ.jpg',
       },
       {
         id: 'vastupal-tejpal-temple',
@@ -684,7 +684,7 @@ export const siteCopy = {
           'વસ્તુપાલ – તેજપાલના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'वस्तुपाल – तेजपाल के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/7-vastupal-tejpal-temple.jpg',
+        image: '/images/14 jinalaya/7.VASTUPAL – TEJPAL.jpg',
       },
       {
         id: 'gumastan-temple',
@@ -694,7 +694,7 @@ export const siteCopy = {
           'ગુમાસ્તાના દેરાસરનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'गुमास्ता के देरासर का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/8-gumastan-temple.jpg',
+        image: '/images/14 jinalaya/8.gumastan.jpg',
       },
       {
         id: 'king-samprati-temple',
@@ -704,7 +704,7 @@ export const siteCopy = {
           'સંપ્રતિ રાજાની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'संप्रति राजा की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/9-king-samprati-temple.jpg',
+        image: '/images/14 jinalaya/9.KING SAMPRATI.jpg',
       },
       {
         id: 'gyanvav-temple',
@@ -714,7 +714,7 @@ export const siteCopy = {
           'જ્ઞાનવાવના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'ज्ञानवाव के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/10-gyanvav-temple.jpg',
+        image: '/images/14 jinalaya/10.GYANVAV.JPG',
       },
       {
         id: 'dharmsinh-hemchand-temple',
@@ -724,7 +724,7 @@ export const siteCopy = {
           'શેઠ ધરમચંદ હેમચંદના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'सेठ धरमचंद हेमचंद के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/11-dharmsinh-hemchand-temple.jpg',
+        image: '/images/14 jinalaya/11.DHARMSHRI HEMCHAND.JPG',
       },
       {
         id: 'mallavalu-temple',
@@ -734,7 +734,7 @@ export const siteCopy = {
           'મલ્લવાળુ જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'मल्लवालु जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/12-mallavalu-temple.jpg',
+        image: '/images/14 jinalaya/12.MALLAVALU.JPG',
       },
       {
         id: 'chaumukhji-temple',
@@ -744,7 +744,7 @@ export const siteCopy = {
           'ચૌમુખજીના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'चौमुखजी के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/13-chaumukhji-temple.jpg',
+        image: '/images/14 jinalaya/13.CHAUMUKHJI.jpeg',
       },
       {
         id: 'rahnemi-temple',
@@ -754,7 +754,7 @@ export const siteCopy = {
           'રહનેમિના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'रहनेमि के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14-jinalaya/14-rahnemi-temple.jpg',
+        image: '/images/14 jinalaya/14.RAHNEMI.jpg',
       },
     ],
   },

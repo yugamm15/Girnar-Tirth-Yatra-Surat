@@ -122,9 +122,6 @@ const FourteenJinalayaPage = () => {
                 {/* Text Panel */}
                 <div className={`step-content w-full lg:w-1/2 text-center lg:text-left ${isEven ? 'lg:pl-8' : 'lg:pr-8 lg:text-right'
                   }`}>
-                  <span className="inline-block px-3 py-1 rounded-full bg-[#c5a059]/15 text-[#8f6d2f] font-headline text-[10px] tracking-widest uppercase font-bold mb-3 border border-[#c5a059]/30">
-                    {t({ en: 'Coming Soon', gu: 'ટૂંક સમયમાં', hi: 'जल्द आ रहा है' })}
-                  </span>
                   <h3 className="text-2xl md:text-3xl font-headline text-gray-900 mb-4">
                     {t(step.title)}
                   </h3>
