@@ -124,8 +124,8 @@ export const SiteNavbar = ({ variant = 'light' }) => {
   const brandClass = 'pointer-events-auto flex items-center justify-center';
 
   const desktopNavClass = isDark
-    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-black/25 backdrop-blur-md rounded-full border border-primary/40 shadow-lg shadow-black/15 pointer-events-auto'
-    : 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white rounded-full border border-gray-200 shadow-lg shadow-gray-200/50 pointer-events-auto';
+    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-black/25 backdrop-blur-md rounded-full border border-primary/40 shadow-lg shadow-black/15 pointer-events-auto isolate transform-gpu'
+    : 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white rounded-full border border-gray-200 shadow-lg shadow-gray-200/50 pointer-events-auto isolate transform-gpu';
 
   const activeLinkClass = isDark ? 'text-primary border-b border-primary pb-1' : 'text-[#c5a059] border-b border-[#c5a059] pb-1';
   const idleLinkClass = isDark ? 'text-white hover:text-primary' : 'text-gray-500 hover:text-[#c5a059]';

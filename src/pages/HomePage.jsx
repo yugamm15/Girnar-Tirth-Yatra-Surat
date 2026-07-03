@@ -668,7 +668,7 @@ const HomePage = () => {
               {siteCopy.home.intro.spiritualMasters?.map((master, index) => (
                 <article
                   key={index}
-                  className="home-reveal frosted-premium rounded-xl border-t-2 border-primary p-4 sm:p-5 md:p-6 flex flex-col items-center text-center group transition-all duration-500 hover:border-primary/80 hover:-translate-y-1.5 shadow-2xl bg-black/40"
+                  className="home-reveal bg-[#141414]/85 rounded-xl border border-primary/20 border-t-2 border-t-primary p-4 sm:p-5 md:p-6 flex flex-col items-center text-center group transition-all duration-500 hover:border-primary/80 hover:-translate-y-1.5 shadow-2xl isolate transform-gpu"
                 >
                   <div className="w-full h-64 sm:h-72 md:h-[340px] lg:h-[380px] rounded-lg overflow-hidden border border-primary/20 bg-black/60 mb-4 md:mb-5 relative">
                     <img
