@@ -401,7 +401,15 @@ body.mobile-nav-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent; /* Ensure background doesn't cover images */
+  background: transparent;
+  isolation: isolate;
+  contain: paint layout;
+}
+
+.home-bg {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Keep admin/member typography aligned with the main portal font system. */

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { GirnarThreeBackdrop } from '../components/GirnarThreeBackdrop.jsx';
 import { SiteFooter } from '../components/SiteFooter.jsx';
 import { SiteNavbar } from '../components/SiteNavbar.jsx';
 import { siteCopy } from '../content/siteCopy.js';
@@ -586,7 +585,7 @@ const HomePage = () => {
           data-scene-id="hero"
           className="home-scene snap-section relative min-h-screen flex items-center justify-center overflow-hidden"
         >
-          <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 z-0 overflow-hidden">
             <picture>
               <source media="(max-width: 768px)" srcSet={sceneImages.heroMobile} />
               <img
@@ -605,7 +604,6 @@ const HomePage = () => {
               />
             </picture>
             <div className={`pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-black/45 via-black/10 to-black/20 transition-opacity duration-700 ${heroBackdropVisible ? 'opacity-100' : 'opacity-0'}`} />
-            {heroBackdropVisible && !isMobileViewport ? <GirnarThreeBackdrop className="absolute inset-0 pointer-events-none" intensity={1} /> : null}
           </div>
 
           <div

@@ -694,7 +694,7 @@ export const siteCopy = {
           'ગુમાસ્તાના દેરાસરનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
           'गुमास्ता के देरासर का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
         ),
-        image: '/images/14 jinalaya/8.gumastan.jpg',
+        image: '/images/14 jinalaya/8.gustama.jpg',
       },
       {
         id: 'king-samprati-temple',

@@ -52,7 +52,7 @@ const NavDropdown = ({ item, t, isDark, activeLinkClass, idleLinkClass, navLinkT
       <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 z-[1300] transition-all duration-200 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto visible' : 'opacity-0 translate-y-2 pointer-events-none invisible'
         }`}>
         <div className={`min-w-[210px] overflow-hidden rounded-xl border ${isDark
-          ? 'bg-[#111111] border-white/20 shadow-xl shadow-black/30'
+          ? 'bg-black/65 backdrop-blur-xl border-white/20 shadow-xl shadow-black/30'
           : 'bg-white border-gray-200 shadow-xl shadow-gray-300/30'
           }`}>
           {item.dropdown.map((subItem) => {
@@ -124,7 +124,7 @@ export const SiteNavbar = ({ variant = 'light' }) => {
   const brandClass = 'pointer-events-auto flex items-center justify-center';
 
   const desktopNavClass = isDark
-    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-[#111111] rounded-full border border-primary/30 shadow-lg shadow-black/10 pointer-events-auto'
+    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-black/25 backdrop-blur-md rounded-full border border-primary/40 shadow-lg shadow-black/15 pointer-events-auto'
     : 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white rounded-full border border-gray-200 shadow-lg shadow-gray-200/50 pointer-events-auto';
 
   const activeLinkClass = isDark ? 'text-primary border-b border-primary pb-1' : 'text-[#c5a059] border-b border-[#c5a059] pb-1';
@@ -132,10 +132,10 @@ export const SiteNavbar = ({ variant = 'light' }) => {
 
   const menuButtonClass = isMobileViewport
     ? isDark
-      ? 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-[#111111] rounded-full border border-primary/30 pointer-events-auto'
+      ? 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-black/25 backdrop-blur-md rounded-full border border-primary/40 pointer-events-auto shadow-lg shadow-black/15'
       : 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto'
     : isDark
-      ? 'xl:hidden flex items-center justify-center w-12 h-12 bg-[#111111] rounded-full border border-primary/30 pointer-events-auto'
+      ? 'xl:hidden flex items-center justify-center w-12 h-12 bg-black/25 backdrop-blur-md rounded-full border border-primary/40 pointer-events-auto shadow-lg shadow-black/15'
       : 'xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto';
 
   const burgerLineClass = isDark ? 'bg-primary' : 'bg-[#c5a059]';

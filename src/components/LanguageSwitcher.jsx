@@ -40,7 +40,7 @@ export const LanguageSwitcher = ({ variant = 'light', className = '' }) => {
     : `bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 ${isOpen ? 'ring-2 ring-[#c5a059]/20 border-[#c5a059]/40' : ''}`;
 
   const menuClasses = isDark
-    ? 'bg-[#0a0a0a]/95 border border-primary/20 backdrop-blur-2xl shadow-2xl shadow-black/60'
+    ? 'bg-black/70 border border-primary/20 backdrop-blur-xl shadow-2xl shadow-black/40'
     : 'bg-white border border-gray-200 backdrop-blur-xl shadow-xl shadow-gray-200/50';
 
   return (
