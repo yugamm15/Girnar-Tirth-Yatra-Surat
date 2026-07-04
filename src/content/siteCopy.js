@@ -606,14 +606,14 @@ export const siteCopy = {
     heroBadge: tr('14 Jinalaya · Darshan', '૧૪ જિનાલય · દર્શન', '14 जिनालय · दर्शन'),
     heroTitle: tr('14 Jinalaya Girnar Tirth Darshan', '૧૪ જિનાલય ગિરનાર તીર્થ દર્શન', '14 जिनालय गिरनार तीर्थ दर्शन'),
     heroDescription: tr(
-      'Detailed information, divine history, and spiritual significance of the sacred 14 Jinalayas on Shri Giriraj will be published here very soon.',
-      'શ્રી ગિરિરાજ પર આવેલા પવિત્ર ૧૪ જિનાલયોની વિગતવાર માહિતી, દિવ્ય ઈતિહાસ અને આધ્યાત્મિક મહત્વ ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-      'श्री गिरिराज पर स्थित पवित्र 14 जिनालयों की विस्तृत जानकारी, दिव्य इतिहास और आध्यात्मिक महत्व जल्द ही यहाँ प्रस्तुत किया जाएगा।'
+      'Explore the detailed history, architectural grandeur, and divine spiritual significance of the sacred 14 Jinalayas nestled on the holy peaks of Shri Girnar Tirth.',
+      'શ્રી ગિરનાર તીર્થના પાવન શિખરો પર બિરાજમાન પરમ પવિત્ર ૧૪ જિનાલયોનો વિગતવાર ઈતિહાસ, શિલ્પકલા અને દિવ્ય આધ્યાત્મિક મહિમાનું અહીં અન્વેષણ કરો.',
+      'श्री गिरनार तीर्थ के पावन शिखरों पर विराजमान परम पवित्र 14 जिनालयों के विस्तृत इतिहास, वास्तुकला और दिव्य आध्यात्मिक महत्व का यहाँ अवलोकन करें।'
     ),
     comingSoonNote: tr(
-      'Our research and documentation team is compiling detailed steps and high-resolution darshan of all 14 Jinalayas.',
-      'અમારી સંશોધન અને દસ્તાવેજીકરણ ટીમ તમામ ૧૪ જિનાલયોના વિગતવાર પગથિયાં અને હાઈ-રિઝોલ્યુશન દર્શન સંકલિત કરી રહી છે.',
-      'हमारी शोध और दस्तावेज़ीकरण टीम सभी 14 जिनालयों के विस्तृत चरण और हाई-रेज़ोल्यूशन दर्शन संकलित कर रही है।'
+      'Our research and documentation team has compiled detailed steps and historical descriptions of all 14 Jinalayas.',
+      'અમારી સંશોધન અને દસ્તાવેજીકરણ ટીમે તમામ ૧૪ જિનાલયોના વિગતવાર માર્ગ અને ઐતિહાસિક વર્ણન સંકલિત કર્યા છે.',
+      'हमारी शोध और दस्तावेज़ीकरण टीम ने सभी 14 जिनालयों के विस्तृत चरण और ऐतिहासिक विवरण संकलित किए हैं।'
     ),
     jinalayasList: [
       {
@@ -690,9 +690,9 @@ Kumarpal Maharaj was king of Gujarat from year 1143 to 1174. He had constructed 
         id: 'chandraprabha-swami-temple',
         title: tr('5. CHANDRAPRABHA SWAMI TEMPLE', '૫. શ્રી ચન્દ્રપ્રભસ્વામીનું જિનાલય', '5. श्री चन्द्रप्रभस्वामी का जिनालय'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Chandraprabha Swami Temple will be updated soon.',
-          'શ્રી ચન્દ્રપ્રભસ્વામીના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'श्री चन्द्रप्रभस्वामी के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `This temple is situated in an isolated place. Main idol of Chandraprabha Swami Bhagwan is of 16 inch which was established in V.S. 1901. The roof of this temple is well decorated with many beautiful paintings and various statues have been installed on it on all the sides. Returning towards Kumarpal Toonk and from there coming out of Neminath Tonk, then on reaching the road near to main entry gate of Uparkot (Devkot), one passes by the Manoharbhuvan Dharamshala rooms on the opposite side of the road. Moving forward, passing through ‘Surajkund’, one reaches Mansingh Bhojraj temple.`,
+          `આ જિનાલયનું સ્થાન એકદમ એકાંતમાં આવેલું છે. આ જિનાલયમાં મૂળનાયક શ્રી ચન્દ્રપ્રભસ્વામીની ૧૬ ઇંચની પ્રતિમાની પ્રતિષ્ઠા વિ.સં. ૧૯૦૧ માં થયેલ છે. આ જિનાલયની છત અનેક કલાક્રુતિઓથી સુશોભિત છે. જેમાં ચારે બાજુ ફરતી પૂતળીઓ સ્થાપિત કરી રંગ પૂરવામાં આવેલ છે. ત્યાંથી પાછા ફરી કુમારપાળની ટૂંકની બારીમાંથી પ્રવેશી શ્રી નેમિનાથપ્રભુની ટૂંકમાંથી બહાર નીકળીને પુન: ઉપરકોટ(દેવકોટ) ના મુખ્યદ્વાર પાસેના રસ્તે આવી તેની સામે મનોહરભુવનવાળી ધર્મશાળાની રૂમો પાસેથી સુરજકુંડ થઇને શ્રી માનસંગ ભોજરાજના દેરાસરે જવાય છે.`,
+          `यह जिनालय बिल्कुल एकांत में स्थित है। इस जिनालय में मूलनायक श्री चन्द्रप्रभस्वामी की 16 इंच की प्रतिमा की प्रतिष्ठा वि.सं. 1901 में हुई थी। इस जिनालय की छत अनेक कलाकृतियों से सुशोभित है, जिसमें चारों ओर घूमती हुई पुतलियाँ स्थापित करके रंग भरा गया है। वहाँ से वापस लौटकर कुमारपाल की टोंक की खिड़की से प्रवेश कर श्री नेमिनाथ प्रभु की टोंक से बाहर निकलकर पुनः ऊपरकोट (देवकोट) के मुख्य द्वार के पास वाले रास्ते पर आकर, उसके सामने मनोहरभुवन वाली धर्मशाला के कमरों के पास से सूरजकुंड होकर श्री मानसिंह भोजराज के देरासर जाया जाता है।`
         ),
         image: '/images/14 jinalaya/5.CHANDRAPRABHA SWAMI.JPG',
       },
@@ -770,9 +770,19 @@ The entrance of this temple appears to be two-storeyed. Although its main entran
         id: 'gyanvav-temple',
         title: tr('10. GYANVAV TEMPLE', '૧૦. જ્ઞાનવાવનું જિનાલય', '10. ज्ञानवाव का जिनालय'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Gyanvav Temple will be updated soon.',
-          'જ્ઞાનવાવના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'ज्ञानवाव के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `From the side of King Samprati’s temple, as one goes northwards down the slope and enters the gate on the right side, one comes across a compound that houses the “Gnanvav”. And upon entering the same compound from the northern comes the Chaumukhi’ temple, which is known by the name of Sambhavnath Bhagwan.
+
+The main deity in this temple is a 16 inch idol of Sambhavnath Bhagwan.Descending down from this temple also leads to Bhimkund and ChandraPrabha Swami temple. Behind Bhimkund on the northern side, work had begun to construct shrines for the 24 Tirthankaras of the previous era, but due to some reason, this work could not be completed. Climbing up south from the Gnanvav temple and walking 50 steps eastwards from King Samprati’s temple, comes the gate of a fort and walking ahead 50 steps more, one reaches Sheth Dharamchand Hemchand’s temple on the left.`,
+          `સંપ્રતિરાજાના જિનાલયની બાજુમાંથી ઉત્તરદિશા તરફના ઢાળમાં નીચે ઉતરતાં બાજુમાં જ જમણાહાથે રહેલા દ્વારમાં પ્રવેશ કરતાં જ પ્રથમ ચોગાનમાં જ્ઞાનવાવ આવે છે. આ ચોકમાં રહેલા ઉત્તરદિશા તરફના દ્વારથી અંદર પ્રવેશતાં ચૌમુખજીનું દેરાસર આવે છે. જે શ્રી સંભવનાથ ભગવાનના નામે ઓળખાય છે. આ જિનાલયનાં મૂળનાયક ૧૬ ઈંચના શ્રી સંભવનાથ ભગવાન છે.
+
+આ દેરાસરની નીચે ઉતારીને પણ ભીમકુંડ તથા શ્રી ચંદ્રપ્રભ સ્વામીનાં જિનાલયે જઈ શકાય છે. ભીમકુંડની પાછળ ઉત્તરદિશામાં ભૂતકાળમાં ચોવીસ તીર્થંકર પરમાત્માની પ્રતિમાઓ પધરાવવા માટે ચોવીસ દેરીઓ બનાવવા માટેનું કામકાજ શરુ થયું હશે પરંતુ કોઈપણ કારણસર તે બંધ પડતાં તે કાર્ય અધુરું થયેલ પડ્યું છે.
+
+જ્ઞાનવાવનાં દેરાસરથી દક્ષિણદિશા તરફ ચઢી સંપ્રતિરાજાના દેરાસરથી પૂર્વદિશામાં આગળ વધતાં ૫૦ પગથિયાં ચઢતાં કોટનો દરવાજો આવે ત્યાંથી આગળ વધી ૫૦ પગથિયાં ચઢતાં ડાબા હાથે શેઠ ધરમચંદ હેમચંદનું જિનાલય આવે છે.`,
+          `संप्रति राजा के जिनालय के बगल से उत्तर दिशा की ओर ढलान पर नीचे उतरते समय, बगल में ही दाईं ओर के द्वार में प्रवेश करते ही पहले प्रांगण में 'ज्ञानवाव' आता है। इस चौक में स्थित उत्तर दिशा के द्वार से अंदर प्रवेश करने पर चौमुखजी का देरासर आता है, जो श्री संभवनाथ भगवान के नाम से जाना जाता है। इस जिनालय के मूलनायक 16 इंच के श्री संभवनाथ भगवान हैं।
+
+इस देरासर से नीचे उतरकर भी भीमकुंड और श्री चंद्रप्रभ स्वामी के जिनालय तक जाया जा सकता है। भीमकुंड के पीछे उत्तर दिशा में भूतकाल में चौबीस तीर्थंकर परमात्मा की प्रतिमाएँ विराजमान करने के लिए चौबीस देरियाँ (लघु मंदिर) बनाने का कार्य शुरू हुआ होगा, लेकिन किसी कारणवश वह बंद हो जाने से कार्य अधूरा पड़ा हुआ है।
+
+ज्ञानवाव के देरासर से दक्षिण दिशा की ओर चढ़कर संप्रति राजा के देरासर से पूर्व दिशा में आगे बढ़ते हुए 50 सीढ़ियाँ चढ़ने पर किले का दरवाजा आता है, वहाँ से आगे बढ़कर और 50 सीढ़ियाँ चढ़ने पर बाईं ओर सेठ धरमचंद हेमचंद का जिनालय आता है।`
         ),
         image: '/images/14 jinalaya/10.GYANVAV.JPG',
       },
@@ -780,9 +790,9 @@ The entrance of this temple appears to be two-storeyed. Although its main entran
         id: 'dharmsinh-hemchand-temple',
         title: tr('11. DHARMSHRI HEMCHAND TEMPLE', '૧૧. શેઠ ધરમચંદ હેમચંદનું જિનાલય', '11. सेठ धरमचंद हेमचंद का जिनालय'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Dharmsinh Hemchand Temple will be updated soon.',
-          'શેઠ ધરમચંદ હેમચંદના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'सेठ धरमचंद हेमचंद के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `The first temple that comes after going out of the gate of Uparkot (Devkot) is Sheth Dharamchand Hemchand’s temple. This temple is also known as ‘The temple of Khada’. The main idol of this temple is 29 inch Shantinath Bhagwan. Sheth Dharamchand Hemchand, who was a merchant from Mangrol village, got this temple renovated in V.S. 1932.`,
+          `ઉપરકોટ (દેવકોટ) નાં દરવાજામાંથી બહાર નીકળ્યા બાદ સૌથી પહેલું દેરાસર આ શેઠ ધરમચંદ હેમચંદનું આવે છે. જેને ખાડાનું દેરાસર પણ કહેવામાં આવે છે. આ દેરાસરમાં મૂળનાયક ૨૯ ઈંચનાં શ્રી શાંતિનાથ ભગવાન બિરાજમાન છે. માંગરોળ ગામાના દશાશ્રીમાળી વણિક શેઠ ધરમચંદ હેમચંદ દ્વારા વિ.સં. ૧૯૩૨ માં આ દેરાસરનું સમારકામ કરાવવામાં આવ્યું હતું.`,
+          `ऊपरकोट (देवकोट) के द्वार से बाहर निकलने के बाद सबसे पहला देरासर सेठ धरमचंद हेमचंद का आता है। इसे 'खाड़े का देरासर' (खाडा का मंदिर) भी कहा जाता है। इस देरासर में मूलनायक के रूप में 29 इंच के श्री शांतिनाथ भगवान विराजमान हैं। मांगरोल गाँव के दशाश्रीमाली वणिक सेठ धरमचंद हेमचंद द्वारा वि.सं. 1932 में इस देरासर का जीर्णोद्धार (समारकाम) करवाया गया था।`
         ),
         image: '/images/14 jinalaya/11.DHARMSHRI HEMCHAND.JPG',
       },
@@ -790,9 +800,9 @@ The entrance of this temple appears to be two-storeyed. Although its main entran
         id: 'mallavalu-temple',
         title: tr('12. MALLAVALU TEMPLE', '૧૨. મલ્લવાળુ જિનાલય', '12. मल्लवालु जिनालय'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Mallavalu Temple will be updated soon.',
-          'મલ્લવાળુ જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'मल्लवालु जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `After climbing some 35-40 steps further ahead from Sheth Dharamchand Hemchand’s Temple, comes the Mallavadi Temple on the right. The main deity of this temple is 21 inch idol of Shri Shantinath Bhagwan. It is named as “Mallavalu temple” because it was renovated by Joravarmallji.`,
+          `શેઠ ધરમચંદ હેમચંદના દેરાસરથી આગળ વધતાં લગભગ ૩૫- ૪૦ પગથિયાં ચઢતાં જમણીબાજુ આ મલ્લવાળું દેરાસર આવે છે. આ જિનાલયમાં મૂળનાયક ૨૧ ઈંચના શ્રી શાંતિનાથ ભગવાન બિરાજમાન છે. જેનો ઉદ્ધાર જોરાવરમલ્લજી દ્વારા થયો હોવાથી આ દેરાસર મલ્લવાળા દેરાસર તરીકે ઓળખાય છે.`,
+          `सेठ धरमचंद हेमचंद के देरासर से आगे बढ़ते हुए लगभग 35-40 सीढ़ियाँ चढ़ने पर दाईं ओर यह 'मल्लवाला देरासर' आता है। इस जिनालय में मूलनायक के रूप में 21 इंच के श्री शांतिनाथ भगवान विराजमान हैं। इसका जीर्णोद्धार जोरावरमल्लजी द्वारा किया गया था, इसलिए इस देरासर को 'मल्लवाले देरासर' के नाम से जाना जाता है।`
         ),
         image: '/images/14 jinalaya/12.MALLAVALU.JPG',
       },
@@ -800,9 +810,21 @@ The entrance of this temple appears to be two-storeyed. Although its main entran
         id: 'chaumukhji-temple',
         title: tr('13. CHAUMUKHJI TEMPLE', '૧૩. ચૌમુખજીનું જિનાલય', '13. चौमुखजी का जिनालय'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Chaumukhji Temple will be updated soon.',
-          'ચૌમુખજીના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'चौमुखजी के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `Chaumikhji temple has a north facing 25 inch idol of Neminath Bhagwan as the MoolNayak, east facing Suparshwanath Bhagwan, south facing ChandraPrabha Swami and west facing MuniSuvrat Swami Bhagwan. Articles were found on the “Pabasan” that mentioned Acharya JinharshaSuri Maharaj as having done the Pratishta of these idols in the year V.S. 1511. This temple is also known as Shri Shamala Parshwanath’s temple, the reason for which is not known, but it seems that at sometime in past, the main idol of this temple could have been that of Shamala Parshwanath Bhagwan. Further, on each of the four corners of the Pabasan inside this temple, there is a small square pillar which has 24 idols engraved upon it. Thus, a total of 96 idols have been engraved on these pillars. This temple is also known as ‘Chorivalu’ temple.
+
+In the year V.S. 2058, when the Chaumikhji temple was plastered, it seems that the symbols (called as “Lanchan”) of MoolNayak Neminath Bhagwan and that of the other three idols were accidentally marked to be that of Shree Chandraprabhu Swami.
+
+Climbing up about 70-80 steps from this temple, on the left side, comes the path to go to ‘Sahasavan’ – Shri Neminath Bhagwan’s Diksha and Kevalgnan’s place, while on right, climbing up some 15-20 steps and after crossing ‘Gaumukhganga’ and climbing up further 350 steps, comes the temple of Rahnemi.`,
+          `ચૌમુખજીનાં દેરાસરના હાલ ઉત્તરાભિમુખ મૂળનાયક ૨૫ ઈંચના શ્રી નેમિનાથ, પૂર્વાભિમુખ શ્રી સુપાર્શ્વનાથ, દક્ષિણાભિમુખ શ્રી ચંદ્રપ્રભસ્વામી અને પશ્ચીમાભિમુખ શ્રી મુનિસુવ્રત સ્વામી છે. તેની પ્રતિષ્ઠા વિ.સં. ૧૫૧૧માં આ.જિનહર્ષસૂરિ મહારાજ સાહેબના હસ્તે થેલ હોવાના પબાસણના લેખો જોવા મળતા હતા. આ જિનાલય શ્રી શામળા પાર્શ્વનાથનાં નામે પણ ઓળખાય છે, જેની પાછળનું રહસ્ય સમજાતું નથી પરંતુ પૂર્વે અન્ય કોઈ કાળે ત્યાં મૂળનાયક શ્રી શામળા પાર્શ્વનાથ હોવાની સંભાવના રહે છે. વાળી આ દેરાસરની અંદરના પબાસણનાં ચારેય ખૂણામાં રહેલી ચોરસ એક –એક થાંભલીમાં ૨૪ -૨૪ પ્રતીમોએમ કુલ ૯૬ પ્રતિમાઓ કોતરવામાં આવેલી છે. આ ચાર થાંભલી લગ્ન મંડપની ચાર ચોરી જેવી લાગતી હોવાથી આ જિનાલયને ચોરીવાળું દેરાસર પણ કહેવાય છે.
+
+વિ.સં. ૨૦૫૮ દરમ્યાન આ ચૌમુખજીનો લેપ થયો ત્યારે શરતચૂકથી તેમાં મૂળનાયક શ્રી નેમિનાથ તથા બાકીના ત્રણ ભગવાનમાં શ્રી ચંદ્રપ્રભ સ્વામીનાં લંછન મૂકી ગયા હોય તેવું જણાય છે.
+
+ચૌમુખજીનાં દેરાસરથી આગળ લગભગ ૭૦-૮૦ પગથિયાં ચડતાં ડાબા હાથે સહસાવન શ્રી નેમિનાથ ભગવાનની દીક્ષા – કેવલજ્ઞાન કલ્યાણકભૂમિ તરફ જવાનો માર્ગ આવે છે અને જમણી બાજુ ૧૫ -૨૦ પગથિયાં ચડતાં ગૌમુખીગંગા પસાર કરી લગભગ ૩૫૦ પગથિયાં ઉપર ચડતાં જમણી બાજુ રહનેમિનું જિનાલય આવે છે.`,
+          `चौमुखजी के देरासर में वर्तमान में उत्तरमुखी मूलनायक के रूप में 25 इंच के श्री नेमिनाथ भगवान, पूर्वमुखी श्री सुपार्श्वनाथ भगवान, दक्षिणमुखी श्री चंद्रप्रभ स्वामी और पश्चिममुखी श्री मुनिसुव्रत स्वामी भगवान विराजमान हैं। पबासन के लेखों से पता चलता है कि इन प्रतिमाओं की प्रतिष्ठा वि.सं. 1511 में आचार्य जिनहर्षसूरि महाराज साहेब के कर-कमलों द्वारा की गई थी। इस जिनालय को श्री शामला पार्श्वनाथ के नाम से भी जाना जाता है, जिसके पीछे का कारण स्पष्ट नहीं है, लेकिन संभावना है कि पूर्व में किसी समय यहाँ मूलनायक श्री शामला पार्श्वनाथ रहे होंगे। साथ ही, इस देरासर के भीतर पबासन के चारों कोनों में स्थित एक-एक चौकोर स्तंभ में 24-24 प्रतिमाएँ उत्कीर्ण हैं, इस प्रकार कुल 96 प्रतिमाएँ इन स्तंभों पर उकेरी गई हैं। ये चार स्तंभ विवाह मंडप की चार 'चौरी' (कनौरी/चोरी) जैसे प्रतीत होते हैं, इसलिए इस जिनालय को 'चौरीवाला देरासर' भी कहा जाता है।
+
+वि.सं. 2058 के दौरान जब इस चौमुखजी का लेप किया गया था, तब भूलवश मूलनायक श्री नेमिनाथ और शेष तीन भगवान की प्रतिमाओं पर श्री चंद्रप्रभ स्वामी के लांछन (चिह्न) लगा दिए गए हों, ऐसा प्रतीत होता है।
+
+चौमुखजी के देरासर से आगे लगभग 70-80 सीढ़ियाँ चढ़ने पर बाईं ओर सहसावन—श्री नेमिनाथ भगवान की दीक्षा एवं केवलज्ञान कल्याणक भूमि की ओर जाने का मार्ग आता है, और दाईं ओर 15-20 सीढ़ियाँ चढ़ने व गौमुखीगंगा पार करने के बाद लगभग 350 सीढ़ियाँ और चढ़ने पर दाईं ओर रहनेमि का जिनालय आता है।`
         ),
         image: '/images/14 jinalaya/13.CHAUMUKHJI.jpeg',
       },
@@ -810,9 +832,15 @@ The entrance of this temple appears to be two-storeyed. Although its main entran
         id: 'rahnemi-temple',
         title: tr('14. RAHNEMI TEMPLE', '૧૪. રહનેમિનું જિનાલય', '14. रहनेमि का जिनालय'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Rahnemi Temple will be updated soon.',
-          'રહનેમિના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'रहनेमि के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `The main deity of this temple is a 51 inch black idol of Siddha Bhagwan Shri Rahnemi. This idol was anointed about 6-7 years ago. This probably would be the only Jain temple where the MoolNayak is not an Arihant Bhagwan but a Siddha Bhagwan.
+
+Rahnemi was the small brother of twenty second Tirthankara Shri Neminath Bhagwan. He came to Girnar mountain after getting ordained into monkhood and after pursuing ascetic practises here and eliminating the eight karmas, he attained Kelvalgnan and Moksha at Sahasavan.`,
+          `આ જિનાલયમાં મૂળનાયક તરીકે ૫૧ ઈંચના સિદ્ધાત્મા શ્રી રહનેમિની શ્યામવર્ણીય પ્રતિમા બિરાજમાન છે. ૬ -૭ વર્ષ પૂર્વે આ પ્રતિમાનો લેપ કરવામાં આવ્યો હતો. ભારતભરમાં પ્રાયઃ એકમાત્ર જિનાલય હશે કે જ્યાં અરિહંત પરમાત્મા ન હોવા છતાં સિધ્ધાત્મા શ્રી રહનેમિની પ્રતિમા મૂળનાયક તરીકે સ્થાપન કરવામાં આવી હોય!
+
+શ્રી રહનેમિ બાવીસમાં તીર્થંકર શ્રી નેમિનાથ પરમાત્માના નાનાભાઈ હતા. તેમણે દીક્ષા લઈને ગિરનારની પવિત્રભૂમિમાં સંયમ આરાધના કરી અષ્ટકર્મનો ક્ષય કરી સહસાવનમાં કેવલજ્ઞાન અને મોક્ષપદની પ્રાપ્તિ કરી હતી.`,
+          `इस जिनालय में मूलनायक के रूप में 51 इंच के सिद्धात्मा श्री रहनेमि की श्यामवर्ण (काली) प्रतिमा विराजमान है। 6-7 वर्ष पूर्व इस प्रतिमा का लेप किया गया था। भारतभर में शायद यह एकमात्र ऐसा जिनालय होगा जहाँ अरिहंत परमात्मा न होने के बावजूद सिद्धात्मा श्री रहनेमि की प्रतिमा मूलनायक के रूप में स्थापित की गई है!
+
+श्री रहनेमि बाईसवें तीर्थंकर श्री नेमिनाथ परमात्मा के छोटे भाई थे। उन्होंने दीक्षा लेकर गिरनार की पवित्र भूमि में संयम आराधना की, अष्ट कर्मों का क्षय किया और सहसावन में केवलज्ञान तथा मोक्ष पद प्राप्त किया।`
         ),
         image: '/images/14 jinalaya/14.RAHNEMI.jpg',
       },
