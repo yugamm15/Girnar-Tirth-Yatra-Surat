@@ -630,9 +630,21 @@ export const siteCopy = {
         id: 'merakvasi-toonk',
         title: tr('2. MERAKVASI TOONK', '૨. મેરકવાસી ટૂંક', '2. मेरकवासी टोंक'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Merakvasi Toonk will be updated soon.',
-          'મેરકવાસી ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'मेरकवासी टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `The fund-raising contribution initiated by King Siddharaj's minister Saraj for the shrine of Lord Neminath was utilized to build the Merakvasi Toonk. The exquisite carvings of this shrine were crafted by paying the artisans in gold of equal weight. The carving work is so incredibly intricate that even the strings of the sitar and the fingernails of the hands playing them are visible with flawless precision.
+
+The Mulnayak (primary deity) of this Bavan Jinalay (temple complex of 52 shrines) is the 29-inch idol of Shri Sahastrafana Parshwanath Bhagwan, which was consecrated in Vikram Samvat 1859 by the holy hands of P.P. Acharya Jinendrasuri Maharaj Saheb. Circumbulating this Bavan Jinalay from the left side, one can see the Ashtapadji Patta carved in V.S. 1442, and further ahead in the central shrine is the Ashtapadji Derasar. Moving further, exactly behind the Mulnayak deity, Lord Mahaviraswami is seated. Moving forward, in the central shrine on the northern side, the Chaumukhji idols of Lord Shantinath have been consecrated. The highly enchanting carvings on the ceilings of the courtyards in front of each shrine on the northern side bring immense joy to the mind.
+
+Going towards the left outside the main entrance of the Jinalay, on the way to Sagram Soni's Toonk, behind the opposite wall lies the Navokund (New Pond). It is said that Sagram Soni contributed 36,000 gold coins corresponding to the 36,000 questions of the Bhagavati Sutra to the Gyan Bhandar (knowledge fund). From that contribution, sacred books like the Kalpa Sutra were written using golden ink.`,
+          `સિધ્ધરાજના મંત્રી સારજે નેમિનાથ ભગવાનની ટૂંક માટે જે ટીપ કરી હતી. તે પૈસામાંથી મેરકવશીની ટૂંક બંધાવી હતી. કોતરણી બરાબર સોનું આપી કારીગરો પાસે આ ટૂંકનું કામ કરાવ્યું હતું. તે કામ એટલું ઝીણું કરાવ્યું છે કે સિતારના તાર તેની ઉપર ફરતી આંગળીઓના નખ અણિશુધ્ધાં દેખાય છે.
+
+આ બાવન જિનાલયના મૂળનાયક ૨૯ ઇંચ ના શ્રી સહસ્ત્રફણાપાશ્ર્વનાથ ભગવાન છે, જેની પ્રતિષ્ઠા વિ.સં. ૧૮૫૯ માં પ.પૂ. આ. જિનેન્દ્રસૂરિ મહારાજ સાહેબના હસ્તે થયેલ છે. આ બાવન જિનાલયની ડાબી તરફથી ફરતાં વિ.સં. ૧૪૪૨ માં કોતરાયેલ અસ્ટાપદજીનો પટ તથા આગળ જતાં મધ્યભાગમાં દેરીમાં અષ્ટાપદજીનું દેરાસર છે. ત્યાંથી આગળ મૂળનાયક પરમાત્માની બરાબર પાછળના ભાગમાંથી શ્રી મહાવીરસ્વામી ભગવાન બિરાજમાન છે. આગળ વધતાં ઉત્તરદિશા તરફથી દેરીમાં મધ્યમાં શ્રી શાંતીનાથ ભગવાનની ચૌમુખજી પ્રતિમાજીઓ બિરાજમાર કરવામાં આવી છે. ઉત્તરદિશામાં દરેક દેરીઓની આગળની ચોકોની છત્તમાં અત્યંત મનોહરી કોતરણીઓ મનને આહલાદ પમાડે છે.
+
+જિનાલયની મુખ્ય દ્વાર બહાર ડાબી તરફ જતાં સગરામસોનીની ટૂંક આવે તે રસ્તે સામેની દિવાલની પાછ્ળ નવોકુંડ આવેલ છે. એમ કહેવાય છે કે સગરામ સોનીએ ભગવતી સૂત્રના ૩૬૦૦૦ પ્રશ્ર્નોની ૩૬૦૦૦ સોનામહોરો જ્ઞાન ખાતે મૂકી હતી. તેમાંથી સુવર્ણની સાહીથી ક્લ્પસૂત્ર વિગેરે પુસ્તકો લખાવ્યા હતા.`,
+          `सिद्धराज के मंत्री सारज ने नेमिनाथ भगवान की टोंक के लिए जो योगदान (चंदा) किया था, उस धन से मेरकवासी टोंक का निर्माण कराया गया था। कारीगरों को बराबर मात्रा में सोना देकर इस टोंक की नक्काशी का काम करवाया गया था। यह नक्काशी का काम इतना सूक्ष्म और बारीक है कि सितार के तार और उस पर घूमती उंगलियों के नाखून भी बिल्कुल स्पष्ट और सटीक दिखाई देते हैं।
+
+इस बावन जिनालय के मूलनायक 29 इंच के श्री सहस्रफणा पार्श्वनाथ भगवान हैं, जिनकी प्रतिष्ठा वि.सं. 1859 में परम पूज्य आचार्य जिनेंद्रसूरि महाराज साहेब के कर-कमलों द्वारा संपन्न हुई थी। इस बावन जिनालय की बाईं ओर से परिक्रमा करते हुए वि.सं. 1442 में उत्कीर्ण अष्टापदजी का पट्ट तथा आगे चलकर मध्य भाग में स्थित देरी (लघु मंदिर) में अष्टापदजी का देरासर है। वहाँ से आगे, मूलनायक परमात्मा के ठीक पीछे के भाग में श्री महावीरस्वामी भगवान विराजमान हैं। आगे बढ़ने पर उत्तर दिशा में स्थित देरी के मध्य में श्री शांतिनाथ भगवान की चौमुखजी प्रतिमाएं विराजमान की गई हैं। उत्तर दिशा में प्रत्येक देरी के सामने बने चौक की छतों में की गई अत्यंत मनमोहक नक्काशी मन को आनंदित कर देती है।
+
+जिनालय के मुख्य द्वार से बाहर बाईं ओर जाने पर, जहाँ सग्राम सोनी की टोंक आती है, उस मार्ग पर सामने की दीवार के पीछे नवोकुंड स्थित है। ऐसा कहा जाता है कि सग्राम सोनी ने भगवती सूत्र के 36,000 प्रश्नों के लिए ज्ञान खाते में 36,000 स्वर्ण मुद्राएं (सोनामोहरें) अर्पित की थीं। उसी राशि से सुवर्ण (सोने) की स्याही से कल्पसूत्र आदि ग्रंथों का लेखन करवाया गया था।`
         ),
         image: '/images/14 jinalaya/2.merakvasi.jpg',
       },
@@ -640,9 +652,21 @@ export const siteCopy = {
         id: 'sangram-soni-toonk',
         title: tr('3. SANGRAM SONI’S TOONK', '૩. સંગરામસોની ની ટૂંક', '3. संग्रामसोनी की टोंक'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Sangram Soni’s Toonk will be updated soon.',
-          'સંગરામસોની ની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'संग्रामसोनी की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `Coming out of Merakvasi’s Toonk, one can reach Sangram Soni’s Toonk from the Northern side’s entrance. The main temple of this marvellous 52 idol temple area has a two storey Rangmandap It has nice provision for seating the ladies in the upper storey during proceedings. The main deity is Lord Sahastraphana Parshwanath’s 29 inch idol. It was established in V.S. 1859 on Jeth Sud 7 on Thursday by Acharya JinendraSuri Maharaj. The ceiling of the Gabhara is around 35 to 40 feet high and this makes it stand out from that of the other temples. The shrine of this temple is known to be the tallest amongst all the temples located on Girnar.
+
+Sangram Soni who was a merchant by profession in Siddhpur area of Patan district had built this temple. It is said that Sangram Soni donated 36000 Gold coins to the knowledge library corresponding to the 36000 questions in Bhagwati Sutra (Jain Agam). Using this money, Kalpa Sutra and other sacred Jain literature were written with golden ink.
+
+Sangram Soni lived in the times of Mughal Emperor Akbar and it is said that he was referred to as the maternal uncle of Emperor Akbar. According to a few scholars, in reality, this temple referred to as “Sangram Soni” or “Sagaram Soni” was renovated by SamarSingh Malde and newly made. Pertinents proofs have been furnished by the aforesaid scholars to support this theory.`,
+          `મેરકવશીની ટૂંકમાંથી બહાર નીકળી ઉત્તરદિશાના દ્વારમાંથી સગરામસોનીની ટૂંકમાં જવાય છે. આ બાવન જિનાલયના મુખ્ય જિનાલયમાં બે માળવાળો અત્યંત મનોહર રંગમંડપ છે. જેમાં પૂજા વિગેરે અનુષ્ઠાન દરમ્યાન ઉપરનાં ભાગમાં સ્ત્રીઓને બેસવા માટે સુંદર વ્યવસ્થા દોઠવવામાં આવેલ છે. મૂળનાયક શ્રી સહસ્ત્રફણાપાશ્ર્વનાથ પ્રભુની ૨૯ ઇંચની પ્રતિમા બિરાજમાન છે. જેની પ્રતિષ્ઠા વિ. સં. ૧૮૫૯ ના જેઠ સુદ ૭ ને ગુરૂવારે પૂ. આ. જિનેન્દ્રસૂરિ મહારાજસાહેબના હસ્તે થયેલ છે. ગભારાના છત્તની ઊંચાઇ લગભગ ૩૫ થી ૪૦ ફૂંટ ઊંચી હોવાથી અન્ય ગભારા કરતાં વિશેષ જણાય છે. ગિરનારના જિનાલયોમાં આ જિનાલયનું શિખર સૌથી ઊંચુ જણાય છે.
+
+સિધ્ધ્પુર પાટણના વણીક સગરામસોનીએ આ જિનાલયનું નિર્માણ કરાવ્યું હતું. એમ કહેવાય છે કે સગરામસોનીએ ભગવતી સૂત્રના ૩૬૦૦૦ પ્રશ્ર્નોની ૩૬૦૦૦ સોનામહોરો જ્ઞાન ખાતે મૂકી હતી. તેમાંથી સુવર્ણની સાહીથી ક્લ્પસૂત્ર વિગેરે પુસ્તકો લખાવ્યા હતા.
+
+સગરામસોની અકબર બાદશાહના વખતમાં થયા હતા તેમને અકબરનો મામો કહી બોલાવતા એમ કહેવાય છે. સગરામસોની કે સંગ્રામ સોનીના નામે ઓળખાતું આ જિનાલય હકીકતમાં સમરસિંહ માલદે દ્વારા ઉધ્ધાર કરીને તદન નવું જ નિર્વાણ કરવામાં આવેલી છે. તેવું કેટલાક વિદ્વાનોએ વાસ્તવિક પ્રમાણ દર્શાવવાપૂર્વક જણાવ્યું છે`,
+          `मेरकवासी टोंक से बाहर निकलकर उत्तर दिशा के द्वार से सग्राम सोनी (संग्राम सोनी) की टोंक में प्रवेश किया जाता है। इस बावन जिनालय के मुख्य मंदिर में दो मंजिला अत्यंत सुंदर रंगमंडप है, जिसमें पूजा आदि अनुष्ठान के दौरान ऊपरी मंजिल में महिलाओं के बैठने की सुंदर व्यवस्था की गई है। यहाँ मूलनायक श्री सहस्रफणा पार्श्वनाथ प्रभु की 29 इंच की प्रतिमा विराजमान है, जिसकी प्रतिष्ठा वि.सं. 1859 ज्येष्ठ सुद 7, गुरुवार को पूज्य आचार्य जिनेंद्रसूरि महाराज के कर-कमलों द्वारा संपन्न हुई थी। इस मंदिर के गर्भगृह की छत की ऊंचाई लगभग 35 से 40 फीट है, जो इसे अन्य गर्भगृहों से विशिष्ट बनाती है। गिरनार के सभी मंदिरों में इस जिनालय का शिखर सबसे ऊंचा माना जाता है।
+
+सिद्धपुर पाटण के व्यापारी सग्राम सोनी ने इस जिनालय का निर्माण करवाया था। ऐसा कहा जाता है कि सग्राम सोनी ने भगवती सूत्र (जैन आगम) के 36,000 प्रश्नों के लिए ज्ञान भंडार (पुस्तकालय) में 36,000 स्वर्ण मुद्राएं समर्पित की थीं। उसी राशि से सुवर्ण (सोने) की स्याही से कल्पसूत्र और अन्य पवित्र जैन ग्रंथों का लेखन करवाया गया था।
+
+सग्राम सोनी मुगल बादशाह अकबर के समय में हुए थे और ऐसा कहा जाता है कि उन्हें अकबर का मामा कहकर पुकारा जाता था। कुछ विद्वानों के अनुसार, वास्तव में 'सग्राम सोनी' या 'संग्राम सोनी' के नाम से पहचाने जाने वाले इस जिनालय का जीर्णोद्धार समरसिंह मालदे द्वारा किया गया था और इसे बिल्कुल नए सिरे से निर्मित किया गया था। इस सिद्धांत के समर्थन में उक्त विद्वानों द्वारा प्रामाणिक साक्ष्य भी प्रस्तुत किए गए हैं।`
         ),
         image: '/images/14 jinalaya/3..SANGRAM SONI.jpg',
       },
@@ -650,9 +674,15 @@ export const siteCopy = {
         id: 'kumarpal-toonk',
         title: tr('4. KUMARPAL’S TOONK', '૪. કુમારપાળની ટૂંક', '4. कुमारपाल की टोंक'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Kumarpal’s Toonk will be updated soon.',
-          'કુમારપાળની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'कुमारपाल की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `Coming out of Sangram Soni’s, from the Northern gate one enters Kumarpal’s Toonk. As soon as one enters Kumarpal’s Tonk, a vast compound is visible on all the sides of the main temple. Walking in the compound, one reaches the main temple wherein one comes across a giant Rangmandap. Walking further, there is one more Rangmandap. The main idol of this temple is 24 inch Abhinandan Swami Bhagwan. This idol was etsbalished in year V.S. 1875 on Saturday, Vaishakh Sud 7 by Acharya Jinendra Suri. In the northern premises of this temple, there is a large well named ‘Dedkivav’. Its water level never goes above the surface.
+
+Kumarpal Maharaj was king of Gujarat from year 1143 to 1174. He had constructed this Toonk. Exiting through a small door from the north side, there is a narrow path to reach temple of ChandraPrabha Swami Bhagwan just ahead of ‘Bhimkund’.`,
+          `સંગરામસોનીની ટૂંકમાંથી બહાર નીકળી ઉત્તરદિશાના દ્વારમાં કુમારપાળની ટૂંકમાં જવાય છે. કુમારપાળની ટૂંકમાં પ્રવેશતાં મુખ્ય જિનાલયની ચારેબાજુ ઘણું પ્રાંગણ જોવા મળે છે. આ પ્રાંગણમાં થઇ જિનાલયમાં પ્રવેશ કરતાં એક વિશાળ રંગમંડપ આવે છે જેમાં આગળ વધતાં બીજો રંગમંડપ આવે છે. આ જિનાલયના મૂળનાયક તરીકે ૨૪ ઇંચના શ્રી અભિનંદનસ્વામી બિરાજમાન છે. જેની પ્રતિષ્ઠા વિ.સં. ૧૮૭૫ ના વૈશાખ સુદ ૭ ના શનિવારે પૂ. આ. જિનેન્દ્રસૂરિ મહારાજ સાહેબના હસ્તે કરવામાં આવી હતી. આ જિનાલયના ઉત્તર દિશાના પ્રાંગણમાં એક દેડકીવાવ નામની વાવ છે. તે વાવનું પાણી હંમેશાની સપાટી કરતાં ક્યારેય ઉંચે જતું નથી
+
+કુમારપાળ મહારાજ સન ૧૧૪૩ થી ૧૧૭૪ સુધી ગુજરાતના રાજા હતા. તેમણે આ ટૂંક બંધાવી છે. ત્યાંથી ઉત્તરદિશા તરફની બારીથી બહાર નીકળી ભીમકુંડથી આગળ ચન્દ્રપ્રભસ્વામીના જિનાલય સુધી જવાનો કેડીમાર્ગ આવે છે.`,
+          `सग्राम सोनी की टोंक से बाहर निकलकर उत्तर दिशा के द्वार से कुमारपाल की टोंक में प्रवेश किया जाता है। कुमारपाल की टोंक में प्रवेश करते ही मुख्य मंदिर के चारों ओर एक विशाल प्रांगण (आंगन) दिखाई देता है। इस प्रांगण से होकर मंदिर में प्रवेश करने पर एक विशाल रंगमंडप आता है, जिसके आगे बढ़ने पर एक और रंगमंडप है। इस जिनालय के मूलनायक के रूप में 24 इंच के श्री अभिनंदनस्वामी भगवान विराजमान हैं, जिनकी प्रतिष्ठा वि.सं. 1875 वैशाख सुद 7, शनिवार को पूज्य आचार्य जिनेंद्रसूरि महाराज साहेब के कर-कमलों द्वारा की गई थी। इस मंदिर के उत्तरी प्रांगण में 'देड़कीवाव' नामक एक बावड़ी (कुआं) है। उस बावड़ी का जल स्तर कभी भी सामान्य स्तर से ऊपर नहीं जाता है।
+
+कुमारपाल महाराज वर्ष 1143 से 1174 तक गुजरात के राजा थे। उन्होंने ही इस टोंक का निर्माण करवाया था। वहाँ से उत्तर दिशा की ओर एक छोटी खिड़की/द्वार से बाहर निकलकर भीमकुंड से आगे चंद्रप्रभस्वामी के जिनालय तक जाने का पगडंडी मार्ग आता है।`
         ),
         image: '/images/14 jinalaya/4.KUMARPAL.jpg',
       },
@@ -670,9 +700,15 @@ export const siteCopy = {
         id: 'masingh-bhojraj-temple',
         title: tr('6. MASINGH BHOJRAJ TEMPLE', '૬. માનસંગ ભોજરાજનું જિનાલય', '6. मानसंग भोजराज का जिनालय'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Masingh Bhojraj Temple will be updated soon.',
-          'માનસંગ ભોજરાજના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'मानसंग भोजराज के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `This temple was built by Kutch Mandvi’s Visa Oswal Mansingh Bhojraj. Sambhavnath Bhagwan’s 25 inch idol is seated as the main idol.
+
+‘Surajkund’ that comes on the way to this temple was also built by Mansingh Bhojraj. He also formally installed the Adeshwar temple in Junagadh village in year V.S. 1901. Coming out of this temple and back on the main road, as one moves up north comes the Vastupal – Tejpal Toonk.`,
+          `આ જિનાલય કચ્છ માંડવીના વીશા ઓશવાળ શા. માનસંગ ભોજરાજે બંધાયેલ હતું. જેનાં મૂળનાયક તરીકે શ્રી સંભવનાથ ભગવાનની ૨૫ ઇંચની સુંદર પ્રતિમા બિરાજમાન છે.
+
+આ જિનાલયમાં જતા પૂર્વે માર્ગમાં આવતો સુરજકુંડ પણ શા. માનસંગે કરાવેલ છે. જૂનાગઢ ગામમાં આદિશ્ર્વર ભગવાનના દેરાસરની પ્રતિષ્ઠા પણ તેમણે વિ.સં. ૧૯૦૧ માં કરાવી હતી. દર્શન કરી બહાર નીકળી મુખ્યમાર્ગ ઉપર ઉત્તરદિશા તરફ આગળ વધતાં જમણા હાથ ઉપર વસ્તુપાલ – તેજપાલની ટૂંક આવે છે.`,
+          `इस जिनालय का निर्माण कच्छ मांडवी के वीशा ओसवाल शाह मानसिंह भोजराज द्वारा करवाया गया था। यहाँ मूलनायक के रूप में श्री संभवनाथ भगवान की 25 इंच की सुंदर प्रतिमा विराजमान है।
+
+इस जिनालय में जाने के मार्ग में आने वाला सूरजकुंड भी शाह मानसिंह द्वारा निर्मित करवाया गया था। उन्होंने जूनागढ़ गाँव में आदिश्वर भगवान के देरासर की प्रतिष्ठा भी वि.सं. 1901 में करवाई थी। दर्शन करने के पश्चात बाहर निकलकर मुख्य मार्ग पर उत्तर दिशा की ओर आगे बढ़ने पर दाहिने हाथ पर वस्तुपाल-तेजपाल की टोंक आती है।`
         ),
         image: '/images/14 jinalaya/6.MASINGH BHOJRAJ.jpg',
       },
@@ -680,9 +716,23 @@ export const siteCopy = {
         id: 'vastupal-tejpal-temple',
         title: tr('7. VASTUPAL – TEJPAL TEMPLE', '૭. વસ્તુપાલ – તેજપાલનું જિનાલય', '7. वस्तुपाल – तेजपाल का जिनालय'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Vastupal – Tejpal Temple will be updated soon.',
-          'વસ્તુપાલ – તેજપાલના જિનાલયનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'वस्तुपाल – तेजपाल के जिनालय का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `This temple comprises of 3 temples adjoining each other. These temples were built by Vastupal and Tejpal between V.S. 1232 and V.S. 1242. Main idol of this temple is a 43 inch Shamla Parshwanath Bhagwan. This idol was established on Saturday, Vaishakh Sud 3 in year V.S. 1306 by Acharya Devsuri Maharaj Saheb’s disciple Jayanand Maharaj Saheb in the lineage of Acharya PradyagnaSuri Maharaj.
+
+In this temple there are around 6-7 stone inscriptions which date back to Fagan Sud 10, Wednesday in the year V.S. 1288. In the temple located on the left of the main temple, ‘Chaumukhi’ Bhagwan has been installed inside a square-shaped Samavasarana. The Chaumukhi comprises of 3 idols of Parshwanath Bhagwan that have an inscription of year V.S. 1556 and one idol of ChandraPrabha Swami Bhagwan with inscription of year V.S. 1485. On the temple located on the right of the main temple, ‘Chaumukhi’ Bhagwan has been installed on the top of a round-shaped Mount Meru. This Chaumukhi comprises of an idol of Supaarshwanath Bhagwan facing west, two idols of Neminath Bhagwan facing east and North and one idol of ChandraPrabha Swami Bhagwan idol facing south. The idols of Supaarshwanath and Neminath Bhagwan date back to year V.S. 1546. The construction of Meru is made of yellow stone. It is said that minister Vastupal brought yellow stone from foreign country and metal stone from Mecca. The temple’s engraving and art are captivating. And the grandness and the arrangement of the Chaumukhji temples are pleasing to the eye.
+
+In year V.S. 1932, NarsiKeshavji built fortress around Samprati, Kumarpal and Vastupal-Tejpal Toonk’s and also renovated the temples.`,
+          `આ જિનાલયમાં એક સાથે પરસ્પર જોડાયેલાં ત્રણ મંદિરો છે. આ જિનાલયો ગુર્જરદેશના મંત્રીશ્ર્વર વસ્તુપાલ – તેજપાલ દ્વારા વિ. સં. ૧૨૩૨ થી ૧૨૪૨ ના કાળમાં બંધાવ્યા હતા. જેમાં હાલ મૂળનાયક તરીકે ૪૩ ઇંચન શ્રી શામળા પાશ્ર્વનાથ ભગવાન બિરાજમાન છે. જેની પ્રતિષ્ઠા વિ. સં. ૧૩૦૬ ના વૈશાખ સુદ - ૩ ના શનીવારના દિવસે પૂ. આ. પ્રદ્યગ્નસૂરિ મહારાજ સાહેબની મુખ્ય પરંપરામાં શ્રી દેવસૂરી મ. સા. ના શિષ્ય શ્રી જયાનંદ મહારાજ સાહેબે કરી હતી.
+
+આ જિનાલયમાં લગભગ છ થી સાત શિલાલેખો છે. જે વિ. સં. ૧૨૮૮ ના ફાગણ સુદ ૧૦ બુધવારના છે. મુખ્ય જિનાલયની ડાબી બાજુના જિનાલયમાં ચોરસ સમવસરણમાં ચૌમુખથી ભગવાન પધરાવેલા છે. જેમાં ત્રણ પ્રતિમા શ્રી પાશ્ર્વનાથભગવાનની વિ. સં. ૧૫૫૬ ની સાલના લેખવાળી તથા ચોથી શ્રી ચન્દ્રપ્રભસ્વામીની પ્રતિમા વિ. સં. ૧૪૮૫ ની સાલના લેખવાળા છે. જમણીબાજુના જિનાલયમાં ગૌળ મેરૂની ઉપર ચૌમુખજી ભગવાન પધરાવેલા છે, જેમાં પશ્ર્ચિમાભિમુખ શ્રી સુપાશ્ર્વનાથપ્રભુ ઉત્તર અને પૂર્વાભિમૂખ શ્રી નેમિનાથ ભગવાન આ ત્રણેય પ્રતિમાઓ વિ. સં. ૧૫૪૬ની સાલની છે અને દક્ષિણાભિમુખ શ્રી ચન્દ્રપ્રભસ્વામીની પ્રતિમા બિરાજમાન છે. આ મેરૂની રચના પીળા તથા પાષાણમાંથી કરવામાં આવેલ છે.
+
+આ દેરાસરમાં પીળા આરસ તથા સળીના પથ્થર વાપરવામાં આવ્યા છે. એમ કહેવાય છે કે વસ્તુપાળ પીળા પથ્થર પરદેશથી લાવ્યા હતા અને સળીના પથ્થર મક્કામાંથી લાવ્યા હતા. આ જિનાલયોની કોતરણી, કલાક્રુતિ મનને આનંદ આપનારી બને છે. ચૌમુખજી જિનાલયોની વિશાળતા તથા ગોઠવણી નયનરમ્ય છે.
+
+સં. ૧૯૩૨માં નરસીકેશવજીએ સંપ્રતિરાજાની, કુમારપાળની અને વસ્તુપાલ – તેજપાલની વિગેરે ટૂંકોની આસપાસ કિલ્લા બંધાવ્યા તથા દેરાસરો સમરાવ્યા હતા.`,
+          `इस जिनालय में एक साथ परस्पर जुड़े हुए तीन मंदिर हैं। इन जिनालयों का निर्माण गुर्जर देश के मंत्रीश्वर वस्तुपाल - तेजपाल द्वारा वि. सं. 1232 से 1242 के काल में करवाया गया था। इसमें वर्तमान में मूलनायक के रूप में 43 इंच के श्री शामला पार्श्वनाथ भगवान विराजमान हैं। जिनकी प्रतिष्ठा शनिवार, वैशाख सुद 3, वि. सं. 1306 के दिन पूज्य आचार्य प्रद्युम्नसूरि महाराज साहेब की मुख्य परंपरा में श्री देवसूरि म. सा. के शिष्य श्री जयानंद महाराज साहेब द्वारा की गई थी।
+
+इस जिनालय में लगभग छह से सात शिलालेख हैं, जो वि. सं. 1288 के फागुन सुद 10, बुधवार के हैं। मुख्य जिनालय के बाईं ओर स्थित जिनालय में, एक चौकोर समवसरण के भीतर 'चौमुखजी' भगवान विराजमान किए गए हैं। इस चौमुखजी में पार्श्वनाथ भगवान की तीन प्रतिमाएँ वि. सं. 1556 के लेख वाली हैं और चौथी श्री चंद्रप्रभ स्वामी भगवान की प्रतिमा वि. सं. 1485 के लेख वाली है। मुख्य जिनालय के दाईं ओर स्थित जिनालय में, गोल मेरु के ऊपर चौमुखजी भगवान विराजमान किए गए हैं। इस चौमुखजी में पश्चिम की ओर मुख किए हुए श्री सुपार्श्वनाथ प्रभु, उत्तर and पूर्व की ओर मुख किए हुए श्री नेमिनाथ भगवान की प्रतिमाएँ विराजमान हैं (ये तीनों प्रतिमाएँ वि. सं. 1546 की साल की हैं) और दक्षिण की ओर मुख किए हुए श्री चंद्रप्रभ स्वामी भगवान की प्रतिमा विराजमान है। इस मेरु की रचना पीले पत्थर से की गई है। ऐसा कहा जाता है कि मंत्री वस्तुपाल पीला पत्थर विदेश से लाए थे और सली का पत्थर मक्का से लाए थे। इन जिनालयों की नक्काशी और कलाकृति मन को अत्यंत आनंदित करने वाली है। चौमुखजी मंदिरों की विशालता और उनकी व्यवस्था नयनाभिराम है।
+
+वि. सं. 1932 में, नरसी केशवजी ने संप्रति राजा, कुमारपाल और वस्तुपाल - तेजपाल आदि टोंकों के चारों ओर किले का निर्माण करवाया था और मंदिरों का जीर्णोद्धार किया था।`
         ),
         image: '/images/14 jinalaya/7.VASTUPAL – TEJPAL.jpg',
       },
@@ -690,9 +740,9 @@ export const siteCopy = {
         id: 'gumastan-temple',
         title: tr('8. GUMASTAN TEMPLE', '૮. ગુમાસ્તાનું દેરાસર', '8. गुमास्ता का देरासर'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of Gumastan Temple will be updated soon.',
-          'ગુમાસ્તાના દેરાસરનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'गुमास्ता के देरासर का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `Behind the compound of Vastupal Tejpal temple is their mother’s temple which is more famous as Gumastan temple. The main idol of this temple is 19 inch idol of Sambhavnath Bhagwan. As this temple was built in the name of Vastupal’s mother Kumardevi, it is known as Vastupal’s mother’s temple. Also, as this temple was built by Kutch Mandvi’s Gulabshah, it is also known as Gulabshah’s temple. (In the due course of time, temple name has changed from Gulabshah to Gumastan)`,
+          `વસ્તુપાલ – તેજપાલના જિનાલયની પાછળના પ્રાંગણમાં તેમની માતાનું દેરાસર છે. જે ગુમાસ્તાના દેરાસરના નામથી પ્રસિધ્ધ છે. આ મંદિરના મૂળનાયક શ્રી સંભવનાથ ભગવાન ૧૯ ઇંચના બિરાજમાન છે. વસ્તુપાલની માતા કુમારદેવીના નામે આ મંદિર બંધાવ્યું હોવાથી તે વસ્તુપાલની માતાના દેરાસર તરીકે ઓળખાય છે. વળી, કચ્છ-માંડવીના ગુલાબશાહે બંધાવ્યું હોવાથી ગુલાબશાહના મંદિરના નામે ઓળખાય છે. (ગુલાબશાહ નામનો અપભ્રંશ થતા કાળક્રમે તે ગુમાસ્તા નામે પ્રચલિત થયું તેવું લાગે છે.)`,
+          `वस्तुपाल - तेजपाल जिनालय के पीछे के प्रांगण में उनकी माता का देरासर है, जो 'गुमास्ता के देरासर' के नाम से प्रसिद्ध है। इस मंदिर के मूलनायक 19 इंच के श्री संभवनाथ भगवान विराजमान हैं। चूंकि यह मंदिर वस्तुपाल की माता कुमारदेवी के नाम पर बनवाया गया था, इसलिए इसे 'वस्तुपाल की माता का देरासर' भी कहा जाता है। इसके अलावा, कच्छ-मांडवी के गुलाबशाह द्वारा निर्मित होने के कारण इसे 'गुलाबशाह का मंदिर' भी कहा जाता है। (समय के साथ गुलाबशाह नाम का अपभ्रंश होने से यह गुमास्ता नाम से प्रचलित हो गया ऐसा प्रतीत होता है।)`
         ),
         image: '/images/14 jinalaya/8.gustama.jpg',
       },
@@ -700,9 +750,19 @@ export const siteCopy = {
         id: 'king-samprati-temple',
         title: tr('9. KING SAMPRATI’S TEMPLE', '૯. સંપ્રતિ રાજાની ટૂંક', '9. संप्रति राजा की टोंक'),
         description: tr(
-          'Detailed history, architectural grandeur, and spiritual glory of King Samprati’s Temple will be updated soon.',
-          'સંપ્રતિ રાજાની ટૂંકનો દિવ્ય ઈતિહાસ, શિલ્પકલા અને આધ્યાત્મિક મહિમા ટૂંક સમયમાં અહીં રજૂ કરવામાં આવશે.',
-          'संप्रति राजा की टोंक का दिव्य इतिहास, वास्तुकला और आध्यात्मिक महिमा जल्द ही यहाँ प्रस्तुत की जाएगी।'
+          `Coming out of Vastupal Tejpal’s temple and walking north, one reaches King Samprati’s temple. King Samprati was born in the lineage of Chandragupta Maurya and was the grandson of King Ashoka. He embraced Jainism upon listening to the preachings of Acharya Suhastisuri Maharaj Saheb. He ruled Ujjain around V.S. 226. He built around 1.25 lakh temples and got about 1.25 crore idols installed. Main deity of this temple built by King Samprati is a 57 inch idol of Neminath Bhagwan. An article at the base of the idol reveals that this temple was established around V.S. 1519. Outside the temple’s Gabhara is the idol of a demi-goddess, which is said to be of Chakeshwari Devi in some Jain holy books while some others say it to be that of Ambika Devi. But since this idol sits atop a Swan and its hands are endowed with Veena and a book, it can be understood beyond doubt that this idol is that of Saraswati Devi. Additionally, the Rangmandap contains a 54 inch standing idol (known as ‘Kausagga’ idol) along with 24 other eye-pleasing idols. Outside this Rangmandap, there is yet another bigger Rangmandap.
+
+The entrance of this temple appears to be two-storeyed. Although its main entrance faces west, currently only the south-facing entrance is kept open. The outer walls of this temple are filled with extremely captivating carvings. Art lovers are filled with immense joy upon seeing these carvings. The various shapes in these engravings serve as a great source of learning and support for beginner sculptors.`,
+          `વસ્તુપાલ – તેજપાલનાં જિનાલયમાંથી બહાર નીકળી ઉત્તરદિશા તરફ જતાં સંપ્રતિ રાજાની ટૂંક આવે છે. શ્રી ચંદ્રગુપ્તમૌર્યનાં વંશમાં થયેલ અશોકના પૌત્ર મગધસમ્રાટ સંપ્રતિ મહારાજા થયા હતા. જેમણે આચાર્ય સુહસ્તિસૂરિ મહારાજ સાહેબના સદુપદેશથી જૈન ધર્મનો સ્વીકાર કર્યો હતો. તે લગભગ વિ.સં. ૨૨૬ ની આસપાસ ઉજૈન નગરીમાં રાજ કરતાં હતા. તેઓએ સવાલાખ જિનાલયો અને સવાકરોડ પ્રતિમા ભરાવ્યા હતા. સંપ્રતિ મહારાજાએ બંધાવેલ આ જિનાલયના મૂળનાયક તરીકે ૫૭ ઈંચનાં શ્રી નેમિનાથ ભગવાન બિરાજમાન છે. આ પ્રતિમા વિ.સં. ૧૫૧૯ માં પ્રતિષ્ઠા કરાવ્યા હોવાનો લેખ પ્રતિમાજીની ગાદીમાં જોવા મળે છે.
+
+મૂળનાયકના ગભારાની બહારના ગોખલામાં દેવીની પ્રતિમા છે જેને કેટલાક ગ્રંથોમાં ચકેશ્વરી દેવી અને કેટલાક ગ્રંથોમાં અંબિકા દેવી તરીકે ઓળખાવી જુદા – જુદા સમયે તે ગોખલા ઉપર તેના નામ લખાયેલા છે. જયારે વાસ્તવમાં આ પ્રતિમા હંસવાહિની, હાથમાં વીણા અને પોથી યુક્ત હોવાથી આ પ્રતિમા સરસ્વતી દેવીની હોવાનું સ્પષ્ટ પણે કહી શકાય છે. આ સિવાય રંગમંડપમાં ૫૪ ઈંચના ઉભા કાઉસગ્ગિયા પ્રતિમા સહિત અન્ય ૨૪ નયનરમ્ય પ્રતિમા પણ બિરાજમાન છે. આ રંગમંડપની બહાર પણ બીજો મોટો રંગમંડપ બનાવવામાં આવેલ છે.
+
+આ જિનાલયનું પ્રવેશદ્વાર બે માળનું હોવાનું જણાય છે. તેનું પશ્ચિમ સન્મુખ દ્વાર હોવા છતાં હાલ આ જિનાલયમાં દક્ષિણાભિમુખ પ્રવેશદ્વાર જ ખુલ્લું રાખવામાં આવેલ છે. આ જિનાલયની બહારની દીવાલો અત્યંત મનોહારિણી કોતરણીથી ભરચક છે. શિલ્પકલાના રસિક આત્માઓ આ કોતરણી જોઈને અતિ આહ્લાદ પામે છે. આ નકશીની વિવિધ આકૃતિઓ પ્રાથમિક કક્ષાના શિલ્પકારોને શિલ્પકળામાં આલંબનકારી બંને તેવી છે.`,
+          `वस्तुपाल - तेजपाल जिनालय से बाहर निकलकर उत्तर दिशा की ओर जाने पर संप्रति राजा की टोंक आती है। चंद्रगुप्त मौर्य के वंश में हुए सम्राट अशोक के पौत्र संप्रति राजा हुए थे, जिन्होंने आचार्य सुहस्तिसूरि महाराज साहेब के सदुपदेश से जैन धर्म स्वीकार किया था। वे लगभग वि. सं. 226 के आसपास उज्जैन नगरी पर शासन करते थे। उन्होंने सवा लाख जिनालय और सवा करोड़ प्रतिमाएं बनवाई थीं। संप्रति महाराजा द्वारा निर्मित इस जिनालय के मूलनायक के रूप में 57 इंच के श्री नेमिनाथ भगवान विराजमान हैं। इस प्रतिमा की वि. सं. 1519 में प्रतिष्ठा होने का लेख प्रतिमाजी की गद्दी में देखने को मिलता है।
+
+मूलनायक के गर्भगृह के बाहर के आले (गोखले) में एक देवी की प्रतिमा है, जिसे कुछ ग्रंथों में चक्रेश्वरी देवी और कुछ में अंबिका देवी के रूप में दर्शाया गया है और अलग-अलग समय पर उस आले पर उनके नाम लिखे गए हैं। जबकि वास्तव में यह प्रतिमा हंसवाहिनी, हाथ में वीणा और पुस्तक युक्त होने के कारण स्पष्ट रूप से सरस्वती देवी की मानी जा सकती है। इसके अलावा, रंगमंडप में 54 इंच की कायोत्सर्ग (खड़ी 'काउसग्गिया') प्रतिमा सहित अन्य 24 नयनरम्य प्रतिमाएं भी विराजमान हैं। इस रंगमंडप के बाहर एक और बड़ा रंगमंडप बनाया गया है।
+
+इस जिनालय का प्रवेश द्वार दो मंजिला प्रतीत होता है। इसका प्रवेश द्वार पश्चिम की ओर होने के बावजूद, वर्तमान में इस जिनालय का दक्षिणमुखी प्रवेश द्वार ही खुला रखा गया है। इस जिनालय की बाहरी दीवारें अत्यंत मनमोहक नक्काशी से भरपूर हैं। मूर्तिकला प्रेमी इस नक्काशी को देखकर अत्यंत आनंदित होते हैं। इस नक्काशी की विभिन्न आकृतियाँ शुरुआती मूर्तिकारों के लिए शिल्प कला सीखने में सहायक हैं।`
         ),
         image: '/images/14 jinalaya/9.KING SAMPRATI.jpg',
       },

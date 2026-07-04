@@ -12,61 +12,34 @@ const FourteenJinalayaPage = () => {
   const { t } = useLanguage();
   const pageCopy = siteCopy.fourteenJinalayaPage;
   const containerRef = useRef(null);
-  const lineRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Animate the connecting line filling up
-      if (lineRef.current) {
-        gsap.fromTo(
-          lineRef.current,
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: 'top 40%',
-              end: 'bottom 60%',
-              scrub: true,
-            },
-          }
-        );
-      }
-
       // Animate each step as it comes into view
       const steps = gsap.utils.toArray('.pilgrimage-step');
       steps.forEach((step) => {
         const img = step.querySelector('.step-image');
         const content = step.querySelector('.step-content');
-        const dot = step.querySelector('.step-dot');
 
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: step,
-            start: 'top 85%',
+            start: 'top 90%',
             end: 'top 20%',
             toggleActions: 'play none none reverse',
           },
         });
 
         tl.fromTo(
-          dot,
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.7)' }
-        )
-          .fromTo(
-            img,
-            { x: step.classList.contains('flex-row-reverse') ? 80 : -80, opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out' },
-            '-=0.2'
-          )
-          .fromTo(
-            content,
-            { x: step.classList.contains('flex-row-reverse') ? -40 : 40, opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out' },
-            '-=0.5'
-          );
+          img,
+          { scale: 0.96, y: 40, opacity: 0 },
+          { scale: 1, y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' }
+        ).fromTo(
+          content,
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' },
+          '-=0.5'
+        );
       });
     }, containerRef);
 
@@ -88,44 +61,29 @@ const FourteenJinalayaPage = () => {
           </p>
         </header>
 
-        <div ref={containerRef} className="space-y-24 relative pt-4">
-          {/* Connecting Line Background */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c5a059]/15 hidden lg:block -translate-x-1/2"></div>
-          {/* Animated Connecting Line */}
-          <div
-            ref={lineRef}
-            className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c5a059] hidden lg:block -translate-x-1/2 origin-top"
-          ></div>
-
-          {pageCopy.jinalayasList?.map((step, index) => {
-            const isEven = index % 2 === 0;
+        <div ref={containerRef} className="space-y-16 md:space-y-24 relative pt-4">
+          {pageCopy.jinalayasList?.map((step) => {
             return (
               <div
                 key={step.id}
-                className={`pilgrimage-step flex flex-col lg:flex-row items-center gap-8 lg:gap-16 relative ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'
-                  }`}
+                className="pilgrimage-step flex flex-col items-center gap-6 max-w-7xl mx-auto light-panel p-6 md:p-8"
               >
-                {/* Step Indicator Dot */}
-                <div className="step-dot absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#c5a059] border-4 border-white hidden lg:block z-10 shadow-sm"></div>
-
-                {/* Image Panel */}
-                <div className="w-full lg:w-1/2">
+                {/* Image Panel (Showing First) */}
+                <div className="w-full">
                   <SecureImage
                     src={step.image}
                     alt={t(step.title)}
-                    containerClassName={`step-image light-panel p-3 bg-white border border-[#ddd2b7] shadow-md min-h-[280px] md:min-h-[360px] ${isEven ? 'light-panel-left' : 'light-panel-right'
-                      }`}
-                    className="w-full h-[280px] md:h-[360px] object-cover rounded-sm"
+                    containerClassName="step-image w-full overflow-hidden rounded-sm min-h-[280px] md:min-h-[480px] border border-[#ddd2b7]/60 shadow-md"
+                    className="w-full h-[280px] md:h-[480px] object-cover rounded-sm"
                   />
                 </div>
 
-                {/* Text Panel */}
-                <div className={`step-content w-full lg:w-1/2 text-center lg:text-left ${isEven ? 'lg:pl-8' : 'lg:pr-8 lg:text-right'
-                  }`}>
-                  <h3 className="text-2xl md:text-3xl font-headline text-gray-900 mb-4">
+                {/* Text Panel (Showing After Picture) */}
+                <div className="step-content w-full text-left px-2 md:px-4">
+                  <h3 className="text-2xl md:text-3xl font-headline text-gray-900 mb-4 border-b border-[#ddd2b7]/60 pb-3">
                     {t(step.title)}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-line text-justify md:text-left text-sm md:text-base">
                     {t(step.description)}
                   </p>
                 </div>
