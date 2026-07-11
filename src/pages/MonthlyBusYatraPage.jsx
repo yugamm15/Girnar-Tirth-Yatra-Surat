@@ -347,7 +347,7 @@ const MonthlyBusYatraPage = () => {
 
           <article className="light-panel light-panel-right light-card-image overflow-hidden">
             <SecureImage
-              src={isMobileViewport ? '/images/mobile/bus.webp' : '/images/girnar_Bus_picture.png'}
+              src={isMobileViewport ? '/images/mobile/bus.webp' : '/images/Bus Picture.png'}
               alt={t(pageCopy.heroTitle)}
               containerClassName="h-full min-h-[280px] md:min-h-[360px] w-full"
               className="w-full h-full object-cover"

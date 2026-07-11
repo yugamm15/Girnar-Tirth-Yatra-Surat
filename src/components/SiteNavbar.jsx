@@ -28,7 +28,7 @@ const NavDropdown = ({ item, t, isDark, activeLinkClass, idleLinkClass, navLinkT
 
   return (
     <div
-      className="relative group"
+      className="relative group translate-z-0"
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
@@ -50,11 +50,11 @@ const NavDropdown = ({ item, t, isDark, activeLinkClass, idleLinkClass, navLinkT
 
       {/* Dropdown Menu */}
       <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 z-[1300] transition-all duration-200 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto visible' : 'opacity-0 translate-y-2 pointer-events-none invisible'
-        }`}>
+        } translate-z-0 isolation-isolate`}>
         <div className={`min-w-[210px] overflow-hidden rounded-xl border ${isDark
-          ? 'bg-black/65 backdrop-blur-xl border-white/20 shadow-xl shadow-black/30'
+          ? 'bg-[#181818] border-white/10 shadow-xl shadow-black/40'
           : 'bg-white border-gray-200 shadow-xl shadow-gray-300/30'
-          }`}>
+          } translate-z-0`}>
           {item.dropdown.map((subItem) => {
             const isSubActive = isActivePath(location.pathname, subItem.path);
             return (
@@ -63,8 +63,8 @@ const NavDropdown = ({ item, t, isDark, activeLinkClass, idleLinkClass, navLinkT
                 to={subItem.path}
                 className={`block px-5 py-4 text-[11px] 2xl:text-[12px] font-headline tracking-widest uppercase transition-colors whitespace-nowrap ${isSubActive
                   ? isDark ? 'text-primary bg-white/10 font-bold' : 'text-[#c5a059] bg-gray-100 font-bold'
-                  : isDark ? 'hover:text-primary hover:bg-white/10 text-white/85' : 'hover:text-[#c5a059] hover:bg-gray-100 text-gray-700'
-                  }`}
+                  : isDark ? 'hover:text-primary hover:bg-white/5 text-white/85' : 'hover:text-[#c5a059] hover:bg-gray-100 text-gray-700'
+                  } translate-z-0`}
               >
                 {t(subItem.label)}
               </Link>
@@ -118,25 +118,25 @@ export const SiteNavbar = ({ variant = 'light' }) => {
 
   const isDark = variant === 'dark';
   const navWrapperClass = isMobileViewport
-    ? 'fixed top-3 inset-x-0 px-3 z-[1200] flex items-center justify-between gap-2 pointer-events-none'
-    : 'fixed top-2 lg:top-3 inset-x-0 px-4 lg:px-8 xl:px-10 z-[1200] flex justify-between items-center gap-3 pointer-events-none';
+    ? 'fixed top-3 inset-x-0 px-3 z-[1200] flex items-center justify-between gap-3 pointer-events-none translate-z-0'
+    : 'fixed top-2 lg:top-3 inset-x-0 px-4 lg:px-8 xl:px-10 z-[1200] flex justify-between items-center gap-3 pointer-events-none translate-z-0';
 
-  const brandClass = 'pointer-events-auto flex items-center justify-center';
+  const brandClass = 'pointer-events-auto flex items-center justify-center translate-z-0';
 
   const desktopNavClass = isDark
-    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-black/25 backdrop-blur-md rounded-full border border-primary/40 shadow-lg shadow-black/15 pointer-events-auto isolate transform-gpu'
-    : 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white rounded-full border border-gray-200 shadow-lg shadow-gray-200/50 pointer-events-auto isolate transform-gpu';
+    ? 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-black/25 backdrop-blur-md rounded-full border border-primary/40 shadow-lg shadow-black/15 pointer-events-auto transform-gpu translate-z-0 isolation-isolate relative z-10'
+    : 'hidden xl:flex items-center gap-4 px-4 xl:px-5 h-16 w-auto bg-white rounded-full border border-gray-200 shadow-lg shadow-gray-200/50 pointer-events-auto transform-gpu translate-z-0 isolation-isolate';
 
-  const activeLinkClass = isDark ? 'text-primary border-b border-primary pb-1' : 'text-[#c5a059] border-b border-[#c5a059] pb-1';
-  const idleLinkClass = isDark ? 'text-white hover:text-primary' : 'text-gray-500 hover:text-[#c5a059]';
+  const activeLinkClass = isDark ? 'text-primary border-b border-primary pb-1 translate-z-0' : 'text-[#c5a059] border-b border-[#c5a059] pb-1 translate-z-0';
+  const idleLinkClass = isDark ? 'text-white hover:text-primary border-b border-transparent pb-1 translate-z-0' : 'text-gray-500 hover:text-[#c5a059] border-b border-transparent pb-1 translate-z-0';
 
   const menuButtonClass = isMobileViewport
     ? isDark
-      ? 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-black/25 backdrop-blur-md rounded-full border border-primary/40 pointer-events-auto shadow-lg shadow-black/15'
-      : 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto'
+      ? 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-black/25 backdrop-blur-md rounded-full border border-primary/40 pointer-events-auto shadow-lg shadow-black/15 translate-z-0 relative z-10'
+      : 'flex-shrink-0 xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto translate-z-0'
     : isDark
-      ? 'xl:hidden flex items-center justify-center w-12 h-12 bg-black/25 backdrop-blur-md rounded-full border border-primary/40 pointer-events-auto shadow-lg shadow-black/15'
-      : 'xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto';
+      ? 'xl:hidden flex items-center justify-center w-12 h-12 bg-black/25 backdrop-blur-md rounded-full border border-primary/40 pointer-events-auto shadow-lg shadow-black/15 translate-z-0 relative z-10'
+      : 'xl:hidden flex items-center justify-center w-12 h-12 bg-white rounded-full border border-gray-200 pointer-events-auto translate-z-0';
 
   const burgerLineClass = isDark ? 'bg-primary' : 'bg-[#c5a059]';
   const brandTitleClass = isIndicLanguage

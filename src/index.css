@@ -239,11 +239,31 @@ body.mobile-nav-open {
 
 /* Custom Utilities from Stitch Code */
 .frosted-premium {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(230, 195, 100, 0.15);
   box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+  isolation: isolate;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix compositing glitches for elements with backdrop-blur over Three.js canvas */
+.translate-z-0 {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.isolation-isolate {
+  isolation: isolate;
 }
 
 .gold-glow {
@@ -403,8 +423,6 @@ body.mobile-nav-open {
   align-items: center;
   justify-content: center;
   background: transparent;
-  isolation: isolate;
-  contain: paint layout;
 }
 
 .home-bg {

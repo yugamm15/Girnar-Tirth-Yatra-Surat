@@ -40,15 +40,15 @@ export const LanguageSwitcher = ({ variant = 'light', className = '' }) => {
     : `bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 ${isOpen ? 'ring-2 ring-[#c5a059]/20 border-[#c5a059]/40' : ''}`;
 
   const menuClasses = isDark
-    ? 'bg-black/70 border border-primary/20 backdrop-blur-xl shadow-2xl shadow-black/40'
-    : 'bg-white border border-gray-200 backdrop-blur-xl shadow-xl shadow-gray-200/50';
+    ? 'bg-[#181818] border border-primary/20 shadow-2xl shadow-black/40'
+    : 'bg-white border border-gray-200 shadow-xl shadow-gray-200/50';
 
   return (
-    <div className={`relative inline-block ${className}`} ref={dropdownRef}>
+    <div className={`relative inline-block ${className} translate-z-0`} ref={dropdownRef}>
       <button
         type="button"
         onClick={toggleDropdown}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded-full transition-all duration-300 outline-none ${buttonClasses}`}
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-full transition-all duration-300 outline-none ${buttonClasses} translate-z-0`}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
@@ -69,9 +69,8 @@ export const LanguageSwitcher = ({ variant = 'light', className = '' }) => {
       </button>
 
       <div
-        className={`absolute right-0 mt-3 w-48 rounded-2xl overflow-hidden transition-all duration-500 origin-top-right z-[200] ${
-          isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
-        } ${menuClasses}`}
+        className={`absolute right-0 mt-3 w-48 rounded-2xl overflow-hidden transition-all duration-500 origin-top-right z-[200] ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+          } ${menuClasses} translate-z-0 isolation-isolate`}
       >
         <div className="py-2" role="listbox">
           {supportedLanguages.map((option) => {
@@ -82,11 +81,10 @@ export const LanguageSwitcher = ({ variant = 'light', className = '' }) => {
                 onClick={() => handleLanguageSelect(option.code)}
                 role="option"
                 aria-selected={isSelected}
-                className={`w-full flex items-center justify-between px-5 py-3.5 text-sm transition-all duration-300 group ${
-                  isSelected
+                className={`w-full flex items-center justify-between px-5 py-3.5 text-sm transition-all duration-300 group ${isSelected
                     ? isDark ? 'bg-primary/10 text-primary' : 'bg-[#f7f0df] text-[#c5a059]'
                     : isDark ? 'text-white/70 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
+                  } translate-z-0`}
               >
                 <div className="flex flex-col items-start leading-tight">
                   <span className={`font-bold tracking-wide ${isSelected ? 'opacity-100' : 'opacity-80'}`}>
