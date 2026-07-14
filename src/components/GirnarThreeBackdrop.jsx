@@ -232,7 +232,7 @@ export function GirnarThreeBackdrop({ className = '', intensity = 1 }) {
         pointerEvents: 'none',
         position: 'absolute',
         inset: 0,
-        zIndex: -1,
+        zIndex: 1,
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
         isolation: 'isolate',

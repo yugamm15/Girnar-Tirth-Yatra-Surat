@@ -894,11 +894,11 @@ Rahnemi was the small brother of twenty second Tirthankara Shri Neminath Bhagwan
         id: 1,
         title: tr('Sahesavan Tirth', 'સહેસાવન તીર્થ', 'सहेसावन तीर्थ'),
         description: tr(
-          'Detailed spiritual significance, history, and divine darshan details of this holy spot are coming soon.',
-          'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
-          'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
+          "Sahesavan is the place of Neminath Dada's Diksha and Kevalgnan Kalyanak i.e. this is where he renounced the world for leading an ascetic life and this is also the place where he became enlightened. Sahasavan is the holy place where one can still feel the overwhelming fragrance of Dada’s vows of renunciation (Diksha). At this same place, Dada attained Kevalgyan.",
+          "સહેસાવન એ નેમિનાથ દાદાના દીક્ષા અને કેવળજ્ઞાન કલ્યાણકનું સ્થાન છે એટલે કે આ એ સ્થાન છે જ્યાં તેમણે સંયમ જીવન સ્વીકાર્યું અને જ્યાં તેઓ કેવળજ્ઞાની બન્યા. સહેસાવન એ પવિત્ર ભૂમિ છે જ્યાં આજે પણ દાદાના દીક્ષા વ્રતના સંયમની દિવ્ય સુવાસ અનુભવી શકાય છે. આ જ સ્થાને દાદાને કેવળજ્ઞાન પ્રાપ્ત થયું હતું.",
+          "सहेसावन नेमिनाथ दादा के दीक्षा और केवलज्ञान कल्याणक का स्थान है यानी यह वह स्थान है जहां उन्होंने संयम जीवन स्वीकार किया और जहां वे केवलज्ञानी बने। सहेसावन वह पवित्र भूमि है जहां आज भी दादा के दीक्षा व्रत के संयम की दिव्य सुगंध महसूस की जा सकती है। इसी स्थान पर दादा को केवलज्ञान प्राप्त हुआ था।"
         ),
-        image: '/images/sahesavan/sahesavan-tirth.jpg',
+        image: '/images/sahesavan/1.sahesavan.jpg',
       },
       {
         id: 2,
@@ -908,7 +908,7 @@ Rahnemi was the small brother of twenty second Tirthankara Shri Neminath Bhagwan
           'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
           'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
         ),
-        image: '/images/sahesavan/samavasaran-tirth.jpg',
+        image: '/images/sahesavan/2.samavasaran tirth.jpg',
       },
       {
         id: 3,
@@ -928,7 +928,7 @@ Rahnemi was the small brother of twenty second Tirthankara Shri Neminath Bhagwan
           'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
           'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
         ),
-        image: '/images/sahesavan/diksha-kalyanak.jpg',
+        image: '/images/sahesavan/4.Diksha kalyanak.jpeg',
       },
       {
         id: 5,
@@ -938,7 +938,7 @@ Rahnemi was the small brother of twenty second Tirthankara Shri Neminath Bhagwan
           'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
           'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
         ),
-        image: '/images/sahesavan/moksh-kalyanak.jpg',
+        image: '/images/sahesavan/5.moksh kalyanak.jpg',
       },
       {
         id: 6,
@@ -948,7 +948,7 @@ Rahnemi was the small brother of twenty second Tirthankara Shri Neminath Bhagwan
           'આ પાવન સ્થાનનો આધ્યાત્મિક મહિમા અને ઇતિહાસ ટૂંક સમયમાં રજૂ કરવામાં આવશે.',
           'इस पावन स्थान की आध्यात्मिक महिमा और इतिहास जल्द ही प्रस्तुत किया जाएगा।'
         ),
-        image: '/images/sahesavan/himanshusuri-dada-charan-paduka.jpg',
+        image: '/images/sahesavan/6.Himanshu Suri Dada.jpg',
       },
     ],
   },

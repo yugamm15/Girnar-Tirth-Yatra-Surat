@@ -678,17 +678,15 @@ const HomePage = () => {
             </article>
             <article className="frosted-premium rounded-sm border-t-2 border-primary p-5 md:p-10 flex flex-col mx-auto w-full h-full">
               <div>
-                <span className="text-primary font-headline text-[10px] tracking-[0.5em] uppercase opacity-60">{t(siteCopy.home.intro.acharyaBadge)}</span>
-                <div className="mt-3 md:mt-6 rounded-sm overflow-hidden border border-primary/20 bg-black/35">
+                <div className="rounded-sm overflow-hidden border border-primary/20 bg-black/35">
                   <img
-                    src={isMobileViewport ? '/images/mobile/portrait.webp' : '/images/P.P. Acharya Hemvallabh M.S..jpeg'}
+                    src="/images/hemvallabh m.s.jpeg"
                     alt={t(siteCopy.home.intro.acharyaTitle)}
-                    className="home-reveal w-full h-[220px] md:h-[320px] object-cover"
+                    className="home-reveal w-full h-[320px] md:h-[480px] object-cover"
                     loading="lazy"
                     decoding="async"
                   />
                 </div>
-                <p className="home-reveal mt-3 text-on-surface-variant leading-5 font-light text-[11px] md:text-sm">{t(siteCopy.home.intro.acharyaTitle)}</p>
               </div>
             </article>
           </div>
