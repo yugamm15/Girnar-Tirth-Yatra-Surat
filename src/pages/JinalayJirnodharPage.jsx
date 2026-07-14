@@ -37,8 +37,8 @@ const createCustomIcon = (delay, idx = 0, isMobile = false) => {
   const animationStyle = `animation: pin-drop 0.9s cubic-bezier(0.21, 0.82, 0.44, 1) forwards; animation-delay: ${delay}ms; --start-x: ${startX}px; --start-y: ${startY}px; will-change: transform, opacity;`;
 
   // Use a simple box-shadow or no filter on mobile to prevent horizontal line glitches
-  const svgStyle = isMobile 
-    ? '' 
+  const svgStyle = isMobile
+    ? ''
     : 'filter: drop-shadow(0px 6px 3px rgba(0,0,0,0.4));';
 
   return L.divIcon({
@@ -147,8 +147,8 @@ const JinalayJirnodharPage = () => {
   const filteredJinalayas = useMemo(() => {
     if (!searchQuery.trim()) return jinalayas;
     const lowerQuery = searchQuery.toLowerCase();
-    return jinalayas.filter(j => 
-      j.name?.toLowerCase().includes(lowerQuery) || 
+    return jinalayas.filter(j =>
+      j.name?.toLowerCase().includes(lowerQuery) ||
       j.village?.toLowerCase().includes(lowerQuery)
     );
   }, [jinalayas, searchQuery]);
@@ -208,16 +208,16 @@ const JinalayJirnodharPage = () => {
     return filteredJinalayas.map((jinalaya) => {
       const coords = parseLocation(jinalaya.location);
       if (!coords) return null;
-      
+
       const originalIdx = jinalayas.findIndex(j => j.id === jinalaya.id);
       if (!pinIconsRef.current[jinalaya.id]) {
         pinIconsRef.current[jinalaya.id] = createCustomIcon(originalIdx * delayPerPin, originalIdx, isMobileViewport);
       }
 
       return (
-        <Marker 
-          key={jinalaya.id} 
-          position={coords} 
+        <Marker
+          key={jinalaya.id}
+          position={coords}
           icon={pinIconsRef.current[jinalaya.id]}
         >
           <Popup className="custom-popup">
@@ -268,15 +268,15 @@ const JinalayJirnodharPage = () => {
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#c5a059_1px,transparent_1px)] [background-size:20px_20px]"></div>
           <div className="relative z-10 w-full h-full flex flex-col items-center">
             <h2 className="text-xl md:text-2xl font-headline text-[#7a5f2d] mb-8 uppercase tracking-widest opacity-80">Jinalay Locations & Tirth Network</h2>
-            
+
             <div className="w-full h-[350px] md:h-[500px] rounded-sm overflow-hidden border border-[#c5a059]/30 shadow-inner bg-[#f9f7f2] relative group">
               <div className="absolute inset-0 flex items-center justify-center bg-[#f9f7f2] animate-pulse group-[.loaded]:hidden">
                 <span className="text-[#c5a059] font-headline text-xs tracking-widest animate-bounce">Loading Sacred Map...</span>
               </div>
-              
-              <MapContainer 
-                center={[21.1702, 72.8311]} 
-                zoom={6} 
+
+              <MapContainer
+                center={[21.1702, 72.8311]}
+                zoom={6}
                 scrollWheelZoom={false}
                 dragging={!isMobileViewport || true}
                 touchZoom={true}
@@ -297,9 +297,9 @@ const JinalayJirnodharPage = () => {
                 {mapMarkers}
               </MapContainer>
             </div>
-            
 
-            
+
+
             <p className="mt-8 text-[10px] md:text-xs text-[#8f6d2f] uppercase tracking-[0.3em] font-bold opacity-60">Interactive Map: Zoom and drag to explore cities & states</p>
           </div>
         </section>
@@ -357,9 +357,8 @@ const JinalayJirnodharPage = () => {
                     <div className="flex items-center justify-between gap-3">
                       <h2 className="text-xl md:text-2xl font-headline text-gray-900 leading-tight">{jinalaya.name}</h2>
                       <span
-                        className={`px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] font-bold rounded-full border shrink-0 ${
-                          statusClassNames[jinalaya.status] ?? statusClassNames.planned
-                        }`}
+                        className={`px-2.5 py-1 text-[10px] uppercase tracking-[0.12em] font-bold rounded-full border shrink-0 ${statusClassNames[jinalaya.status] ?? statusClassNames.planned
+                          }`}
                       >
                         {t(siteCopy.statuses[jinalaya.status] || jinalaya.status)}
                       </span>
@@ -377,7 +376,7 @@ const JinalayJirnodharPage = () => {
                     </p>
 
                     <div className="mt-5">
-                      <Link 
+                      <Link
                         to={`/jinalay-jirnodhar/${jinalaya.id}`}
                         className="px-6 py-3 bg-[#c5a059] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#b08d4a] transition-colors"
                       >
@@ -406,11 +405,10 @@ const JinalayJirnodharPage = () => {
                       key={pageNumber}
                       type="button"
                       onClick={() => goToPage(pageNumber)}
-                      className={`shrink-0 min-w-10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border rounded-sm transition-colors ${
-                        pageNumber === currentPage
-                          ? 'bg-[#c5a059] border-[#c5a059] text-white'
-                          : 'bg-white border-[#ddd2b7] text-gray-700 hover:border-[#c5a059] hover:text-[#8f6d2f]'
-                      }`}
+                      className={`shrink-0 min-w-10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border rounded-sm transition-colors ${pageNumber === currentPage
+                        ? 'bg-[#c5a059] border-[#c5a059] text-white'
+                        : 'bg-white border-[#ddd2b7] text-gray-700 hover:border-[#c5a059] hover:text-[#8f6d2f]'
+                        }`}
                       aria-current={pageNumber === currentPage ? 'page' : undefined}
                     >
                       {pageNumber}
