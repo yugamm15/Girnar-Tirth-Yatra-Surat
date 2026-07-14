@@ -333,8 +333,38 @@ export const siteCopy = {
         image: '/images/about-girnar/neminath.jpg'
       },
       {
+        id: 'aadinath-bhagvan-tonk',
+        title: tr('10. Shri Aadinath Bhagvan', '૧૦. શ્રી આદિનાથ ભગવાન', '10. श्री आदिनाथ भगवान'),
+        description: tr(
+          "Lord Aadinath (Rishabhadev) Bhagvan, the first Tirthankara, is worshipped at this sacred tonk. Beholding the majestic and peaceful idol of the Lord fills the heart with pure devotion. Devotees visit this shrine to seek spiritual guidance and blessings for their inner journey.",
+          "પ્રથમ તીર્થંકર ભગવાન આદિનાથ (ઋષભદેવ) આ પવિત્ર ટૂંકમાં પૂજાય છે. પ્રભુની મનોહર અને શાંત પ્રતિમાના દર્શન હૃદયને પવિત્ર ભક્તિભાવથી ભરી દે છે. ભક્તો પોતાના આત્મિક કલ્યાણ અને આશીર્વાદ મેળવવા માટે આ જિનાલયના દર્શને આવે છે.",
+          "प्रथम तीर्थंकर भगवान आदिनाथ (ऋषभदेव) इस पवित्र टोंक में पूजे जाते हैं। प्रभु की मनोहर और शांत प्रतिमा के दर्शन हृदय को परम भक्तिभाव से भर देते हैं। भक्तगण अपने आध्यात्मिक कल्याण और आशीर्वाद प्राप्त करने के लिए इस जिनालय के दर्शन करते हैं।"
+        ),
+        image: '/images/about-girnar/10.aadinath bhagvan.JPG'
+      },
+      {
+        id: 'amijara-parshwanath',
+        title: tr('11. Shri Amijara Parshwanath', '૧૧. શ્રી અમીઝરા પાર્શ્વનાથ', '11. श्री अमीझरा पार्श्वनाथ'),
+        description: tr(
+          "Shri Amijara Parshwanath Bhagwan is revered for the miraculous oozing of divine nectar (Ami) from the sacred idol. Located in a peaceful underground shrine, worshipping this ancient form of Lord Parshwanath brings immense spiritual peace and removes worldly obstacles.",
+          "શ્રી અમીઝરા પાર્શ્વનાથ ભગવાન પ્રભુની પ્રતિમામાંથી વહેતા દિવ્ય અમૃત (અમી) ના પ્રવાહ માટે અતિ પ્રસિદ્ધ છે. ભૂગર્ભ જિનાલયમાં બિરાજમાન પ્રભુના આ અતિ પ્રાચીન સ્વરૂપની પૂજા-અર્ચના કરવાથી પરમ શાંતિ મળે છે અને ભવ્ય જીવોના વિઘ્નો દૂર થાય છે.",
+          "श्री अमीझरा पार्श्वनाथ भगवान प्रभु की प्रतिमा से बहने वाले दिव्य अमृत (अमी) के प्रवाह के लिए अति प्रसिद्ध हैं। भूमिगृह (तहखाने) में विराजमान प्रभु के इस अति प्राचीन स्वरूप की पूजा-अर्थना करने से परम शांति मिलती है और सांसारिक बाधाएं दूर होती हैं।"
+        ),
+        image: '/images/about-girnar/11.amijara parshwanath.JPG'
+      },
+      {
+        id: 'gajpath-kund',
+        title: tr('12. Gajpath Kund', '૧૨. ગજપથ કુંડ', '12. गजपद कुंड'),
+        description: tr(
+          "Gajpath Kund (Gajpad Kund), also known as the Elephant Footprint Pond, holds great significance. According to beliefs, it was created when Lord Indra’s divine elephant Airavat struck its foot on the ground. Its holy, sweet water is believed to contain the essence of thousands of sacred rivers, purifying the body and soul of pilgrims.",
+          "ગજપથ કુંડ (ગજપદ કુંડ) અથવા હાથીપગલાં કુંડ ખૂબ પવિત્ર અને ચમત્કારી માનવામાં આવે છે. માન્યતા અનુસાર, જ્યારે ઇન્દ્ર મહારાજ ઐરાવત હાથી પર સવાર થઈને આવ્યા ત્યારે હાથીના ચરણ સ્પર્શથી આ કુંડ બન્યો હતો. આ કુંડના દિવ્ય અને મધુર જળમાં હજારો નદીઓનું પુણ્ય સમાયેલું છે, જે યાત્રાળુઓના તન અને મનને પવિત્ર કરે છે.",
+          "गजपथ कुंड (गजपद कुंड) जिसे हाथीपगला कुंड भी कहा जाता है, अत्यंत पवित्र माना जाता है। मान्यता के अनुसार, जब इंद्र महाराज ऐरावत हाथी पर सवार होकर आए थे, तब हाथी के चरण स्पर्श से इस कुंड का निर्माण हुआ था। इस कुंड के मधुर जल में हजारों पवित्र नदियों का पुण्य समाहित माना जाता है, जो यात्रियों के तन और मन को पवित्र करता है।"
+        ),
+        image: '/images/about-girnar/12.Gajpath Kund.jpeg'
+      },
+      {
         id: 'sahesavan',
-        title: tr('10. Sahesavan', '૧૦. સહેસાવન', '10. सहेसावन'),
+        title: tr('13. Sahesavan', '૧૩. સહેસાવન', '13. સહેસાવન'),
         description: tr(
           'Sahesavan, the heart of Girnar, is not just a place, but the sacred land of the spiritual elevation of Lord Neminath. This is the very place where two precious and divine Kalyanaks of Lord Neminath\'s life were completed. 1. Diksha Kalyanak: On this land of Sahesavan, Lord Neminath renounced all worldly attachments and material pleasures and embraced Diksha (initiation). In the holy place where the Lord renounced the world and adopted the path of "Aparigraha" (non-possessiveness), waves of detachment are still felt today. Standing here, let us pray, "O Lord! Give me also some vision and strength to walk on this path of Your detachment." 2. Kevalgyan Kalyanak (Attainment of Omniscience): In this very Sahesavan, Lord Neminath destroyed his Ghati karmas and attained infinite knowledge—Kevalgyan. The infinite power to know and see the entire universe was attained by the Lord here. Stepping onto this place, one feels as if the darkness of our ignorance is being removed and the light of knowledge is dawning.',
           'ગિરનારના હૃદય સમાન સહસાવન એ માત્ર એક સ્થાન નથી, પરંતુ તે પ્રભુ નેમિનાથના આત્મિક ઉત્કર્ષની પાવન ભૂમિ છે. આ જ એ સ્થાન છે જ્યાં પ્રભુ નેમિનાથના જીવનના બે અમૂલ્ય અને દિવ્ય કલ્યાણકો સંપન્ન થયા હતા. ૧.દીક્ષા કલ્યાણક : સહસાવનની આ ભૂમિ પર પ્રભુ નેમિનાથે સંસારના તમામ રાગ-દ્વેષ અને ભૌતિક સુખ-વૈભવનો ત્યાગ કરી દીક્ષા અંગીકાર કરી હતી. જે પવિત્ર સ્થાને પ્રભુએ સંસારનો ત્યાગ કરી "અપરિગ્રહ" નો માર્ગ અપનાવ્યો, ત્યાં આજે પણ વૈરાગ્યની લહેરો અનુભવાય છે. અહીં ઊભા રહીને આપણે પ્રાર્થના કરીએ કે, "હે પ્રભુ! આપના આ વૈરાગ્યના પંથે ચાલવાની મને પણ થોડી દ્રષ્ટિ અને શક્તિ આપજો." ૨.કેવળજ્ઞાન કલ્યાણક (સર્વજ્ઞતાની પ્રાપ્તિ): આ જ સહસાવનમાં પ્રભુ નેમિનાથે ઘાતી કર્મોનો ક્ષય કરી અનંત જ્ઞાન—કેવળજ્ઞાન પ્રાપ્ત કર્યું હતું. લોકાલોકને જાણવાની અને જોવાની અસીમ શક્તિ પ્રભુને અહીં પ્રાપ્ત થઈ હતી. આ સ્થાન પર પગ મૂકતા જ એવી અનુભૂતિ થાય છે કે જાણે આપણા અજ્ઞાનનો અંધકાર દૂર થઈ રહ્યો હોય અને જ્ઞાનનું તેજ પ્રગટી રહ્યું હોય.',
