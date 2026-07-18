@@ -1,6 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient.js';
+import { authDB } from '../lib/database.js';
 import { upashraysDB, membersDB, jinalayasDB, checkingReportsDB, adminProfilesDB, yatrikRegistrationsDB, yatraDatesDB, upashrayMediaDB, paymentIntentsDB, uploadWebPImage } from '../lib/database.js';
 import { dbCache } from '../lib/database.js';
 import LoginForm from './auth/LoginForm';
@@ -13,10 +13,7 @@ import ToastViewport from './ToastViewport.jsx';
 import { generateMemberCode } from '../utils/memberUtils.js';
 import { formatDateForDisplay } from '../utils/dateUtils.js';
 import { getPersistableImageUrl, getSafeImageUrl } from '../utils/imageUtils.js';
-const ADMIN_CREDENTIALS = {
-  email: 'GirnarTirthYatraGroup@gmail.com',
-  password: 'Girnar@22'
-};
+// Admin credentials are now validated via the MySQL backend API (localhost:3001/api/auth/login)
 
 const PORTAL_CACHE_KEY = 'girnar_portal_state_v1';
 
@@ -548,62 +545,36 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     }
 
     const checkSession = async () => {
-      // 1. Supabase Session Check (Background verification)
       try {
-        if (!supabase?.auth) {
-          if (isMounted && isInitializing) {
-            setView('login');
-            setIsInitializing(false);
-          }
-          return;
-        }
-
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError || !session?.user) {
-          // If no supabase session and no local override, force login
-          const override = localStorage.getItem('auth_override');
-          if (!override && isMounted) {
-            setView('login');
-          }
-          if (isMounted) setIsInitializing(false);
-          return;
-        }
-
-        const email = session.user.email?.toLowerCase() || '';
-        const isDefaultAdminEmail = email === ADMIN_CREDENTIALS.email.toLowerCase();
+        const token = localStorage.getItem('girnar_admin_token');
+        const override = localStorage.getItem('auth_override');
 
         if (initialView === 'admin') {
-          if (isDefaultAdminEmail) {
-            if (isMounted) {
-              setView('admin');
-              setIsInitializing(false);
-              loadAllData();
-            }
-          } else {
-            const adminProfile = await adminProfilesDB.getByUserId(session.user.id).catch(() => null);
-            if (adminProfile && ['admin', 'editor'].includes(adminProfile.role) && isMounted) {
-              setView('admin');
-              setIsInitializing(false);
-              loadAllData();
-            } else if (isMounted) {
-              setView('login');
-              setIsInitializing(false);
-            }
-          }
-        } else if (initialView === 'member') {
-          const memberRecord = await membersDB.getByEmail(email).catch(() => null);
-          if (memberRecord?.has_access && isMounted) {
-            setCurrentMemberId(memberRecord.id);
-            setView('member');
+          if (override === 'admin' && isMounted) {
+            setView('admin');
             setIsInitializing(false);
             loadAllData();
-          } else if (isMounted) {
-            setView('login');
-            setIsInitializing(false);
+            if (token) {
+              authDB.verify().catch(() => {});
+            }
+            return;
           }
+          if (isMounted) { setView('login'); setIsInitializing(false); }
+
+        } else if (initialView === 'member') {
+          if (override === 'member') {
+            const memberId = localStorage.getItem('auth_member_id');
+            if (memberId && isMounted) {
+              setCurrentMemberId(memberId);
+              setView('member');
+              setIsInitializing(false);
+              loadAllData();
+              return;
+            }
+          }
+          if (isMounted) { setView('login'); setIsInitializing(false); }
         }
-      } catch (err) { 
+      } catch (err) {
         console.error('Session verification error:', err);
         if (isMounted && isInitializing) {
           setView('login');
@@ -616,53 +587,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     return () => { isMounted = false; };
   }, [initialView]);
 
-  const trySupabaseAuthLogin = async (normalizedEmail) => {
-    try {
-      if (!supabase || !supabase.auth) return false;
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: normalizedEmail, password
-      });
-
-      if (error || !data?.user) return false;
-
-      const [adminProfile, memberRecord] = await Promise.all([
-        adminProfilesDB.getByUserId(data.user.id).catch(() => null),
-        membersDB.getByEmail(normalizedEmail).catch(() => null)
-      ]);
-
-      const isDefaultAdminEmail = normalizedEmail === ADMIN_CREDENTIALS.email.toLowerCase();
-
-      if (initialView === 'admin' || isDefaultAdminEmail) {
-        const canAccessAdmin = adminProfile && adminProfile.is_active !== false && ['admin', 'editor'].includes(adminProfile.role);
-
-        if (canAccessAdmin || isDefaultAdminEmail) {
-          setView('admin');
-          setError('');
-          navigate('/admin/upashrays');
-          await loadAllData();
-          return true;
-        }
-
-        await supabase.auth.signOut().catch(() => { });
-        setError('You do not have admin access for this account');
-        return true;
-      } else if (initialView === 'member') {
-        if (memberRecord && memberRecord.has_access) {
-          setCurrentMemberId(memberRecord.id);
-          setView('member');
-          setError('');
-          navigate('/member/upashray-reports');
-          await loadAllData();
-          return true;
-        }
-        await supabase.auth.signOut().catch(() => { });
-        setError('You do not have member access for this account');
-        return true;
-      }
-      return false;
-    } catch (e) { console.error(e); return false; }
-  };
+  // MySQL JWT authentication via authDB
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
@@ -670,20 +595,21 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     setProcessingMessage('Authenticating...');
     const normalizedEmail = email.trim().toLowerCase();
 
-    try {
-      const loggedInWithSupabase = await trySupabaseAuthLogin(normalizedEmail);
-      if (loggedInWithSupabase) return;
-    } catch (authError) { }
-
     if (initialView === 'admin') {
-      if (normalizedEmail === ADMIN_CREDENTIALS.email.toLowerCase() && password === ADMIN_CREDENTIALS.password) {
+      try {
+        // Authenticate via MySQL backend
+        await authDB.login(normalizedEmail, password);
         localStorage.setItem('auth_override', 'admin');
         setView('admin');
         setError('');
         navigate('/admin/upashrays');
+        setProcessingMessage('Loading Admin Portal...');
         await loadAllData();
-      } else { setError('Admin credentials are wrong'); }
-      setIsProcessing(false);
+      } catch (err) {
+        setError('Admin credentials are wrong');
+      } finally {
+        setIsProcessing(false);
+      }
       return;
     }
 
@@ -696,7 +622,6 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
             localStorage.setItem('auth_override', 'member');
             localStorage.setItem('auth_member_id', memberRecord.id);
             
-            // Load data BEFORE switching view to ensure a smooth transition
             setProcessingMessage('Loading your dashboard...');
             await loadAllData();
             
@@ -716,16 +641,6 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       return;
     }
 
-    if (normalizedEmail === ADMIN_CREDENTIALS.email.toLowerCase() && password === ADMIN_CREDENTIALS.password) {
-      localStorage.setItem('auth_override', 'admin');
-      
-      setProcessingMessage('Loading Admin Portal...');
-      await loadAllData();
-      
-      setView('admin');
-      setError('');
-      navigate('/admin/upashrays');
-    } else { setError('Credentials are wrong'); }
     setIsProcessing(false);
   };
 
@@ -735,9 +650,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     localStorage.removeItem('auth_override');
     localStorage.removeItem('auth_member_id');
     localStorage.removeItem(PORTAL_CACHE_KEY);
-    try {
-      if (supabase && supabase.auth) await supabase.auth.signOut();
-    } catch (e) { }
+    authDB.clearSession();
     setView('login');
     navigate(initialView === 'admin' ? '/admin' : '/member');
     setIsProcessing(false);

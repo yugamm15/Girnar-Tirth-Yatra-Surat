@@ -415,11 +415,11 @@ export const siteCopy = {
       'આ હીરો વિભાગ ભવિષ્યમાં રૂટ એનિમેશન અથવા સિનેમેટિક યાત્રા વિડિઓ માટે ખાસ અનામત રાખવામાં આવ્યો છે.',
       'यह हीरो ब्लॉक भविष्य में रूट एनीमेशन या सिनेमैटिक यात्रा वीडियो हेतु जानबूझकर आरक्षित रखा गया है।',
     ),
-    supabasePhaseTitle: tr('Admin Phase (Later - Supabase)', 'એડમિન ચરણ (પછી - Supabase)', 'एडमिन चरण (बाद में - Supabase)'),
-    supabasePhaseBullets: [
+    adminPhaseTitle: tr('Admin Phase (MySQL Backend)', 'એડમિન ચરણ (MySQL Backend)', 'एडमिन चरण (MySQL Backend)'),
+    adminPhaseBullets: [
       tr('upashrays table for core and i18n text fields', 'મૂલભૂત અને i18n લખાણ માટે upashrays ટેબલ', 'कोर और i18n टेक्स्ट फ़ील्ड हेतु upashrays टेबल'),
       tr('upashray_media table for before / process / after assets', 'before / process / after એસેટ્સ માટે upashray_media ટેબલ', 'before / process / after मीडिया हेतु upashray_media टेबल'),
-      tr('Storage bucket for uploads and responsive media variants', 'અપલોડ અને રિસ્પોન્સિવ મીડિયા માટે સ્ટોરેજ બકેટ', 'अपलोड और रेस्पॉन्सिव मीडिया वेरिएंट हेतु स्टोरेज बकेट'),
+      tr('Local uploads folder for before / process / after images', 'અપલોડ અને મીડિયા માટે સ્થાનિક ફોલ્ડર', 'अपलोड और मीडिया वेरिएंट हेतु स्थानीय फ़ोल्डर'),
       tr('Admin-only authentication and edit permissions', 'એડમિન માટે મર્યાદિત લોગિન અને સંપાદન અધિકાર', 'केवल एडमिन हेतु प्रमाणन और संपादन अनुमति'),
     ],
   },
@@ -954,12 +954,12 @@ Rahnemi was the small brother of twenty second Tirthankara Shri Neminath Bhagwan
   },
 };
 
-export const supabaseRoadmap = {
-  title: tr('Future Supabase Admin Plan', 'ભવિષ્ય Supabase એડમિન યોજના', 'भविष्य Supabase एडमिन योजना'),
+export const adminRoadmap = {
+  title: tr('MySQL Admin Plan', 'MySQL એડમિન યોજના', 'MySQL एडमिन योजना'),
   body: tr(
-    'Public pages currently read from local structured content. In the next phase this will switch to Supabase tables and storage without a UI rewrite.',
-    'હાલ જાહેર પેજો સ્થાનિક માળખાકીય કન્ટેન્ટ પરથી ચલાવે છે. આગામી ચરણમાં UI બદલ્યા વિના Supabase ટેબલ અને સ્ટોરેજ પર પરિવર્તન થશે.',
-    'वर्तमान में सार्वजनिक पेज स्थानीय संरचित कंटेंट से चलते हैं। अगले चरण में UI बदले बिना इसे Supabase टेबल और स्टोरेज पर स्विच किया जाएगा।',
+    'Public pages currently read from local structured content. In the next phase this will switch to MySQL tables and local storage without a UI rewrite.',
+    'હાલ જાહેર પેજો સ્થાનિક માળખાકીય કન્ટેન્ટ પરથી ચલાવે છે. આગામી ચરણમાં UI બદલ્યા વિના MySQL ટેબલ અને સ્થાનિક સ્ટોરેજ પર પરિવર્તન થશે.',
+    'वर्तमान में सार्वजनिक पेज स्थानीय संरचित कंटेंट से चलते हैं। अगले चरण में UI बदले बिना इसे MySQL टेबल और स्थानीय स्टोरेज पर स्विच किया जाएगा।',
   ),
 };
 

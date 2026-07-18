@@ -1,9 +1,68 @@
-import { supabase } from './supabaseClient';
+// ============================================================
+// database.js — Frontend API client for MySQL backend
+// All data operations use fetch() to Node.js backend (localhost:3001)
+// ============================================================
+
+
 import { formatDateToISO } from '../utils/dateUtils.js';
 import { convertImageFileToWebP, sanitizeImageFileName } from '../utils/imageUtils.js';
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001/api';
 const DATABASE_CACHE_PREFIX = 'girnar_db_cache_v1';
 
+// ─── In-memory token cache (primary) + localStorage (persistence) ───
+// Using a module-level variable ensures the token is ALWAYS available
+// in the same session, even if localStorage has timing issues.
+let _tokenCache = null;
+
+// Initialize from localStorage on module load
+try {
+  _tokenCache = localStorage.getItem('girnar_admin_token') || null;
+} catch (_) {}
+
+const getToken = () => {
+  // Always prefer in-memory cache; fall back to localStorage
+  if (_tokenCache) return _tokenCache;
+  try {
+    _tokenCache = localStorage.getItem('girnar_admin_token') || null;
+    return _tokenCache;
+  } catch (_) {
+    return null;
+  }
+};
+
+// ─── Helper: Build headers (with optional auth) ───
+const buildHeaders = (auth = false, json = true) => {
+  const headers = {};
+  if (json) headers['Content-Type'] = 'application/json';
+  if (auth) {
+    const token = getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else {
+      console.warn('[database.js] buildHeaders: auth=true but NO token available!');
+    }
+  }
+  return headers;
+};
+
+// ─── Helper: Perform fetch and throw on HTTP errors ───
+const apiFetch = async (path, options = {}) => {
+  const res = await fetch(`${API_BASE}${path}`, options);
+  if (!res.ok) {
+    let errMsg = `HTTP ${res.status}`;
+    try {
+      const body = await res.json();
+      errMsg = body.error || errMsg;
+    } catch (_) { /* ignore parse errors */ }
+    throw new Error(errMsg);
+  }
+  // 204 No Content
+  if (res.status === 204) return null;
+  return res.json();
+};
+
+// ─── Cache helpers ───
 const readCache = (key) => {
   try {
     const raw = localStorage.getItem(`${DATABASE_CACHE_PREFIX}:${key}`);
@@ -29,11 +88,9 @@ const writeCache = (key, data) => {
 const normalizeTripDate = (value) => {
   if (!value) return null;
   if (value instanceof Date) return formatDateToISO(value);
-
   const raw = String(value).trim();
   if (!raw) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-
   const parsed = new Date(raw.replace(/(\d+)(st|nd|rd|th)/gi, '$1'));
   return Number.isNaN(parsed.getTime()) ? null : formatDateToISO(parsed);
 };
@@ -50,112 +107,143 @@ export const dbCache = {
   },
 };
 
+// ─── Auth helpers (stored in both memory and localStorage) ───
+export const authDB = {
+  saveSession({ token, user }) {
+    // Save to in-memory cache first (immediate, synchronous)
+    _tokenCache = token;
+    // Also persist to localStorage for page-reload survival
+    try {
+      localStorage.setItem('girnar_admin_token', token);
+      localStorage.setItem('girnar_admin_user', JSON.stringify(user));
+    } catch (_) {}
+  },
+  clearSession() {
+    _tokenCache = null;
+    try {
+      localStorage.removeItem('girnar_admin_token');
+      localStorage.removeItem('girnar_admin_user');
+    } catch (_) {}
+  },
+  getUser() {
+    try {
+      return JSON.parse(localStorage.getItem('girnar_admin_user') || 'null');
+    } catch { return null; }
+  },
+  isLoggedIn() {
+    return !!getToken();
+  },
+  async login(email, password) {
+    const data = await apiFetch('/auth/login', {
+      method: 'POST',
+      headers: buildHeaders(false, true),
+      body: JSON.stringify({ email, password }),
+    });
+    // Save session immediately so all subsequent calls have the token
+    this.saveSession(data);
+    console.log('[authDB] Login successful, token cached in memory + localStorage');
+    return data;
+  },
+  async logout() {
+    await apiFetch('/auth/logout', {
+      method: 'POST',
+      headers: buildHeaders(true, true),
+    }).catch(() => {});
+    this.clearSession();
+  },
+  async verify() {
+    return apiFetch('/auth/verify', {
+      headers: buildHeaders(true, false),
+    });
+  },
+};
+
+// ─── Image upload via backend ───
 export const uploadWebPImage = async ({ bucketName, folderName, recordId, file, mediaType, quality = 0.82 }) => {
-  if (!file) {
-    throw new Error('Image file is required.');
+  if (!file) throw new Error('Image file is required.');
+
+  console.log('[uploadWebPImage] start', { bucketName, folderName, recordId, mediaType, fileName: file.name });
+  const webpBlob = await convertImageFileToWebP(file, { quality });
+  console.log('[uploadWebPImage] converted to webp', { size: webpBlob.size, type: webpBlob.type });
+
+  const safeFileName = sanitizeImageFileName(file.name || 'image');
+  const formData = new FormData();
+  formData.append('file', webpBlob, `${mediaType}-${Date.now()}-${safeFileName}.webp`);
+  formData.append('upashray_id', recordId);
+  formData.append('media_type', mediaType);
+  formData.append('alt_text', `${mediaType} image`);
+  formData.append('sort_order', '0');
+
+  const token = getToken();
+  const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+  const res = await fetch(`${API_BASE}/upashray-media`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Upload failed: HTTP ${res.status}`);
   }
 
-  try {
-    console.log('[uploadWebPImage] start', { bucketName, folderName, recordId, mediaType, fileName: file.name });
-    const webpBlob = await convertImageFileToWebP(file, { quality });
-    console.log('[uploadWebPImage] converted to webp', { size: webpBlob.size, type: webpBlob.type });
-
-    const safeFileName = sanitizeImageFileName(file.name || 'image');
-    const storagePath = `${folderName}/${recordId}/${mediaType}-${Date.now()}-${safeFileName}.webp`;
-
-    const result = await supabase.storage
-      .from(bucketName)
-      .upload(storagePath, webpBlob, {
-        contentType: 'image/webp',
-        upsert: false,
-      });
-
-    // Log full result for debugging (will include error if any)
-    console.log('[uploadWebPImage] upload result', result);
-
-    if (result?.error) {
-      console.error('[uploadWebPImage] upload error', result.error);
-      throw result.error;
-    }
-
-    const { data } = supabase.storage.from(bucketName).getPublicUrl(storagePath);
-    const publicUrl = data?.publicUrl || '';
-    console.log('[uploadWebPImage] publicUrl', publicUrl);
-    return publicUrl;
-  } catch (err) {
-    // Surface helpful debugging information
-    console.error('[uploadWebPImage] unexpected error', err);
-    throw err;
-  }
+  const record = await res.json();
+  // Return the full URL so existing code that uses the publicUrl string still works
+  const fileUrl = record.file_url.startsWith('http')
+    ? record.file_url
+    : `http://localhost:3001${record.file_url}`;
+  console.log('[uploadWebPImage] publicUrl', fileUrl);
+  return fileUrl;
 };
 
 // ============== UPASHRAYS ==============
 
 export const upashraysDB = {
   async getAll(columns = '*') {
-    const { data, error } = await supabase
-      .from('upashrays')
-      .select(columns)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/upashrays', { headers: buildHeaders(false, false) });
   },
 
   async getById(id, columns = '*') {
-    const { data, error } = await supabase
-      .from('upashrays')
-      .select(columns)
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    return data;
+    return apiFetch(`/upashrays/${id}`, { headers: buildHeaders(false, false) });
   },
 
   async getBySlug(slug, columns = '*') {
-    const { data, error } = await supabase
-      .from('upashrays')
-      .select(columns)
-      .eq('slug', slug)
-      .single();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
+    try {
+      return await apiFetch(`/upashrays/slug/${slug}`, { headers: buildHeaders(false, false) });
+    } catch (err) {
+      if (err.message.includes('404')) return null;
+      throw err;
+    }
   },
 
   async create(upashray) {
-    const { data, error } = await supabase
-      .from('upashrays')
-      .insert([{ ...upashray, created_at: new Date().toISOString() }])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch('/upashrays', {
+      method: 'POST',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(upashray),
+    });
   },
 
   async update(id, upashray) {
-    const { data, error } = await supabase
-      .from('upashrays')
-      .update({ ...upashray, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch(`/upashrays/${id}`, {
+      method: 'PUT',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(upashray),
+    });
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('upashrays')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/upashrays/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   },
 
   async search(query) {
-    const { data, error } = await supabase
-      .from('upashrays')
-      .select('*')
-      .or(`name.ilike.%${query}%,village.ilike.%${query}%`)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch(`/upashrays?search=${encodeURIComponent(query)}`, {
+      headers: buildHeaders(false, false),
+    });
   }
 };
 
@@ -163,69 +251,45 @@ export const upashraysDB = {
 
 export const membersDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('members')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/members', { headers: buildHeaders(true, false) });
   },
 
   async getById(id) {
-    const { data, error } = await supabase
-      .from('members')
-      .select('*')
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    return data;
+    return apiFetch(`/members/${id}`, { headers: buildHeaders(true, false) });
   },
 
   async getByEmail(email) {
-    const { data, error } = await supabase
-      .from('members')
-      .select('*')
-      .ilike('email', email)
-      .maybeSingle();
-    if (error) throw error;
-    return data;
+    const all = await this.getAll();
+    return (all || []).find(m => m.email?.toLowerCase() === email?.toLowerCase()) || null;
   },
 
   async create(member) {
-    const { data, error } = await supabase
-      .from('members')
-      .insert([{ ...member, created_at: new Date().toISOString() }])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch('/members', {
+      method: 'POST',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(member),
+    });
   },
 
   async update(id, member) {
-    const { data, error } = await supabase
-      .from('members')
-      .update({ ...member, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch(`/members/${id}`, {
+      method: 'PUT',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(member),
+    });
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('members')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/members/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   },
 
   async search(query) {
-    const { data, error } = await supabase
-      .from('members')
-      .select('*')
-      .or(`name.ilike.%${query}%,email.ilike.%${query}%`)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch(`/members?search=${encodeURIComponent(query)}`, {
+      headers: buildHeaders(true, false),
+    });
   }
 };
 
@@ -233,59 +297,40 @@ export const membersDB = {
 
 export const jinalayasDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('jinalayas')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/jinalayas', { headers: buildHeaders(false, false) });
   },
 
   async getById(id) {
-    const { data, error } = await supabase
-      .from('jinalayas')
-      .select('*')
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    return data;
+    return apiFetch(`/jinalayas/${id}`, { headers: buildHeaders(false, false) });
   },
 
   async create(jinalaya) {
-    const { data, error } = await supabase
-      .from('jinalayas')
-      .insert([{ ...jinalaya, created_at: new Date().toISOString() }])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch('/jinalayas', {
+      method: 'POST',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(jinalaya),
+    });
   },
 
   async update(id, jinalaya) {
-    const { data, error } = await supabase
-      .from('jinalayas')
-      .update({ ...jinalaya, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch(`/jinalayas/${id}`, {
+      method: 'PUT',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(jinalaya),
+    });
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('jinalayas')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/jinalayas/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   },
 
   async search(query) {
-    const { data, error } = await supabase
-      .from('jinalayas')
-      .select('*')
-      .or(`name.ilike.%${query}%,village.ilike.%${query}%`)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch(`/jinalayas?search=${encodeURIComponent(query)}`, {
+      headers: buildHeaders(false, false),
+    });
   }
 };
 
@@ -293,39 +338,29 @@ export const jinalayasDB = {
 
 export const yatraDatesDB = {
   async getAll(columns = '*') {
-    const { data, error } = await supabase
-      .from('yatra_dates')
-      .select(columns)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/yatra-dates', { headers: buildHeaders(false, false) });
   },
 
   async getById(id, columns = '*') {
-    const { data, error } = await supabase
-      .from('yatra_dates')
-      .select(columns)
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    return data;
+    return apiFetch(`/yatra-dates/${id}`, { headers: buildHeaders(false, false) });
   },
 
   async create(yatraDate) {
-    const { data, error } = await supabase
-      .from('yatra_dates')
-      .insert([{ 
-        trip_date: normalizeTripDate(yatraDate.trip_date || yatraDate.date_text),
-        description: yatraDate.description,
-        image: yatraDate.image,
-        registration_open: yatraDate.registration_open,
-        price_per_person: yatraDate.price_per_person || 900,
-        max_capacity: yatraDate.max_capacity === '' || yatraDate.max_capacity === undefined ? null : Number(yatraDate.max_capacity),
-        created_at: new Date().toISOString() 
-      }])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    const payload = {
+      trip_date: normalizeTripDate(yatraDate.trip_date || yatraDate.date_text),
+      description: yatraDate.description,
+      image: yatraDate.image,
+      registration_open: yatraDate.registration_open,
+      price_per_person: yatraDate.price_per_person || 900,
+      max_capacity: yatraDate.max_capacity === '' || yatraDate.max_capacity === undefined
+        ? null
+        : Number(yatraDate.max_capacity),
+    };
+    return apiFetch('/yatra-dates', {
+      method: 'POST',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(payload),
+    });
   },
 
   async update(id, updates) {
@@ -335,26 +370,23 @@ export const yatraDatesDB = {
     }
     delete normalizedUpdates.date_text;
     if (normalizedUpdates.max_capacity !== undefined) {
-      normalizedUpdates.max_capacity = normalizedUpdates.max_capacity === '' || normalizedUpdates.max_capacity === null
-        ? null
-        : Number(normalizedUpdates.max_capacity);
+      normalizedUpdates.max_capacity =
+        normalizedUpdates.max_capacity === '' || normalizedUpdates.max_capacity === null
+          ? null
+          : Number(normalizedUpdates.max_capacity);
     }
-
-    const { data, error } = await supabase
-      .from('yatra_dates')
-      .update({ ...normalizedUpdates, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch(`/yatra-dates/${id}`, {
+      method: 'PUT',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(normalizedUpdates),
+    });
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('yatra_dates')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/yatra-dates/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   }
 };
 
@@ -362,23 +394,11 @@ export const yatraDatesDB = {
 
 export const sponsorshipSchemesDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('sponsorship_schemes')
-      .select('*')
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/sponsorship-schemes', { headers: buildHeaders(false, false) });
   },
 
   async getById(id) {
-    const { data, error } = await supabase
-      .from('sponsorship_schemes')
-      .select('*')
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    return data;
+    return apiFetch(`/sponsorship-schemes/${id}`, { headers: buildHeaders(false, false) });
   },
 
   async create(scheme) {
@@ -388,15 +408,12 @@ export const sponsorshipSchemesDB = {
       amount: Number(scheme.amount || 0),
       sort_order: Number(scheme.sort_order || 0),
       is_active: scheme.is_active === undefined ? true : Boolean(scheme.is_active),
-      created_at: new Date().toISOString(),
     };
-
-    const { data, error } = await supabase
-      .from('sponsorship_schemes')
-      .insert([payload])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch('/sponsorship-schemes', {
+      method: 'POST',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(payload),
+    });
   },
 
   async update(id, scheme) {
@@ -406,24 +423,19 @@ export const sponsorshipSchemesDB = {
       amount: Number(scheme.amount || 0),
       sort_order: Number(scheme.sort_order || 0),
       is_active: scheme.is_active === undefined ? true : Boolean(scheme.is_active),
-      updated_at: new Date().toISOString(),
     };
-
-    const { data, error } = await supabase
-      .from('sponsorship_schemes')
-      .update(payload)
-      .eq('id', id);
-
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch(`/sponsorship-schemes/${id}`, {
+      method: 'PUT',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(payload),
+    });
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('sponsorship_schemes')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/sponsorship-schemes/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   }
 };
 
@@ -431,19 +443,16 @@ export const sponsorshipSchemesDB = {
 
 export const paymentIntentsDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('payment_intents')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/payment-intents', { headers: buildHeaders(true, false) });
   },
 
   async create(intent) {
     const payload = {
       module_key: intent.module_key,
       reference_type: intent.reference_type || null,
-      reference_id: intent.reference_id === undefined || intent.reference_id === null ? null : String(intent.reference_id),
+      reference_id: intent.reference_id === undefined || intent.reference_id === null
+        ? null
+        : String(intent.reference_id),
       payer_name: intent.payer_name || '',
       phone: intent.phone || '',
       email: intent.email || '',
@@ -452,36 +461,29 @@ export const paymentIntentsDB = {
       currency: intent.currency || 'INR',
       status: intent.status || 'pending',
       gateway_order_id: intent.gateway_order_id || null,
-      gateway_payment_id: intent.gateway_payment_id || null,
       items: intent.items || [],
       metadata: intent.metadata || {},
-      created_at: new Date().toISOString(),
     };
-
-    const { data, error } = await supabase
-      .from('payment_intents')
-      .insert([payload])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch('/payment-intents', {
+      method: 'POST',
+      headers: buildHeaders(false, true),
+      body: JSON.stringify(payload),
+    });
   },
 
   async update(id, updates) {
-    const { data, error } = await supabase
-      .from('payment_intents')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch(`/payment-intents/${id}`, {
+      method: 'PUT',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(updates),
+    });
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('payment_intents')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/payment-intents/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   }
 };
 
@@ -489,45 +491,27 @@ export const paymentIntentsDB = {
 
 export const upashrayMediaDB = {
   async getAll(columns = '*') {
-    const { data, error } = await supabase
-      .from('upashray_media')
-      .select(columns)
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/upashray-media', { headers: buildHeaders(false, false) });
   },
 
   async getByUpashrayId(upashrayId, columns = '*') {
-    const { data, error } = await supabase
-      .from('upashray_media')
-      .select(columns)
-      .eq('upashray_id', upashrayId)
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch(`/upashray-media/upashray/${upashrayId}`, {
+      headers: buildHeaders(false, false),
+    });
   },
 
   async getByUpashrayIdAndType(upashrayId, mediaType, columns = '*') {
-    const { data, error } = await supabase
-      .from('upashray_media')
-      .select(columns)
-      .eq('upashray_id', upashrayId)
-      .eq('media_type', mediaType)
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch(`/upashray-media/upashray/${upashrayId}?type=${encodeURIComponent(mediaType)}`, {
+      headers: buildHeaders(false, false),
+    });
   },
 
   async create(mediaItem) {
-    const { data, error } = await supabase
-      .from('upashray_media')
-      .insert([{ ...mediaItem, created_at: new Date().toISOString() }])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch('/upashray-media', {
+      method: 'POST',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(mediaItem),
+    });
   },
 
   async upload(upashrayId, file, mediaType) {
@@ -535,46 +519,46 @@ export const upashrayMediaDB = {
     if (!upashrayId) throw new Error('Upashray ID is required.');
     if (!normalizedType) throw new Error('Media type is required.');
 
-    const fileUrl = await uploadWebPImage({
-      bucketName: 'upashray-media',
-      folderName: 'upashrays',
-      recordId: upashrayId,
-      file,
-      mediaType: normalizedType,
+    const webpBlob = await convertImageFileToWebP(file, { quality: 0.82 });
+    const safeFileName = sanitizeImageFileName(file.name || 'image');
+
+    const formData = new FormData();
+    formData.append('file', webpBlob, `${normalizedType}-${Date.now()}-${safeFileName}.webp`);
+    formData.append('upashray_id', upashrayId);
+    formData.append('media_type', normalizedType);
+    formData.append('alt_text', `${normalizedType} image`);
+    formData.append('sort_order', '0');
+
+    const token = getToken();
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+    const res = await fetch(`${API_BASE}/upashray-media`, {
+      method: 'POST',
+      headers,
+      body: formData,
     });
 
-    const { data, error } = await supabase
-      .from('upashray_media')
-      .insert([{
-        upashray_id: upashrayId,
-        media_type: normalizedType,
-        file_url: fileUrl,
-        alt_text: `${normalizedType} image`,
-        sort_order: 0,
-        created_at: new Date().toISOString()
-      }])
-      .select();
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || `Upload failed: HTTP ${res.status}`);
+    }
 
-    if (error) throw error;
-    return data?.[0];
+    return res.json();
   },
 
   async update(id, mediaItem) {
-    const { data, error } = await supabase
-      .from('upashray_media')
-      .update({ ...mediaItem, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch(`/upashray-media/${id}`, {
+      method: 'PUT',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(mediaItem),
+    });
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('upashray_media')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/upashray-media/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   }
 };
 
@@ -582,128 +566,75 @@ export const upashrayMediaDB = {
 
 export const siteSettingsDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('site_settings')
-      .select('*')
-      .order('updated_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/site-settings', { headers: buildHeaders(false, false) });
   },
 
   async getByKey(settingKey) {
-    const { data, error } = await supabase
-      .from('site_settings')
-      .select('*')
-      .eq('setting_key', settingKey)
-      .single();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
+    try {
+      return await apiFetch(`/site-settings/${settingKey}`, {
+        headers: buildHeaders(false, false),
+      });
+    } catch (err) {
+      if (err.message.includes('404')) return null;
+      throw err;
+    }
   },
 
   async upsert(settingKey, settingValue) {
-    const payload = {
-      setting_key: settingKey,
-      setting_value: settingValue,
-      updated_at: new Date().toISOString()
-    };
-
-    const { data, error } = await supabase
-      .from('site_settings')
-      .upsert([payload], { onConflict: 'setting_key' })
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch(`/site-settings/${settingKey}`, {
+      method: 'PUT',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify({ setting_value: settingValue }),
+    });
   },
 
   async delete(settingKey) {
-    const { error } = await supabase
-      .from('site_settings')
-      .delete()
-      .eq('setting_key', settingKey);
-    if (error) throw error;
+    await apiFetch(`/site-settings/${settingKey}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   }
 };
 
 // ============== ADMIN PROFILES ==============
+// Note: Admin users are now managed via admin_users table in MySQL.
+// These methods map to the auth system for compatibility.
 
 export const adminProfilesDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('admin_profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    // Not exposed via API — return empty array for compatibility
+    return [];
   },
 
   async getByUserId(userId) {
-    const { data, error } = await supabase
-      .from('admin_profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
+    return null;
   },
 
   async upsert(profile) {
-    const payload = {
-      ...profile,
-      updated_at: new Date().toISOString()
-    };
-
-    const { data, error } = await supabase
-      .from('admin_profiles')
-      .upsert([payload], { onConflict: 'user_id' })
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return profile;
   },
 
   async delete(userId) {
-    const { error } = await supabase
-      .from('admin_profiles')
-      .delete()
-      .eq('user_id', userId);
-    if (error) throw error;
+    // No-op
   }
 };
 
 // ============== AUDIT LOGS ==============
+// Audit logs not yet exposed via backend API — stub for compatibility
 
 export const auditLogsDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('audit_logs')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return [];
   },
 
   async getByEntity(entityType, entityId) {
-    let query = supabase
-      .from('audit_logs')
-      .select('*')
-      .eq('entity_type', entityType)
-      .order('created_at', { ascending: false });
-
-    if (entityId) {
-      query = query.eq('entity_id', String(entityId));
-    }
-
-    const { data, error } = await query;
-    if (error) throw error;
-    return data || [];
+    return [];
   },
 
   async create(logEntry) {
-    const { data, error } = await supabase
-      .from('audit_logs')
-      .insert([{ ...logEntry, created_at: new Date().toISOString() }])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    // Silently skip audit log writes (not yet implemented in backend)
+    console.log('[auditLogsDB] audit log (not saved):', logEntry);
+    return { ...logEntry, id: Date.now() };
   }
 };
 
@@ -711,71 +642,67 @@ export const auditLogsDB = {
 
 export const yatrikRegistrationsDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('yatrik_registrations')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/yatrik-registrations', { headers: buildHeaders(true, false) });
   },
 
   async getByYatraId(yatraId) {
-    const { data, error } = await supabase
-      .from('yatrik_registrations')
-      .select('*')
-      .eq('yatra_id', yatraId)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch(`/yatrik-registrations/yatra/${yatraId}`, {
+      headers: buildHeaders(false, false),
+    });
   },
 
   async create(registration) {
-    const { data, error } = await supabase
-      .from('yatrik_registrations')
-      .insert([{ ...registration, registration_source: registration.registration_source || 'online', created_at: new Date().toISOString() }])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    const payload = {
+      registrations: [{
+        ...registration,
+        registration_source: registration.registration_source || 'online',
+      }]
+    };
+    const result = await apiFetch('/yatrik-registrations', {
+      method: 'POST',
+      headers: buildHeaders(false, true),
+      body: JSON.stringify(payload),
+    });
+    // Backend returns { inserted: [{id, first_name, last_name}] }
+    return result?.inserted?.[0] || result;
   },
 
   async createMultiple(registrations) {
     const prepared = registrations.map(reg => ({
       ...reg,
       registration_source: reg.registration_source || 'online',
-      created_at: new Date().toISOString()
     }));
-    const { data, error } = await supabase
-      .from('yatrik_registrations')
-      .insert(prepared)
-      .select();
-    if (error) throw error;
-    return data || [];
+    const result = await apiFetch('/yatrik-registrations', {
+      method: 'POST',
+      headers: buildHeaders(false, true),
+      body: JSON.stringify({ registrations: prepared }),
+    });
+    return result?.inserted || [];
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('yatrik_registrations')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/yatrik-registrations/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   }
 };
 
 // ============== DEMO YATRIK REGISTRATIONS ==============
+// Demo registrations go to same table with a different source flag for now
 
 export const demoYatrikRegistrationsDB = {
   async createMultiple(registrations) {
     const prepared = registrations.map(reg => ({
       ...reg,
       registration_source: reg.registration_source || 'online',
-      created_at: new Date().toISOString()
     }));
-    const { data, error } = await supabase
-      .from('demo_yatrik_registrations')
-      .insert(prepared)
-      .select();
-    if (error) throw error;
-    return data || [];
+    const result = await apiFetch('/yatrik-registrations', {
+      method: 'POST',
+      headers: buildHeaders(false, true),
+      body: JSON.stringify({ registrations: prepared }),
+    });
+    return result?.inserted || [];
   }
 };
 
@@ -783,59 +710,38 @@ export const demoYatrikRegistrationsDB = {
 
 export const checkingReportsDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('checking_reports')
-      .select('*')
-      .order('report_date', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/checking-reports', { headers: buildHeaders(true, false) });
   },
 
   async getById(id) {
-    const { data, error } = await supabase
-      .from('checking_reports')
-      .select('*')
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    return data;
+    return apiFetch(`/checking-reports/${id}`, { headers: buildHeaders(true, false) });
   },
 
   async getByUpashrayId(upashrayId) {
-    const { data, error } = await supabase
-      .from('checking_reports')
-      .select('*')
-      .eq('upashray_id', upashrayId)
-      .order('report_date', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch(`/checking-reports?upashray_id=${upashrayId}`, {
+      headers: buildHeaders(true, false),
+    });
   },
 
   async getByJinalayaId(jinalayaId) {
-    const { data, error } = await supabase
-      .from('checking_reports')
-      .select('*')
-      .eq('jinalaya_id', jinalayaId)
-      .order('report_date', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch(`/checking-reports?jinalaya_id=${jinalayaId}`, {
+      headers: buildHeaders(true, false),
+    });
   },
 
   async create(report) {
-    const { data, error } = await supabase
-      .from('checking_reports')
-      .insert([{ ...report, created_at: new Date().toISOString() }])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch('/checking-reports', {
+      method: 'POST',
+      headers: buildHeaders(true, true),
+      body: JSON.stringify(report),
+    });
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('checking_reports')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/checking-reports/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   }
 };
 
@@ -843,28 +749,21 @@ export const checkingReportsDB = {
 
 export const contactMessagesDB = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('contact_messages')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+    return apiFetch('/contact-messages', { headers: buildHeaders(true, false) });
   },
 
   async create(message) {
-    const { data, error } = await supabase
-      .from('contact_messages')
-      .insert([{ ...message, created_at: new Date().toISOString() }])
-      .select();
-    if (error) throw error;
-    return data?.[0];
+    return apiFetch('/contact-messages', {
+      method: 'POST',
+      headers: buildHeaders(false, true),
+      body: JSON.stringify(message),
+    });
   },
 
   async delete(id) {
-    const { error } = await supabase
-      .from('contact_messages')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await apiFetch(`/contact-messages/${id}`, {
+      method: 'DELETE',
+      headers: buildHeaders(true, false),
+    });
   }
 };
