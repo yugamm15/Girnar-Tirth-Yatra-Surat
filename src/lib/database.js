@@ -7,9 +7,11 @@
 import { formatDateToISO } from '../utils/dateUtils.js';
 import { convertImageFileToWebP, sanitizeImageFileName } from '../utils/imageUtils.js';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001/api';
+let API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001/api';
+if (API_BASE && !API_BASE.endsWith('/api') && !API_BASE.endsWith('/api/')) {
+  API_BASE = API_BASE.replace(/\/$/, '') + '/api';
+}
 const DATABASE_CACHE_PREFIX = 'girnar_db_cache_v1';
-
 // ─── In-memory token cache (primary) + localStorage (persistence) ───
 // Using a module-level variable ensures the token is ALWAYS available
 // in the same session, even if localStorage has timing issues.
