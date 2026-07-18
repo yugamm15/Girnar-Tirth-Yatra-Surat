@@ -57,11 +57,33 @@ router.post('/', verifyToken, async (req, res) => {
 // PUT /api/sponsorship-schemes/:id (protected)
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const { title, description, amount, sort_order, is_active } = req.body;
+    const fields = [];
+    const params = [];
+
+    const allowedFields = [
+      'title', 'description', 'amount', 'sort_order', 'is_active'
+    ];
+
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        fields.push(`${key} = ?`);
+        if (key === 'is_active') {
+          params.push(req.body[key] ? 1 : 0);
+        } else {
+          params.push(req.body[key] === '' ? null : req.body[key]);
+        }
+      }
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({ error: 'No fields to update.' });
+    }
+
+    params.push(req.params.id);
 
     const [result] = await pool.execute(
-      'UPDATE sponsorship_schemes SET title = ?, description = ?, amount = ?, sort_order = ?, is_active = ? WHERE id = ?',
-      [title, description || null, amount || 0, sort_order || 0, is_active ? 1 : 0, req.params.id]
+      `UPDATE sponsorship_schemes SET ${fields.join(', ')} WHERE id = ?`,
+      params
     );
 
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Scheme not found.' });
@@ -69,6 +91,7 @@ router.put('/:id', verifyToken, async (req, res) => {
     const [updated] = await pool.execute('SELECT * FROM sponsorship_schemes WHERE id = ?', [req.params.id]);
     res.json(updated[0]);
   } catch (err) {
+    console.error('PUT /sponsorship-schemes/:id:', err);
     res.status(500).json({ error: err.message });
   }
 });

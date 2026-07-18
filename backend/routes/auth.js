@@ -20,34 +20,69 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
-    // Lookup admin from DB
-    const [rows] = await pool.execute(
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // 1. Lookup admin from DB
+    let [rows] = await pool.execute(
       'SELECT * FROM admin_users WHERE email = ? AND is_active = 1 LIMIT 1',
-      [email]
+      [normalizedEmail]
     );
 
-    if (rows.length === 0) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+    let user = null;
+    let role = null;
+
+    if (rows.length > 0) {
+      const admin = rows[0];
+      const isMatch = await bcrypt.compare(password, admin.password_hash);
+      if (isMatch) {
+        user = { id: admin.id, email: admin.email, role: admin.role, display_name: admin.display_name };
+        role = admin.role || 'admin';
+      }
     }
 
-    const admin = rows[0];
+    // 2. If not admin, lookup member from DB
+    if (!user) {
+      [rows] = await pool.execute(
+        'SELECT * FROM members WHERE email = ? LIMIT 1',
+        [normalizedEmail]
+      );
 
-    // Compare password
-    const isMatch = await bcrypt.compare(password, admin.password_hash);
-    if (!isMatch) {
+      if (rows.length > 0) {
+        const member = rows[0];
+        
+        // Support both plain text and bcrypt password storage for members
+        let isMatch = false;
+        if (member.password && member.password.startsWith('$2')) {
+          isMatch = await bcrypt.compare(password, member.password);
+        } else {
+          isMatch = (member.password === password);
+        }
+
+        if (isMatch) {
+          if (member.has_access) {
+            user = { id: member.id, email: member.email, role: 'member', display_name: member.name };
+            role = 'member';
+          } else {
+            return res.status(403).json({ error: 'Your account does not have access. Please contact Admin.' });
+          }
+        }
+      }
+    }
+
+    if (!user) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     // Sign JWT token (valid for 7 days)
     const token = jwt.sign(
-      { id: admin.id, email: admin.email, role: admin.role },
+      { id: user.id, email: user.email, role: role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
     res.json({
       token,
-      user: { id: admin.id, email: admin.email, role: admin.role, display_name: admin.display_name }
+      user
     });
 
   } catch (err) {

@@ -62,17 +62,33 @@ router.post('/', verifyToken, async (req, res) => {
 // ─── PUT /api/yatra-dates/:id ─── (protected)
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const { trip_date, description, image, registration_open, price_per_person, max_capacity } = req.body;
+    const fields = [];
+    const params = [];
+
+    const allowedFields = [
+      'trip_date', 'description', 'image', 'registration_open', 'price_per_person', 'max_capacity'
+    ];
+
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        fields.push(`${key} = ?`);
+        if (key === 'registration_open') {
+          params.push(req.body[key] ? 1 : 0);
+        } else {
+          params.push(req.body[key] === '' ? null : req.body[key]);
+        }
+      }
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({ error: 'No fields to update.' });
+    }
+
+    params.push(req.params.id);
 
     const [result] = await pool.execute(
-      `UPDATE yatra_dates SET trip_date = ?, description = ?, image = ?,
-        registration_open = ?, price_per_person = ?, max_capacity = ?
-       WHERE id = ?`,
-      [trip_date, description || null, image || null,
-       registration_open ? 1 : 0,
-       price_per_person || 900.00,
-       max_capacity || null,
-       req.params.id]
+      `UPDATE yatra_dates SET ${fields.join(', ')} WHERE id = ?`,
+      params
     );
 
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Yatra date not found.' });
@@ -80,6 +96,7 @@ router.put('/:id', verifyToken, async (req, res) => {
     const [updated] = await pool.execute('SELECT * FROM yatra_dates WHERE id = ?', [req.params.id]);
     res.json(updated[0]);
   } catch (err) {
+    console.error('PUT /yatra-dates/:id:', err);
     res.status(500).json({ error: err.message });
   }
 });

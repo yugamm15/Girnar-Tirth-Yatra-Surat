@@ -67,19 +67,32 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
-// ─── PUT /api/jinalayas/:id ─── (protected)
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const { name, village, route, mulnayak, location, description,
-            before_img, process_img, after_img, status } = req.body;
+    const fields = [];
+    const params = [];
+
+    const allowedFields = [
+      'name', 'village', 'route', 'mulnayak', 'location', 'description',
+      'before_img', 'process_img', 'after_img', 'status'
+    ];
+
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        fields.push(`${key} = ?`);
+        params.push(req.body[key] === '' ? null : req.body[key]);
+      }
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({ error: 'No fields to update.' });
+    }
+
+    params.push(req.params.id);
 
     const [result] = await pool.execute(
-      `UPDATE jinalayas SET name = ?, village = ?, route = ?, mulnayak = ?,
-        location = ?, description = ?, before_img = ?, process_img = ?,
-        after_img = ?, status = ? WHERE id = ?`,
-      [name, village || null, route || null, mulnayak || null, location || null,
-       description || null, before_img || null, process_img || null, after_img || null,
-       status || 'plan', req.params.id]
+      `UPDATE jinalayas SET ${fields.join(', ')} WHERE id = ?`,
+      params
     );
 
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Jinalaya not found.' });

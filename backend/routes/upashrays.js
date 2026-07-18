@@ -85,18 +85,30 @@ router.post('/', verifyToken, async (req, res) => {
 // ─── PUT /api/upashrays/:id ─── Update (protected)
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const { name, village, route, trusty, mobile, location, description,
-            before_img, process_img, after_img, status, slug } = req.body;
+    const fields = [];
+    const params = [];
+
+    const allowedFields = [
+      'name', 'village', 'route', 'trusty', 'mobile', 'location', 'description',
+      'before_img', 'process_img', 'after_img', 'status', 'slug'
+    ];
+
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        fields.push(`${key} = ?`);
+        params.push(req.body[key] === '' ? null : req.body[key]);
+      }
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({ error: 'No fields to update.' });
+    }
+
+    params.push(req.params.id);
 
     const [result] = await pool.execute(
-      `UPDATE upashrays SET
-        name = ?, village = ?, route = ?, trusty = ?, mobile = ?,
-        location = ?, description = ?, before_img = ?, process_img = ?,
-        after_img = ?, status = ?, slug = ?
-       WHERE id = ?`,
-      [name, village, route || null, trusty || null, mobile || null, location || null,
-       description || null, before_img || null, process_img || null, after_img || null,
-       status || 'plan', slug || null, req.params.id]
+      `UPDATE upashrays SET ${fields.join(', ')} WHERE id = ?`,
+      params
     );
 
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Upashray not found.' });

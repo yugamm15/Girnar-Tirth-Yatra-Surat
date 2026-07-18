@@ -61,11 +61,11 @@ const MemberModal = ({
               <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2 font-bold">Password</label>
               <input
                 type="text"
-                value={memberFormData.password}
+                value={memberFormData.password || ''}
                 onChange={(e) => setMemberFormData({ ...memberFormData, password: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-200 p-4 text-gray-900 text-sm focus:border-[#c5a059] outline-none transition-colors"
-                placeholder="Enter custom password"
-                required
+                placeholder={editingMemberId ? "Leave blank to keep current password" : "Enter custom password"}
+                required={!editingMemberId}
               />
             </div>
           </div>

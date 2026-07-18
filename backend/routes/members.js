@@ -77,11 +77,38 @@ router.post('/', verifyToken, async (req, res) => {
 // ─── PUT /api/members/:id ─── Update (protected)
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const { name, email, phone, code, has_access, password } = req.body;
+    const fields = [];
+    const params = [];
+
+    const allowedFields = [
+      'name', 'email', 'phone', 'code', 'has_access', 'password'
+    ];
+
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        // Skip updating password if it is empty string or null (meaning keep existing password)
+        if (key === 'password' && (req.body[key] === '' || req.body[key] === null)) {
+          continue;
+        }
+
+        fields.push(`${key} = ?`);
+        // Map boolean has_access to 1/0, and map empty strings to null except code/phone which can be null
+        if (key === 'has_access') {
+          params.push(req.body[key] ? 1 : 0);
+        } else {
+          params.push(req.body[key] === '' ? null : req.body[key]);
+        }
+      }
+    }
+    if (fields.length === 0) {
+      return res.status(400).json({ error: 'No fields to update.' });
+    }
+
+    params.push(req.params.id);
 
     const [result] = await pool.execute(
-      'UPDATE members SET name = ?, email = ?, phone = ?, code = ?, has_access = ?, password = ? WHERE id = ?',
-      [name, email, phone || null, code || null, has_access ? 1 : 0, password || null, req.params.id]
+      `UPDATE members SET ${fields.join(', ')} WHERE id = ?`,
+      params
     );
 
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Member not found.' });

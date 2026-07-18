@@ -612,29 +612,26 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       }
       return;
     }
-
     if (initialView === 'member') {
       try {
-        const memberRecord = await membersDB.getByEmail(normalizedEmail).catch(() => null);
-        if (memberRecord) {
-          if (memberRecord.has_access && password === memberRecord.password) {
-            setCurrentMemberId(memberRecord.id);
-            localStorage.setItem('auth_override', 'member');
-            localStorage.setItem('auth_member_id', memberRecord.id);
-            
-            setProcessingMessage('Loading your dashboard...');
-            await loadAllData();
-            
-            setView('member');
-            setError('');
-            navigate('/member/upashray-reports');
-          } else if (!memberRecord.has_access) {
-            setError('Your account does not have access. Please contact Admin.');
-          } else { setError('Member credentials are wrong'); }
-        } else { setError('Member not found or access not granted'); }
-      } catch (err) { 
-        console.error('Login error:', err);
-        setError('An error occurred during login'); 
+        const data = await authDB.login(normalizedEmail, password);
+        if (data && data.user && data.user.role === 'member') {
+          setCurrentMemberId(data.user.id);
+          localStorage.setItem('auth_override', 'member');
+          localStorage.setItem('auth_member_id', data.user.id);
+          
+          setProcessingMessage('Loading your dashboard...');
+          await loadAllData();
+          
+          setView('member');
+          setError('');
+          navigate('/member/upashray-reports');
+        } else {
+          setError('Logged in user is not a member');
+          authDB.clearSession();
+        }
+      } catch (err) {
+        setError(err.message || 'Member credentials are wrong');
       } finally {
         setIsProcessing(false);
       }
@@ -867,7 +864,12 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
       }
       resetMemberForm();
       pushToast(editingMemberId ? 'Member updated successfully.' : 'Member added successfully.', 'success');
-    } catch (err) { pushToast('Failed to save member', 'error'); } finally { setIsProcessing(false); }
+    } catch (err) {
+      console.error('Failed to save member:', err);
+      pushToast(err?.message || 'Failed to save member', 'error');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const startEditMember = (m) => {
