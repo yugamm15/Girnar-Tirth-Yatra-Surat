@@ -14,17 +14,17 @@ const PORT = process.env.PORT || 3001;
 // MIDDLEWARE
 // ─────────────────────────────────────────────────────────────
 
-// Allow frontend (Vite on :5173) to call this backend
+// Allow frontend to call this backend (local and Vercel production)
 app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
+    'https://girnar-tirth-yatra-group.vercel.app',
   ],
   methods:     ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
 }));
-
 app.use(express.json());                // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse form data
 
