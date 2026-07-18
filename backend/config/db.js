@@ -16,19 +16,17 @@ const pool = mysql.createPool({
   charset:            'utf8mb4',
 });
 
-// Test the connection on startup
+// Test the connection on startup (non-fatal check)
 async function testConnection() {
   try {
-    const conn = await pool.getConnection();
-    console.log('✅ MySQL connected successfully!');
-    console.log(`   Host: ${process.env.DB_HOST}:${process.env.DB_PORT}`);
-    console.log(`   Database: ${process.env.DB_NAME}`);
-    conn.release();
+     const conn = await pool.getConnection();
+     console.log('✅ MySQL connected successfully!');
+     console.log(`   Host: ${process.env.DB_HOST}:${process.env.DB_PORT}`);
+     console.log(`   Database: ${process.env.DB_NAME}`);
+     conn.release();
   } catch (err) {
-    console.error('❌ MySQL connection FAILED:', err.message);
-    console.error('   Check your DB_HOST, DB_USER, DB_PASSWORD, DB_NAME in backend/.env');
-    process.exit(1); // Stop the server if DB is not reachable
+     console.error('⚠️ MySQL connection check failed on startup:', err.message);
+     console.error('   The server will still run and retry connections dynamically.');
   }
 }
-
 module.exports = { pool, testConnection };
