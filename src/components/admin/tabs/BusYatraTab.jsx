@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 const BusYatraTab = ({
+  pushToast,
   yatraSearch,
   setYatraSearch,
   setEditingYatraDateId,
@@ -50,10 +51,13 @@ const BusYatraTab = ({
       await addOfflineRegistration(offlineFormData);
       setOfflineModalOpen(false);
     } catch (error) {
-      alert(error.message || 'Failed to add offline registration');
+      if (pushToast) {
+        pushToast(error.message || 'Failed to add offline registration', 'error');
+      } else {
+        console.error(error);
+      }
     }
   };
-
   const getSourceLabel = (registration) => (registration.registration_source === 'offline' ? 'Offline' : 'Online');
 
   return (

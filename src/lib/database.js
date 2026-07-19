@@ -7,7 +7,18 @@
 import { formatDateToISO } from '../utils/dateUtils.js';
 import { convertImageFileToWebP, sanitizeImageFileName } from '../utils/imageUtils.js';
 
-let API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001/api';
+let API_BASE = 'https://girnar-tirth-yatra-surat.onrender.com/api';
+
+// If running locally, connect to the local development server instead
+if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+  API_BASE = 'http://localhost:3001/api';
+}
+
+// Fallback to environment variable if explicitly defined
+if (import.meta.env.VITE_API_BASE) {
+  API_BASE = import.meta.env.VITE_API_BASE;
+}
+
 if (API_BASE && !API_BASE.endsWith('/api') && !API_BASE.endsWith('/api/')) {
   API_BASE = API_BASE.replace(/\/$/, '') + '/api';
 }
@@ -16,7 +27,6 @@ const DATABASE_CACHE_PREFIX = 'girnar_db_cache_v1';
 // Using a module-level variable ensures the token is ALWAYS available
 // in the same session, even if localStorage has timing issues.
 let _tokenCache = null;
-
 // Initialize from localStorage on module load
 try {
   _tokenCache = localStorage.getItem('girnar_admin_token') || null;

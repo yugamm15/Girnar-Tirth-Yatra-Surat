@@ -9,7 +9,7 @@ const defaultForm = {
   is_active: true,
 };
 
-const SponsorshipsTab = ({ yatraDates = [] }) => {
+const SponsorshipsTab = ({ yatraDates = [], pushToast }) => {
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -73,7 +73,9 @@ const SponsorshipsTab = ({ yatraDates = [] }) => {
       resetForm();
     } catch (error) {
       console.error('Failed to save sponsorship scheme:', error);
-      alert('Failed to save sponsorship scheme.');
+      if (pushToast) {
+        pushToast('Failed to save sponsorship scheme.', 'error');
+      }
     } finally {
       setSaving(false);
     }
@@ -89,13 +91,16 @@ const SponsorshipsTab = ({ yatraDates = [] }) => {
       if (editingId === scheme.id) resetForm();
     } catch (error) {
       console.error('Failed to delete sponsorship scheme:', error);
-      alert('Failed to delete sponsorship scheme.');
+      if (pushToast) {
+        pushToast('Failed to delete sponsorship scheme.', 'error');
+      }
     }
   };
-
-  const filteredSchemes = schemes.filter((scheme) =>
-    `${scheme.title || ''} ${scheme.description || ''}`.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredSchemes = schemes
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .filter((scheme) =>
+      `${scheme.title || ''} ${scheme.description || ''}`.toLowerCase().includes(search.toLowerCase())
+    );
 
   return (
     <div className="max-w-6xl mx-auto space-y-10">

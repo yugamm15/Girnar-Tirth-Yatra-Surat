@@ -1,11 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import SponsorshipsTab from './SponsorshipsTab';
-
-const SponsorPaymentsTab = ({ paymentIntents = [] }) => {
+const SponsorPaymentsTab = ({ paymentIntents = [], pushToast }) => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showSchemes, setShowSchemes] = useState(false);
-
   const filteredPayments = useMemo(() => {
     return paymentIntents.filter((intent) => {
       const searchable = [
@@ -62,10 +60,9 @@ const SponsorPaymentsTab = ({ paymentIntents = [] }) => {
               <p className="text-xs text-gray-500 mt-1">Create, edit, and delete scheme records from the same page.</p>
             </div>
           </div>
-          <SponsorshipsTab />
+          <SponsorshipsTab pushToast={pushToast} />
         </section>
       )}
-
       <div className="bg-white border border-gray-100 rounded-sm shadow-md p-6 md:p-8 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
         <div>
           <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-700">Quick Filters</h3>

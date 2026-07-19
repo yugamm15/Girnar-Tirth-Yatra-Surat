@@ -12,14 +12,15 @@ import YatraDateModal from './modals/YatraDateModal';
 import ReportDetailModal from './modals/ReportDetailModal';
 
 const AdminPanel = ({ 
-  activeTab, 
-  setActiveTab, 
+  pushToast,
+  activeTab,
+  setActiveTab,
   loadedData,
   loadMembers,
   loadJinalayas,
   loadReports,
   loadBusYatra,
-  loadPaymentIntents,
+  loadPaymentIntents,  
   isMobileMenuOpen, 
   setIsMobileMenuOpen, 
   handleLogout,
@@ -191,6 +192,7 @@ const AdminPanel = ({
         )}
         {activeTab === 'bus-yatra' && (
           <BusYatraTab 
+            pushToast={pushToast}
             yatraSearch={yatraSearch}
             setYatraSearch={setYatraSearch}
             setEditingYatraDateId={setEditingYatraDateId}
@@ -206,8 +208,7 @@ const AdminPanel = ({
             deleteRegistration={deleteRegistration}
             addOfflineRegistration={addOfflineRegistration}
           />
-        )}
-        {(activeTab === 'sponsorships' || activeTab === 'sponsor-payments') && (
+        )}        {(activeTab === 'sponsorships' || activeTab === 'sponsor-payments') && (
           <SponsorPaymentsTab paymentIntents={paymentIntents} />
         )}
         {activeTab === 'members' && (

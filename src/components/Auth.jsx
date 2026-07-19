@@ -1212,10 +1212,12 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     pushToast('Offline registration added successfully.', 'success');
     return savedRegistration;
   };
-
   const exportRegistrationsToCSV = () => {
     const filtered = busRegistrations.filter(reg => registrationYatraFilter === 'all' || String(reg.yatra_id) === String(registrationYatraFilter));
-    if (filtered.length === 0) { alert('No data to export'); return; }
+    if (filtered.length === 0) {
+      pushToast('No data to export', 'warning');
+      return;
+    }
     const headers = ['Yatra Date', 'First Name', 'Last Name', 'Phone', 'Alt Phone', 'Gender', 'Birthdate', 'Source', 'Remarks'];
     const rows = filtered.map(reg => {
       const yatraDate = yatraDates.find(d => String(d.id) === String(reg.yatra_id))?.date_text || 'Unknown';
@@ -1319,7 +1321,7 @@ export const AuthView = ({ onBack, initialView = 'login' }) => {
     return (
       <>
         <GlobalUX />
-        <AdminPanel 
+        <AdminPanel           pushToast={pushToast}
           activeTab={activeTab} setActiveTab={(tab) => navigate(`/admin/${tab}`)} loadedData={loadedData} loadMembers={loadMembers} loadJinalayas={loadJinalayas} loadReports={loadReports} loadBusYatra={loadBusYatra} loadPaymentIntents={loadPaymentIntents} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} handleLogout={handleLogout}
           upashrays={upashrays} upashraySearch={upashraySearch} setUpashraySearch={setUpashraySearch} setIsModalOpen={setIsModalOpen} startEdit={startEdit} deleteUpashray={deleteUpashray} isModalOpen={isModalOpen} resetForm={resetForm} editingId={editingId} formData={formData} setFormData={setFormData} handleSaveUpashray={handleSaveUpashray} handleMultipleFilesChange={handleMultipleFilesChange} removeMediaFile={removeMediaFile} deleteExistingMedia={deleteExistingMedia} deleteLegacyUpashrayMedia={deleteLegacyUpashrayMedia}
           yatraSearch={yatraSearch} setYatraSearch={setYatraSearch} setEditingYatraDateId={setEditingYatraDateId} setYatraDateFormData={setYatraDateFormData} setIsYatraDateModalOpen={setIsYatraDateModalOpen} yatraDates={yatraDates} busRegistrations={busRegistrations} toggleRegistrationStatus={toggleRegistrationStatus} deleteYatraDate={deleteYatraDate} registrationYatraFilter={registrationYatraFilter} setRegistrationYatraFilter={setRegistrationYatraFilter} exportRegistrationsToCSV={exportRegistrationsToCSV} deleteRegistration={deleteRegistration} addOfflineRegistration={addOfflineRegistration} isYatraDateModalOpen={isYatraDateModalOpen} editingYatraDateId={editingYatraDateId} yatraDateFormData={yatraDateFormData} handleYatraFileChange={handleYatraFileChange} handleYatraDateSubmit={handleYatraDateSubmit}

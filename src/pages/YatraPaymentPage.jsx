@@ -7,13 +7,20 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 import { siteCopy } from '../content/siteCopy.js';
 import { yatraDatesDB, yatrikRegistrationsDB, demoYatrikRegistrationsDB } from '../lib/database.js';
 import { sendTicketEmail } from '../utils/emailUtils.js';
-
+import ToastViewport from '../components/ToastViewport.jsx';
 const YatraPaymentPage = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [bookingInfo, setBookingInfo] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [toasts, setToasts] = useState([]);
 
+  const dismissToast = (id) => setToasts((prev) => prev.filter((t) => t.id !== id));
+  const pushToast = (message, type = 'info') => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setToasts((prev) => [...prev, { id, message, type }]);
+    window.setTimeout(() => dismissToast(id), 4000);
+  };
   useEffect(() => {
     const data = sessionStorage.getItem('pending_booking');
     if (!data) {
@@ -41,9 +48,8 @@ const YatraPaymentPage = () => {
     setIsProcessing(true);
 
     const res = await loadRazorpay();
-
     if (!res) {
-      alert('Razorpay SDK failed to load. Are you online?');
+      pushToast('Razorpay SDK failed to load. Are you online?', 'error');
       setIsProcessing(false);
       return;
     }
@@ -86,11 +92,10 @@ const YatraPaymentPage = () => {
       orderData = await orderRes.json();
     } catch (err) {
       console.error('Order creation failed:', err);
-      alert('Unable to initiate payment: ' + err.message);
+      pushToast('Unable to initiate payment: ' + err.message, 'error');
       setIsProcessing(false);
       return;
     }
-
     // Razorpay Options
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -119,22 +124,20 @@ const YatraPaymentPage = () => {
           });
           const verifyData = await verifyRes.json().catch(() => ({}));
           if (!verifyRes.ok || !verifyData.success) {
-            alert('Payment signature verification failed. Registration not saved.');
+            pushToast('Payment signature verification failed. Registration not saved.', 'error');
             setIsProcessing(false);
             return;
           }
-
           const [latestYatra, latestRegistrations] = await Promise.all([
             yatraDatesDB.getById(bookingInfo.yatraId),
             yatrikRegistrationsDB.getByYatraId(bookingInfo.yatraId),
           ]);
           const latestMaxCapacity = latestYatra?.max_capacity == null || latestYatra?.max_capacity === '' ? null : Number(latestYatra.max_capacity);
           if (Number.isFinite(latestMaxCapacity) && latestMaxCapacity > 0 && latestRegistrations.length + bookingInfo.yatricks.length > latestMaxCapacity) {
-            alert(`Sorry, max capacity reached. Please contact ${siteCopy.contactPage.info.phoneValue} for help.`);
+            pushToast(`Sorry, max capacity reached. Please contact ${siteCopy.contactPage.info.phoneValue} for help.`, 'error');
             setIsProcessing(false);
             return;
-          }
-          
+          }          
           // Prepare registrations for database
           const registrations = bookingInfo.yatricks.map(y => ({
             first_name: y.firstName,
@@ -167,7 +170,7 @@ const YatraPaymentPage = () => {
           });
         } catch (error) {
           console.error('Error saving registrations:', error);
-          alert('Payment was successful, but there was an error saving your registration. Please contact support with your Payment ID: ' + response.razorpay_payment_id);
+          pushToast('Payment was successful, but there was an error saving your registration. Please contact support with your Payment ID: ' + response.razorpay_payment_id, 'error');
           setIsProcessing(false);
         }
       },
@@ -192,12 +195,11 @@ const YatraPaymentPage = () => {
 
     const paymentObject = new window.Razorpay(options);
     paymentObject.on('payment.failed', function (response) {
-      alert('Payment Failed: ' + (response.error?.description || 'Unknown error'));
+      pushToast('Payment Failed: ' + (response.error?.description || 'Unknown error'), 'error');
       setIsProcessing(false);
     });
     paymentObject.open();
   };
-
   if (!bookingInfo) return <LightPageShell><TopLineLoader active label="Initializing payment..." /></LightPageShell>;
 
   return (
@@ -317,8 +319,8 @@ const YatraPaymentPage = () => {
           <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em]">Secure 256-bit SSL Encrypted Payment</p>
         </div>
       </div>
+      <ToastViewport toasts={toasts} onDismiss={dismissToast} />
     </LightPageShell>
   );
 };
-
 export default YatraPaymentPage;
