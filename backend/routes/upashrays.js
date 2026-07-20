@@ -31,6 +31,18 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ─── GET /api/upashrays/slug/:slug ─── Get by slug
+router.get('/slug/:slug', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM upashrays WHERE slug = ?', [req.params.slug]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Upashray not found.' });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('GET /upashrays/slug/:slug:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── GET /api/upashrays/:id ─── Get by ID
 router.get('/:id', async (req, res) => {
   try {
@@ -43,17 +55,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ─── GET /api/upashrays/slug/:slug ─── Get by slug
-router.get('/slug/:slug', async (req, res) => {
-  try {
-    const [rows] = await pool.execute('SELECT * FROM upashrays WHERE slug = ?', [req.params.slug]);
-    if (rows.length === 0) return res.status(404).json({ error: 'Upashray not found.' });
-    res.json(rows[0]);
-  } catch (err) {
-    console.error('GET /upashrays/slug/:slug:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // ─── POST /api/upashrays ─── Create (protected)
 router.post('/', verifyToken, async (req, res) => {

@@ -7,7 +7,8 @@
 import { formatDateToISO } from '../utils/dateUtils.js';
 import { convertImageFileToWebP, sanitizeImageFileName } from '../utils/imageUtils.js';
 
-let API_BASE = 'https://girnar-tirth-yatra-surat.onrender.com/api';
+export let API_BASE = 'https://girnar-tirth-yatra-surat.onrender.com/api';
+
 
 // If running locally, connect to the local development server instead
 if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {

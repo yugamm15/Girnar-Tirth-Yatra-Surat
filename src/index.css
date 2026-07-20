@@ -254,6 +254,12 @@ body.mobile-nav-open {
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(230, 195, 100, 0.15);
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.45);
+  isolation: isolate;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   position: relative;
   z-index: 1;
 }

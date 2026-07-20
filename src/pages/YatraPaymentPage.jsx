@@ -5,7 +5,7 @@ import SecureImage from '../components/SecureImage.jsx';
 import TopLineLoader from '../components/TopLineLoader.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { siteCopy } from '../content/siteCopy.js';
-import { yatraDatesDB, yatrikRegistrationsDB, demoYatrikRegistrationsDB } from '../lib/database.js';
+import { yatraDatesDB, yatrikRegistrationsDB, demoYatrikRegistrationsDB, API_BASE } from '../lib/database.js';
 import { sendTicketEmail } from '../utils/emailUtils.js';
 import ToastViewport from '../components/ToastViewport.jsx';
 const YatraPaymentPage = () => {
@@ -76,7 +76,7 @@ const YatraPaymentPage = () => {
     // Create order from backend
     let orderData;
     try {
-      const orderRes = await fetch('/api/create-order', {
+      const orderRes = await fetch(`${API_BASE}/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -113,7 +113,7 @@ const YatraPaymentPage = () => {
           setIsProcessing(true);
 
           // Verify Payment Signature on Backend
-          const verifyRes = await fetch('/api/verify-payment', {
+          const verifyRes = await fetch(`${API_BASE}/verify-payment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

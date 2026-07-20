@@ -65,16 +65,30 @@ router.post('/', async (req, res) => {
 // PUT /api/payment-intents/:id (protected)
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const { status, gateway_payment_id, admin_notes, refund_status,
-            refund_transaction_id, refund_notes } = req.body;
+    const fields = [];
+    const params = [];
+
+    const allowedFields = [
+      'status', 'gateway_payment_id', 'admin_notes', 'refund_status',
+      'refund_transaction_id', 'refund_notes'
+    ];
+
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        fields.push(`${key} = ?`);
+        params.push(req.body[key] === '' ? null : req.body[key]);
+      }
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({ error: 'No fields to update.' });
+    }
+
+    params.push(req.params.id);
 
     const [result] = await pool.execute(
-      `UPDATE payment_intents SET status = ?, gateway_payment_id = ?, admin_notes = ?,
-        refund_status = ?, refund_transaction_id = ?, refund_notes = ?
-       WHERE id = ?`,
-      [status, gateway_payment_id || null, admin_notes || null,
-       refund_status || 'not_requested', refund_transaction_id || null,
-       refund_notes || null, req.params.id]
+      `UPDATE payment_intents SET ${fields.join(', ')} WHERE id = ?`,
+      params
     );
 
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Payment intent not found.' });
@@ -85,6 +99,7 @@ router.put('/:id', verifyToken, async (req, res) => {
     if (typeof row.metadata === 'string') row.metadata = JSON.parse(row.metadata);
     res.json(row);
   } catch (err) {
+    console.error('PUT /payment-intents/:id:', err);
     res.status(500).json({ error: err.message });
   }
 });

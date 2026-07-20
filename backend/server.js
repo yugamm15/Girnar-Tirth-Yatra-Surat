@@ -52,6 +52,8 @@ app.use('/api/upashray-media',         require('./routes/upashrayMedia'));
 app.use('/api/site-settings',          require('./routes/siteSettings'));
 app.use('/api/checking-reports',       require('./routes/checkingReports'));
 app.use('/api/contact-messages',       require('./routes/contactMessages'));
+app.use('/api',                        require('./routes/razorpay'));
+
 
 // ─────────────────────────────────────────────────────────────
 // 404 — Unknown route

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { LightPageShell } from '../components/LightPageShell.jsx';
 import TopLineLoader from '../components/TopLineLoader.jsx';
 import ToastViewport from '../components/ToastViewport.jsx';
-import { sponsorshipSchemesDB, paymentIntentsDB, yatraDatesDB } from '../lib/database.js';
+import { sponsorshipSchemesDB, paymentIntentsDB, yatraDatesDB, API_BASE } from '../lib/database.js';
 import { siteCopy } from '../content/siteCopy.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatDateForDisplay, isFutureYatraTrip } from '../utils/dateUtils.js';
@@ -175,7 +175,7 @@ const MonthlyBusSponsorshipPage = () => {
 
     let orderData;
     try {
-      const orderRes = await fetch('/api/create-order', {
+      const orderRes = await fetch(`${API_BASE}/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -223,7 +223,7 @@ const MonthlyBusSponsorshipPage = () => {
       },
       handler: async (response) => {
         try {
-          const verifyRes = await fetch('/api/verify-payment', {
+          const verifyRes = await fetch(`${API_BASE}/verify-payment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
